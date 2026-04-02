@@ -27,7 +27,8 @@ test("unknown lab slug returns 404", async ({ page }) => {
 for (const path of ["/lab", "/lab/crowd-dashboard"]) {
   test(`axe has no serious issues on ${path}`, async ({ page }) => {
     await page.goto(path);
-    const results = await new AxeBuilder({ page }).analyze();
+    // The embedded demo is third-party content, so axe skips the iframe.
+    const results = await new AxeBuilder({ page }).exclude("iframe").analyze();
     expect(
       results.violations.filter((v) => ["serious", "critical"].includes(v.impact ?? "")),
     ).toEqual([]);
