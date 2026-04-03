@@ -1,0 +1,16 @@
+---
+title: Crowd dashboard
+slug: crowd-dashboard
+description: A live dashboard for counting people in a venue, running on demo data.
+kind: iframe
+url: https://crowdmonitoringdashboard.vercel.app
+thumbnail: /lab/crowd-dashboard.webp
+thumbnailAlt: Crowd dashboard with occupancy counters and a heatmap
+order: 1
+---
+
+The dashboard shows how many people are in a venue right now. It has live occupancy counters, a heatmap of busy areas and a short history of the day.
+
+When no backend is reachable, it falls back to bundled demo data. That is what you see here, so everything on the page is made up.
+
+It talks to any backend that follows its API contract, so the same dashboard can sit on top of different counting systems. The code is on [GitHub](https://github.com/MohammedAl-Alimi/crowd_monitoring_dashboard).
