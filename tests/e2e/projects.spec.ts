@@ -34,3 +34,8 @@ test("no horizontal scroll at 320px", async ({ page }) => {
   );
   expect(noOverflow).toBe(true);
 });
+
+test("projects page lists all seven projects", async ({ page }) => {
+  await page.goto("/projects");
+  await expect(page.getByTestId("project-grid").getByRole("link")).toHaveCount(7);
+});
