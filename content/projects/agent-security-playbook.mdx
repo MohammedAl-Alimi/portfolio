@@ -1,0 +1,58 @@
+---
+title: Agent security playbook
+slug: agent-security-playbook
+tagline: Security rules that AI coding agents can follow and check
+color: "#3BCEAC"
+shape: box
+tags: [security, agents]
+year: 2026
+role: Solo developer
+featured: true
+order: 3
+links:
+  repo: https://github.com/MohammedAl-Alimi/agent-security-playbook
+cover: /projects/agent-security-playbook/cover.webp
+coverAlt: Banner with a shield and check mark next to the title Agent Security Playbook on a dark blue background
+stack:
+  - Markdown
+  - Next.js
+  - Supabase
+  - Clerk
+  - Stripe
+---
+
+## Problem
+
+Apps written with AI agents often work in the demo but are not safe. The agent builds the feature and leaves out the security layer. A missing database rule. A missing ownership check. A webhook with no signature check.
+
+Reminders to "be secure" do not fix that. Leaving things out is the failure.
+
+## What I built
+
+An open-source playbook that an AI coding agent can read and follow. You point the agent at the repo, and it audits your project or builds your feature with the rules applied.
+
+It has 25 rule chapters, from authentication to deployment. It also has a threat model, three checklists, a research file with sources, and a rules file you can paste into your own project.
+
+## How it works
+
+Each rule is a short instruction that can be tested. It shows the wrong code next to the right code. It ends with a verify step, which is a test, a search or a CI check. If a rule breaks later, the build turns red.
+
+The entry point is a file of step by step instructions for the agent. It maps trust boundaries, applies the chapters that fit, and adds tests for each rule.
+
+A daily watch log tracks new incidents and CVEs that affect AI-built apps. An agent keeps it up to date.
+
+## Stack
+
+The playbook is Markdown. The code examples use Next.js, Supabase, Clerk and Stripe because they are common. The patterns apply to any stack.
+
+## Outcome
+
+The repo is public under the MIT licence. Every statistic and incident in it links to a source in the research file.
+
+It is the base for a second project of mine, a passive checker for public web apps.
+
+## What I learned
+
+Structure beats vigilance. A rule that a test can check is a rule that holds.
+
+Examples that agents can copy matter more than long prose. A wrong and right pair is what they match against.
