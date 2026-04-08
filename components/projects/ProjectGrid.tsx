@@ -13,7 +13,7 @@ export function ProjectGrid({ projects }: ProjectGridProps) {
     );
   }
   return (
-    <div data-testid="project-grid" className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div data-testid="project-grid" className="grid lg:grid-flow-dense gap-6 md:grid-cols-2 lg:grid-cols-3">
       {projects.map((project) => (
         <div
           key={project.frontmatter.slug}
