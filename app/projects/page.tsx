@@ -5,7 +5,10 @@ import { Section } from "@/components/ui/Section";
 import { getProjects } from "@/lib/content";
 import { filterProjects, parseTagParam } from "@/lib/filter";
 
-export const metadata: Metadata = { title: "Projects | Mohammed Al-Alimi" };
+export const metadata: Metadata = {
+  title: "Projects",
+  alternates: { canonical: "/projects" },
+};
 
 type ProjectsPageProps = {
   searchParams: Promise<{ tag?: string | string[] }>;
