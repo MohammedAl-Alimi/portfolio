@@ -3,7 +3,10 @@ import { LabCard } from "@/components/lab/LabCard";
 import { Section } from "@/components/ui/Section";
 import { getLabItems } from "@/lib/content";
 
-export const metadata: Metadata = { title: "Lab | Mohammed Al-Alimi" };
+export const metadata: Metadata = {
+  title: "Lab",
+  alternates: { canonical: "/lab" },
+};
 
 export default async function LabPage() {
   const items = (await getLabItems()).toSorted(

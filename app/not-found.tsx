@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/Button";
 import { Section } from "@/components/ui/Section";
 
 export const metadata: Metadata = {
-  title: "Page not found | Mohammed Al-Alimi",
+  title: "Page not found",
 };
 
 export default function NotFound() {

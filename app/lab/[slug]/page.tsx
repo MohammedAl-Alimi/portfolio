@@ -7,6 +7,7 @@ import { MdxBody } from "@/components/mdx/MdxBody";
 import { Button } from "@/components/ui/Button";
 import { Section } from "@/components/ui/Section";
 import { getLabItem, getLabItems } from "@/lib/content";
+import { SITE_NAME } from "@/lib/site";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -22,8 +23,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const item = await getLabItem(slug);
   if (!item) return {};
   const { title, description } = item.frontmatter;
-  const fullTitle = `${title} | Mohammed Al-Alimi`;
-  return { title: fullTitle, description, openGraph: { title: fullTitle, description } };
+  return {
+    title,
+    description,
+    alternates: { canonical: `/lab/${slug}` },
+    openGraph: { title, description, type: "website", siteName: SITE_NAME, locale: "en" },
+  };
 }
 
 export default async function LabItemPage({ params }: PageProps) {
