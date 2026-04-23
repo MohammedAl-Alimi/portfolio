@@ -6,12 +6,12 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 const shapes = [
-  { color: "#FFD23F", left: 760, top: 40, w: 220, radius: 110 },
-  { color: "#3BCEAC", left: 980, top: 150, w: 170, radius: 40 },
-  { color: "#F06595", left: 700, top: 270, w: 150, radius: 75 },
-  { color: "#A78BFA", left: 900, top: 350, w: 230, radius: 60 },
-  { color: "#FF8A3D", left: 1040, top: 20, w: 110, radius: 55 },
-  { color: "#5AA9FF", left: 760, top: 470, w: 120, radius: 30 },
+  { color: "#FFD23F", left: 740, top: 50, w: 200, radius: 100 },
+  { color: "#FF8A3D", left: 1000, top: 40, w: 120, radius: 60 },
+  { color: "#3BCEAC", left: 980, top: 190, w: 180, radius: 44 },
+  { color: "#F06595", left: 720, top: 290, w: 160, radius: 80 },
+  { color: "#A78BFA", left: 940, top: 400, w: 220, radius: 56 },
+  { color: "#5AA9FF", left: 740, top: 470, w: 130, radius: 32 },
 ];
 
 export async function generateImageMetadata() {
@@ -30,8 +30,6 @@ export default async function OpengraphImage() {
           display: "flex",
           position: "relative",
           flexDirection: "column",
-          justifyContent: "space-between",
-          padding: 80,
           backgroundColor: "#FFFBF5",
           color: "#1A1A1A",
         }}
@@ -51,13 +49,23 @@ export default async function OpengraphImage() {
             }}
           />
         ))}
-        <div style={{ display: "flex", flexDirection: "column", maxWidth: 700 }}>
-          <div style={{ fontSize: 96, fontWeight: 800, lineHeight: 1, letterSpacing: -2 }}>
-            {profile.name}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            width: 640,
+            height: "100%",
+            padding: 72,
+          }}
+        >
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <div style={{ fontSize: 88, fontWeight: 800, lineHeight: 1, letterSpacing: -2 }}>Mohammed</div>
+            <div style={{ fontSize: 88, fontWeight: 800, lineHeight: 1, letterSpacing: -2 }}>Al-Alimi</div>
+            <div style={{ fontSize: 32, marginTop: 24, maxWidth: 560 }}>{profile.headline}</div>
           </div>
-          <div style={{ fontSize: 40, marginTop: 32 }}>{profile.headline}</div>
+          <div style={{ fontSize: 32, fontWeight: 700 }}>mohammed</div>
         </div>
-        <div style={{ fontSize: 32, fontWeight: 700 }}>mohammed</div>
       </div>
     ),
     { ...size },
