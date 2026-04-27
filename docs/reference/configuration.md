@@ -32,8 +32,8 @@ Template: `.env.example`. Copy it to `.env.local` for local work. `.env` and `.e
 
 | Setting | Value | Location |
 | --- | --- | --- |
-| Server command | `npm run start` | `lighthouserc.json:3` |
-| Ready pattern | `Ready\|started server` | `lighthouserc.json:4` |
+| Server command | `npm run start` | `lighthouserc.json:4` |
+| Ready pattern | `Ready\|started server` | `lighthouserc.json:5` |
 | URLs | `/`, `/projects/crowd-detection`, `/lab` on `localhost:3000` | `lighthouserc.json:6` to `lighthouserc.json:10` |
 | Runs per URL | 3 | `lighthouserc.json:11` |
 | Upload target | `temporary-public-storage` | `lighthouserc.json:21` |
@@ -166,7 +166,7 @@ File: `.github/dependabot.yml`. Both ecosystems update weekly.
 | --- | --- | --- |
 | Triggers (CI) | Pull requests, and pushes to `main` | `.github/workflows/ci.yml:3` to `.github/workflows/ci.yml:6` |
 | Triggers (Lighthouse) | Pull requests | `.github/workflows/lighthouse.yml:3` to `.github/workflows/lighthouse.yml:4` |
-| Permissions | `contents: read` | `.github/workflows/ci.yml:8` |
+| Permissions | `contents: read` | `.github/workflows/ci.yml:9` |
 | Concurrency | One run per ref, older runs cancelled | `.github/workflows/ci.yml:11` to `.github/workflows/ci.yml:13` |
 | Node version | Taken from `.nvmrc` | `.github/workflows/ci.yml:22` |
 | Lighthouse timeout | 20 minutes | `.github/workflows/lighthouse.yml:13` |
