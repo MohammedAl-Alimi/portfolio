@@ -13,6 +13,7 @@ import {
   type ReactNode,
 } from "react";
 import { scrollToTop } from "@/lib/scroll";
+import { GlitchOverlay } from "./GlitchOverlay";
 
 /*
  * Page transitions (spec 18.6). One provider in the root layout runs a small
@@ -207,13 +208,7 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
   return (
     <TransitionContext.Provider value={value}>
       {children}
-      <div
-        aria-hidden="true"
-        data-transition=""
-        data-state={state}
-        className="fixed inset-0 z-[70] bg-bg"
-        style={{ opacity: state === "idle" ? 0 : 1, pointerEvents: state === "idle" ? "none" : "auto" }}
-      />
+      <GlitchOverlay state={state} ref={overlay} />
     </TransitionContext.Provider>
   );
 }
