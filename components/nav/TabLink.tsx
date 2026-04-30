@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { TransitionLink } from "@/components/motion/TransitionLink";
 import { cn } from "@/lib/cn";
 
 function isActive(href: string, pathname: string) {
@@ -21,13 +21,13 @@ export function TabLink({ href, className, activeClassName, children }: TabLinkP
   const pathname = usePathname();
   const active = isActive(href, pathname);
   return (
-    <Link
+    <TransitionLink
       href={href}
       aria-current={active ? "page" : undefined}
       data-active={active ? "true" : "false"}
       className={cn(className, active && activeClassName)}
     >
       {children}
-    </Link>
+    </TransitionLink>
   );
 }

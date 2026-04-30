@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { TransitionLink } from "@/components/motion/TransitionLink";
 import { cn } from "@/lib/cn";
 import { TAG_NAMES, type TagName } from "@/lib/schemas";
 
@@ -16,23 +16,23 @@ export function TagFilter({ active }: TagFilterProps) {
     <nav aria-label="Filter by tag">
       <ul className="flex flex-wrap gap-2">
         <li>
-          <Link
+          <TransitionLink
             href="/projects"
             aria-current={active === null ? "true" : undefined}
             className={chipClass(active === null)}
           >
             All
-          </Link>
+          </TransitionLink>
         </li>
         {TAG_NAMES.map((tag) => (
           <li key={tag}>
-            <Link
+            <TransitionLink
               href={`/projects?tag=${tag}`}
               aria-current={active === tag ? "true" : undefined}
               className={chipClass(active === tag)}
             >
               {tag}
-            </Link>
+            </TransitionLink>
           </li>
         ))}
       </ul>
