@@ -14,6 +14,7 @@ export interface SmoothScroller {
   readonly scroll: number;
   readonly limit: number;
   on(event: "scroll", callback: (scroller: SmoothScroller) => void): () => void;
+  scrollTo?(target: number, options?: { immediate?: boolean; force?: boolean }): void;
 }
 
 type Listener = (state: ScrollState) => void;
@@ -83,4 +84,10 @@ export function setSmoothScroller(next: SmoothScroller | null): void {
     if (scroller) detachScroller = scroller.on("scroll", emit);
     emit();
   }
+}
+
+/** Jumps to the top with no glide: through Lenis while it runs, natively otherwise. */
+export function scrollToTop(): void {
+  if (scroller?.scrollTo) scroller.scrollTo(0, { immediate: true, force: true });
+  else window.scrollTo(0, 0);
 }
