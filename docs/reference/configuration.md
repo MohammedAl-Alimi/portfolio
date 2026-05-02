@@ -182,6 +182,10 @@ Branch protection is a GitHub setting, not a file in the repository. The values 
 | Required pull request reviews | none |
 | Enforced for admins | no |
 
+## Scripts and CI jobs
+
+The npm script table and the CI job table are in [Project structure](project-structure.md#npm-scripts).
+
 ## Related
 
 - [Project structure](project-structure.md) for the script and CI job tables.
