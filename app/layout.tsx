@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { Footer } from "@/components/ui/Footer";
 import { Nav } from "@/components/ui/Nav";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
@@ -10,11 +11,12 @@ export const metadata: Metadata = {
   description: "Interactive portfolio of Mohammed Al-Alimi.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   return (
     <html
       lang="en"
@@ -28,7 +30,7 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <ThemeProvider>
+        <ThemeProvider nonce={nonce}>
           <Nav />
           <main id="main" tabIndex={-1} className="min-h-[60vh] outline-none">
             {children}
