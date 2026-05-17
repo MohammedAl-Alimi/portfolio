@@ -11,7 +11,7 @@ describe("NAV_ITEMS", () => {
       "Contact",
     ]);
   });
-  it("points Contact at the footer anchor", () => {
-    expect(NAV_ITEMS.find((i) => i.label === "Contact")?.href).toBe("/#contact");
+  it("points Contact at the footer anchor in place", () => {
+    expect(NAV_ITEMS.find((i) => i.label === "Contact")?.href).toBe("#contact");
   });
 });
