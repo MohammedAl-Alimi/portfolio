@@ -28,7 +28,18 @@ export function proxy(request: NextRequest) {
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   response.headers.set(
     "Permissions-Policy",
-    "camera=(), microphone=(), geolocation=(), accelerometer=(self), gyroscope=(self)",
+    [
+      "camera=()",
+      "microphone=()",
+      "geolocation=()",
+      "payment=()",
+      "usb=()",
+      "magnetometer=()",
+      "browsing-topics=()",
+      "interest-cohort=()",
+      "accelerometer=(self)",
+      "gyroscope=(self)",
+    ].join(", "),
   );
   response.headers.set("X-Frame-Options", "DENY");
   return response;
