@@ -9,6 +9,7 @@ import {
   getProfile,
   getProject,
   getProjects,
+  getSite,
   orderProjects,
   projectNumbers,
 } from "@/lib/content-core";
@@ -71,6 +72,18 @@ describe("lab, highlights and profile loaders", () => {
 
   it("throws a clear error for a missing profile", async () => {
     await expect(getProfile(emptyDir)).rejects.toThrow(/profile\.json/);
+  });
+});
+
+describe("site loader", () => {
+  it("loads the site copy", async () => {
+    const site = await getSite(fixturesDir);
+    expect(site.lab.title).toBe("Lab");
+    expect(site.footer.line).toContain("{year}");
+  });
+
+  it("throws a clear error for a missing site file", async () => {
+    await expect(getSite(emptyDir)).rejects.toThrow(/site\.json/);
   });
 });
 

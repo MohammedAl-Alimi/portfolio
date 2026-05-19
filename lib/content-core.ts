@@ -8,11 +8,13 @@ import {
   type LabFrontmatter,
   type Profile,
   type ProjectFrontmatter,
+  type Site,
   aboutFrontmatterSchema,
   highlightSchema,
   labFrontmatterSchema,
   profileSchema,
   projectFrontmatterSchema,
+  siteSchema,
 } from "./schemas";
 
 export type Project = { frontmatter: ProjectFrontmatter; body: string };
@@ -128,6 +130,10 @@ export async function getHighlights(dir: string = defaultDir()): Promise<Highlig
 
 export async function getProfile(dir: string = defaultDir()): Promise<Profile> {
   return readJson(path.join(dir, "profile.json"), profileSchema);
+}
+
+export async function getSite(dir: string = defaultDir()): Promise<Site> {
+  return readJson(path.join(dir, "site.json"), siteSchema);
 }
 
 export async function getAdjacentProjects(
