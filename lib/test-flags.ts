@@ -10,3 +10,12 @@ export function forceMotion(): boolean {
     process.env.NEXT_PUBLIC_E2E === "1" && new URLSearchParams(window.location.search).get("motion") === "force"
   );
 }
+
+/**
+ * `?tier=high`: CI's CPU renderer can probe the tier down to mid, which turns the
+ * crosshair cursor off. The flag pins the high tier (no probe) so its e2e is
+ * deterministic. Reduced motion still wins.
+ */
+export function forceHighTier(): boolean {
+  return process.env.NEXT_PUBLIC_E2E === "1" && new URLSearchParams(window.location.search).get("tier") === "high";
+}
