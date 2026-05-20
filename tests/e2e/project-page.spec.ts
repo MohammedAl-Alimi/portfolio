@@ -3,11 +3,39 @@ import { expectNoSeriousViolations } from "./helpers/axe";
 
 test("project page renders hero, sections and only the links present", async ({ page }) => {
   await page.goto("/projects/crowd-detection");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Crowd detection");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveAccessibleName("Crowd detection");
   await expect(page.getByRole("link", { name: "Repo" }).first()).toBeVisible();
   await expect(page.getByRole("link", { name: "Demo" }).first()).toBeVisible();
   await expect(page.getByRole("link", { name: "Live" })).toHaveCount(0);
   await expect(page.getByRole("heading", { level: 2, name: "Problem" })).toBeVisible();
+});
+
+test("the title is the exact text at load, then decodes or fades", async ({ page }) => {
+  await page.goto("/projects/crowd-detection");
+  const title = page.locator("h1#project-title");
+  // No waiting: the final text is the layout box from the first paint.
+  expect(await title.locator("[data-decode-glyphs]").textContent()).toBe("Crowd detection");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveAccessibleName("Crowd detection");
+  await expect(title).toHaveAttribute("data-decode", /^(done|fade)$/, { timeout: 3000 });
+  await expect(title.locator("[data-decode-glyphs]")).toHaveText("Crowd detection");
+});
+
+test("the hero is black and carries no project colour", async ({ page }) => {
+  await page.goto("/projects/crowd-detection");
+  const hero = page.locator("section[aria-labelledby='project-title']");
+  await expect(hero).toHaveCSS("background-color", "rgb(5, 5, 5)");
+  // crowd-detection's frontmatter colour is #FF6B35.
+  const projectColour = "rgb(255, 107, 53)";
+  const painted = await hero.evaluate((root, colour) => {
+    const all = [root, ...Array.from(root.querySelectorAll("*"))];
+    return all
+      .filter((el) => {
+        const s = getComputedStyle(el);
+        return [s.backgroundColor, s.color, s.borderTopColor].some((c) => c === colour);
+      })
+      .map((el) => el.tagName);
+  }, projectColour);
+  expect(painted).toEqual([]);
 });
 
 test("project page has an og image", async ({ page, request }) => {

@@ -1,6 +1,5 @@
-import { CountUp } from "@/components/motion/CountUp";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
+import { Brackets } from "@/components/ui/Brackets";
 import { Tag } from "@/components/ui/Tag";
 import type { Project } from "@/lib/content";
 import { projectLinks } from "@/lib/project-links";
@@ -10,23 +9,14 @@ function Label({ children }: { children: string }) {
 }
 
 export function ProjectMeta({ project }: { project: Project }) {
-  const { year, role, stack, tags, links } = project.frontmatter;
+  // Year and role are in the hero line above, so the panel starts at the stack.
+  const { stack, tags, links } = project.frontmatter;
   const present = projectLinks(links);
 
   return (
     <aside aria-label="Project details">
-      <Card className="p-6">
+      <Brackets hover={false} className="bg-surface border border-border p-6">
         <dl className="space-y-6">
-          <div>
-            <Label>Year</Label>
-            <dd>
-              <CountUp value={year} />
-            </dd>
-          </div>
-          <div>
-            <Label>Role</Label>
-            <dd>{role}</dd>
-          </div>
           <div>
             <Label>Stack</Label>
             <dd className="flex flex-wrap gap-2">
@@ -57,7 +47,7 @@ export function ProjectMeta({ project }: { project: Project }) {
             ))}
           </ul>
         ) : null}
-      </Card>
+      </Brackets>
     </aside>
   );
 }
