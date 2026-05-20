@@ -28,3 +28,25 @@ test("404 page has no horizontal scroll at 320px", async ({ page }) => {
   );
   expect(noOverflow).toBe(true);
 });
+
+test("404 figure starts as static and reassembles on click", async ({ page }) => {
+  await page.goto("/definitely-not-a-page");
+  const field = page.locator("[data-static-field]");
+  await expect(field).toHaveAttribute("data-state", "scattered");
+  const button = page.getByRole("button", { name: "Reassemble the figure" });
+  await expect(button).toHaveAttribute("aria-pressed", "false");
+  await button.click();
+  await expect(button).toHaveAttribute("aria-pressed", "true");
+  // Polls until the points have landed (900 ms with a canvas, at once without one).
+  await expect(field).toHaveAttribute("data-state", "whole", { timeout: 3000 });
+  await button.click();
+  await expect(field).toHaveAttribute("data-state", "scattered");
+});
+
+test("404 figure reassembles from the keyboard", async ({ page }) => {
+  await page.goto("/definitely-not-a-page");
+  const button = page.getByRole("button", { name: "Reassemble the figure" });
+  await button.focus();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("[data-static-field]")).toHaveAttribute("data-state", "whole", { timeout: 3000 });
+});
