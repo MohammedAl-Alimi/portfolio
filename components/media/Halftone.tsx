@@ -25,41 +25,44 @@ interface Props {
 /**
  * A cover image as a two-tone ordered dither. The base is the real image in greyscale;
  * a small canvas on top holds one pixel per 2 by 2 CSS px cell, scaled up without smoothing.
+ * The dither is drawn from the rendered image once it has loaded, so the cover downloads once.
  * The canvas stays hidden until it has drawn, so a failed load or a missing 2D context
  * leaves the grey image. The low tier skips the canvas.
  */
 export function Halftone({ src, alt = "", sizes, className, resolve = "hover" }: Props) {
   const box = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
+  const image = useRef<HTMLImageElement>(null);
   const tier = useSceneStore((s) => s.tier);
   const enabled = tier !== null && tier !== "low";
 
   useEffect(() => {
     const el = box.current;
     const cv = canvas.current;
-    if (!enabled || !el || !cv) return;
+    const img = image.current;
+    if (!enabled || !el || !cv || !img) return;
     const ctx = cv.getContext("2d", { willReadFrequently: true });
     if (!ctx) return;
 
-    let source: HTMLImageElement | null = null;
+    let near = false;
     let raf = 0;
     let drawnW = 0;
     let drawnH = 0;
-    let cancelled = false;
 
     const draw = () => {
       raf = 0;
-      if (!source) return;
+      // Draws from the image next/image already loaded (same origin), so nothing downloads twice.
+      if (!near || !img.complete || img.naturalWidth === 0) return;
       const w = Math.ceil(el.clientWidth / CELL);
       const h = Math.ceil(el.clientHeight / CELL);
       if (w === 0 || h === 0 || (w === drawnW && h === drawnH)) return;
       cv.width = w;
       cv.height = h;
       // Crop like object-cover, so the dither lines up with the image under it.
-      const scale = Math.max(w / source.naturalWidth, h / source.naturalHeight);
+      const scale = Math.max(w / img.naturalWidth, h / img.naturalHeight);
       const sw = w / scale;
       const sh = h / scale;
-      ctx.drawImage(source, (source.naturalWidth - sw) / 2, (source.naturalHeight - sh) / 2, sw, sh, 0, 0, w, h);
+      ctx.drawImage(img, (img.naturalWidth - sw) / 2, (img.naturalHeight - sh) / 2, sw, sh, 0, 0, w, h);
       let frame: ImageData;
       try {
         frame = ctx.getImageData(0, 0, w, h);
@@ -86,29 +89,30 @@ export function Halftone({ src, alt = "", sizes, className, resolve = "hover" }:
     const schedule = () => {
       if (!raf) raf = requestAnimationFrame(draw);
     };
+    // A new load (first load, or a larger srcset candidate) redraws even at the same size.
+    const onLoad = () => {
+      drawnW = 0;
+      drawnH = 0;
+      schedule();
+    };
+    img.addEventListener("load", onLoad);
     const ro = new ResizeObserver(schedule);
+    ro.observe(el);
 
-    // Nothing loads until the box is close to the viewport.
+    // No dither work until the box is close to the viewport.
     const io = new IntersectionObserver(
       ([entry]) => {
         if (!entry?.isIntersecting) return;
         io.disconnect();
-        const img = document.createElement("img");
-        img.decoding = "async";
-        img.onload = () => {
-          if (cancelled) return;
-          source = img;
-          ro.observe(el);
-          schedule();
-        };
-        img.src = src;
+        near = true;
+        schedule();
       },
       { rootMargin: "200px" },
     );
     io.observe(el);
 
     return () => {
-      cancelled = true;
+      img.removeEventListener("load", onLoad);
       io.disconnect();
       ro.disconnect();
       cancelAnimationFrame(raf);
@@ -118,7 +122,7 @@ export function Halftone({ src, alt = "", sizes, className, resolve = "hover" }:
 
   return (
     <div ref={box} className={cn("relative overflow-hidden", className)}>
-      <Image src={src} alt={alt} fill sizes={sizes} className="object-cover grayscale" />
+      <Image ref={image} src={src} alt={alt} fill sizes={sizes} className="object-cover grayscale" />
       {tier === "low" ? null : (
         <canvas
           ref={canvas}
