@@ -23,9 +23,9 @@ Complete reference for the CSS variables, Tailwind names, fonts and overlays tha
 | `--muted` | `#808086` | `text-muted` | `app/globals.css:30` |
 | `--text` | `#f2f2f0` | `text-text` | `app/globals.css:31` |
 | `--glow` | `#ffffff` | `text-glow`, `border-glow` | `app/globals.css:32` |
-| `--accent-1` to `--accent-6` | old palette, unused by pages | `bg-accent-1` to `bg-accent-6` | `app/globals.css:34` to `app/globals.css:39` |
+| `--accent-1` to `--accent-6` | old palette, unused by pages | `bg-accent-1` to `bg-accent-6` | `app/globals.css:36` to `app/globals.css:41` |
 
-The accents stay only because the pixel storm and the lab still read them (`app/globals.css:33`). They go when those are rebuilt.
+Nothing reads the accents any more: the pixel storm is gone and the lab draws in monochrome. The comment above them (`app/globals.css:35`) keeps page components off them until they are removed.
 
 ### Muted contrast
 
