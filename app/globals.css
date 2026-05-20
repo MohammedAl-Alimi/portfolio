@@ -59,6 +59,42 @@ body {
   line-height: 1.6;
 }
 
+/* Crosshair cursor (components/motion/Crosshair.tsx). While it runs the native
+   cursor hides everywhere except text fields, which keep their caret cursor.
+   The rail's coordinate readout shows only while it runs. */
+html[data-cursor="custom"] *:not(input):not(textarea):not(select):not([contenteditable="true"]) {
+  cursor: none;
+}
+
+html:not([data-cursor="custom"]) [data-cursor-readout] {
+  display: none;
+}
+
+[data-cursor-root][data-state="hidden"] {
+  opacity: 0;
+}
+
+/* Corner brackets: folded away while the crosshair shows, sprung onto the
+   target's rect (120 ms, slight overshoot) in the brackets state. */
+[data-cursor-corner] {
+  opacity: 0;
+  transition:
+    transform 120ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 120ms linear;
+}
+
+[data-cursor-root][data-state="brackets"] [data-cursor-corner] {
+  opacity: 1;
+}
+
+[data-cursor-cross] {
+  transition: opacity 120ms linear;
+}
+
+[data-cursor-root][data-state="brackets"] [data-cursor-cross] {
+  opacity: 0;
+}
+
 html[data-tier="mid"] [data-overlay-scanlines],
 html[data-tier="mid"] [data-overlay-grain] {
   display: none;

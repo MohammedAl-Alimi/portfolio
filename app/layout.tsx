@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
+import { Crosshair } from "@/components/motion/Crosshair";
 import { SmoothScroll } from "@/components/motion/SmoothScroll";
 import { TransitionProvider } from "@/components/motion/TransitionProvider";
 import { Rail } from "@/components/nav/Rail";
@@ -54,6 +55,7 @@ export default async function RootLayout({
             <Footer />
           </div>
           <Overlays />
+          <Crosshair />
         </TransitionProvider>
       </body>
     </html>

@@ -50,6 +50,14 @@ export function Rail() {
           <RailSearchIcon />
         </button>
         <div aria-hidden="true" className="h-px w-8 bg-border" />
+        {/* Written by components/motion/Crosshair.tsx; shown only while the crosshair runs. */}
+        <span
+          aria-hidden="true"
+          data-cursor-readout
+          className="w-[6ch] text-center font-mono text-[10px] tabular-nums text-muted"
+        >
+          X 0000 Y 0000
+        </span>
         <ScrollReadout />
       </div>
     </nav>
