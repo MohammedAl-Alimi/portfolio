@@ -82,7 +82,7 @@ Both fonts load through `next/font/google`, which downloads them at build time a
 
 The body is mono, so `font-sans` and `font-mono` resolve to the same face. Both variable classes are added to `<html>` in `app/layout.tsx:33`.
 
-Small labels use `font-mono uppercase tracking-[0.12em]`: tags (`components/ui/Tag.tsx:11`), nav links (`components/ui/NavLinks.tsx:26`), the footer line (`components/ui/Footer.tsx:26`), card year (`components/projects/ProjectCard.tsx:57`), project meta labels (`components/projects/ProjectMeta.tsx:8`) and the hero hint (`components/home/HeroHint.tsx:46`, `components/home/HeroHint.tsx:58`).
+Small labels use `font-mono uppercase tracking-[0.12em]`: tags (`components/ui/Tag.tsx:11`), nav links (`components/ui/NavLinks.tsx:26`), the footer line (`components/ui/Footer.tsx:26`), card index and year (`components/projects/ProjectCard.tsx:38`, `components/projects/ProjectCard.tsx:58`), project meta labels (`components/projects/ProjectMeta.tsx:8`) and the hero hint (`components/home/HeroHint.tsx:46`, `components/home/HeroHint.tsx:58`).
 
 ## Overlays
 

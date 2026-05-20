@@ -31,7 +31,7 @@ test.describe("scroll motion", () => {
     await page.goto("/");
     const t = await tier(page);
     if (t !== "low") {
-      await expect(page.locator("canvas")).toHaveCount(1);
+      await expect(page.locator("canvas:not([data-halftone])")).toHaveCount(1);
       await page.waitForFunction(() => Boolean((window as unknown as { __figure?: Probe }).__figure));
       expect(await orbit(page)).toBe(0);
       // Smooth scrolling runs on capable tiers only.
@@ -125,7 +125,7 @@ test.describe("scroll motion", () => {
     await page.goto("/");
     expect(await tier(page)).toBe("low");
     await expect(page.locator("html")).not.toHaveClass(/\blenis\b/);
-    await expect(page.locator("canvas")).toHaveCount(0);
+    await expect(page.locator("canvas:not([data-halftone])")).toHaveCount(0);
     expect(await orbit(page)).toBeNull();
 
     expect(await tickerTransform(page)).toBe("none");

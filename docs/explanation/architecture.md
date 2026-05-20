@@ -96,7 +96,7 @@ The plan, from `docs/superpowers/specs/2026-10-31-portfolio-design.md` (section 
 - The result is that a shape can travel from the home cluster into a project hero without a reload.
 - Static HTML and the poster must render without any of it, so low end devices and reduced motion users get the same layout.
 
-The slots already exist as marker attributes: `data-hero-slot` (`components/home/Hero.tsx:29`), `data-project-shape-slot` (`components/projects/ProjectHero.tsx:18`), `data-notfound-shape-slot` (`app/not-found.tsx:13`) and `data-lab-slot` (`app/lab/[slug]/page.tsx:44`). The rule "never add a second canvas" is written in `CLAUDE.md` under "Architecture guardrails".
+The slots already exist as marker attributes: `data-hero-slot` (`components/home/Hero.tsx:29`), `data-project-shape-slot` (`components/projects/ProjectHero.tsx:18`), `data-notfound-shape-slot` (`components/three/StaticField.tsx:64`) and `data-lab-slot` (`app/lab/[slug]/page.tsx:44`). The rule "never add a second canvas" is written in `CLAUDE.md` under "Architecture guardrails".
 
 ## Why a nonce CSP in proxy.ts, and what it costs
 
@@ -114,7 +114,7 @@ The same proxy shapes local runs: on plain `http://localhost` it drops `upgrade-
 
 A project card shows an image, a title, a tagline, tags and a year. The whole card should be clickable, but wrapping everything in one anchor gives screen readers a very long link name, and it blocks any other interactive element inside.
 
-`ProjectCard` uses a stretched link instead. The title is the only link. A pseudo element on it covers the whole card (`components/projects/ProjectCard.tsx:42`), and the card is `relative` so the cover stays inside it (`components/projects/ProjectCard.tsx:20`). The cover image has empty alt text because it is decorative (`components/projects/ProjectCard.tsx:26`). A keyboard user gets one tab stop with a clear name, and `focus-within` draws the outline around the card.
+`ProjectCard` uses a stretched link instead. The title is the only link. A pseudo element on it covers the whole card (`components/projects/ProjectCard.tsx:46`), and the card is `relative` so the cover stays inside it (`components/projects/ProjectCard.tsx:25`). The cover image has empty alt text because it is decorative (`components/media/Halftone.tsx:31`). A keyboard user gets one tab stop with a clear name, and `focus-within` draws the outline around the card.
 
 Simple cards with only text, such as the "What I build" cards, use the plain `Card` with an `href`, which wraps the card in a link (`components/ui/Card.tsx:36`).
 

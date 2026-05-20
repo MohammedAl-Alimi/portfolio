@@ -28,15 +28,16 @@ portfolio/
 | `app/page.tsx` | Home: hero, what I build, featured projects, highlights, Person JSON-LD. | `generateMetadata`, default `Home` |
 | `app/projects/page.tsx` | Project grid with the `?tag=` filter (`app/projects/page.tsx:18`). | `metadata`, default `ProjectsPage` |
 | `app/projects/[slug]/page.tsx` | Project case study. Unknown slugs 404 (`app/projects/[slug]/page.tsx:13`). | `dynamicParams`, `generateStaticParams`, `generateMetadata`, default `ProjectPage` |
-| `app/projects/[slug]/opengraph-image.tsx` | Open Graph image per project, 1200 by 630 (`app/projects/[slug]/opengraph-image.tsx:6`). | `size`, `contentType`, `generateStaticParams`, `generateImageMetadata`, default |
+| `app/projects/[slug]/opengraph-image.tsx` | Open Graph image per project, drawn with the shared frame from `lib/og.tsx`. | `size`, `contentType`, `generateStaticParams`, `generateImageMetadata`, default |
 | `app/about/page.tsx` | About page from `content/about.mdx`. | `metadata`, default `AboutPage` |
 | `app/lab/page.tsx` | Lab index sorted by `order`. | `metadata`, default `LabPage` |
 | `app/lab/[slug]/page.tsx` | Lab item: iframe or registered component (`app/lab/[slug]/page.tsx:45`). | `dynamicParams`, `generateStaticParams`, `generateMetadata`, default `LabItemPage` |
 | `app/cv/route.ts` | `GET /cv` permanently redirects to `/cv.pdf` (`app/cv/route.ts:4`). | `GET` |
 | `app/sitemap.ts` | Sitemap from the content loaders. | default `sitemap` |
 | `app/robots.ts` | Robots rules and sitemap link. | default `robots` |
-| `app/opengraph-image.tsx` | Default Open Graph image. | `size`, `contentType`, `generateImageMetadata`, default |
-| `app/not-found.tsx` | 404 page. | `metadata`, default `NotFound` |
+| `app/opengraph-image.tsx` | Default Open Graph image, drawn with the shared frame from `lib/og.tsx`. | `size`, `contentType`, `generateImageMetadata`, default |
+| `app/not-found.tsx` | 404 page. Renders `StaticField`, the figure as static that reassembles on click. | `metadata`, default `NotFound` |
+| `app/fonts/og/` | Static Syne ExtraBold and JetBrains Mono Regular TTFs for the Open Graph images, with their SIL OFL 1.1 licences. Read at build by `ogFonts` (`lib/og.tsx:17`). | none |
 | `app/error.tsx` | Route error boundary. Shows only the error digest (`app/error.tsx:33`). | default `ErrorPage` |
 | `app/global-error.tsx` | Last resort boundary that replaces the root layout (`app/global-error.tsx:28`). | default `GlobalError` |
 
@@ -46,7 +47,8 @@ portfolio/
 | --- | --- | --- |
 | `components/ui/` | `Brackets`, `Button`, `Card`, `Container`, `Footer`, `icons`, `MobileMenu`, `Nav`, `NavLinks`, `Overlays`, `Section`, `Skeleton`, `Tag`, `Wordmark` | Shared building blocks and site chrome. `Nav` is a server component (`components/ui/Nav.tsx:8`). `Overlays` draws the scanline, grain and vignette layers (`components/ui/Overlays.tsx`). |
 | `components/home/` | `FeaturedProjects`, `Hero`, `HeroPoster`, `WhatIBuild` | Home sections. `HeroPoster` shows the static poster image (`components/home/HeroPoster.tsx:6`). |
-| `components/projects/` | `AdjacentProjects`, `ProjectBody`, `ProjectCard`, `ProjectGrid`, `ProjectHero`, `ProjectMeta`, `TagFilter` | Project list and case study pieces. `ProjectCard` holds the stretched link (`components/projects/ProjectCard.tsx:40`). |
+| `components/projects/` | `AdjacentProjects`, `ProjectBody`, `ProjectCard`, `ProjectGrid`, `ProjectHero`, `ProjectMeta`, `TagFilter` | Project list and case study pieces. `ProjectCard` holds the stretched link (`components/projects/ProjectCard.tsx:46`). |
+| `components/media/` | `Halftone` | Cover images as a two-tone Bayer dither on a canvas over the greyscale image (`components/media/Halftone.tsx:31`). |
 | `components/about/` | `Timeline` | About timeline list. |
 | `components/lab/` | `ComponentSlot`, `HowItWorks`, `LabCard`, `LabFrame`, `registry` | Lab cards, sandboxed iframe (`components/lab/LabFrame.tsx:8`), and the registry of in-page experiments (`components/lab/registry.ts:4`). |
 | `components/mdx/` | `components`, `MdxBody` | MDX rendering with link and image rules. `isSafeHref` is at `components/mdx/components.tsx:7`. |
@@ -57,14 +59,15 @@ portfolio/
 | File | Responsibility | Exports |
 | --- | --- | --- |
 | `lib/schemas.ts` | Zod schemas and enumerations for all content. See [Content schema](content-schema.md). | `SHAPE_NAMES`, `TAG_NAMES`, `projectFrontmatterSchema`, `labFrontmatterSchema`, `highlightSchema`, `profileSchema`, `aboutFrontmatterSchema`, types |
-| `lib/content-core.ts` | Reads and validates content from disk. | `getProjects`, `getProject`, `getLabItems`, `getLabItem`, `getHighlights`, `getProfile`, `getAdjacentProjects`, `getAbout` |
+| `lib/content-core.ts` | Reads and validates content from disk. | `getProjects`, `getProject`, `orderProjects`, `projectNumbers`, `getLabItems`, `getLabItem`, `getHighlights`, `getProfile`, `getAdjacentProjects`, `getAbout` |
 | `lib/content.ts` | Re-exports the loaders behind `server-only` (`lib/content.ts:1`). | everything from `content-core` |
 | `lib/csp.ts` | Builds the Content Security Policy string. | `buildCsp` |
 | `lib/lab-origins.ts` | Allowlist of iframe origins. | `LAB_FRAME_ORIGINS`, `isAllowedLabOrigin` |
 | `lib/site.ts` | Site origin and name. | `SITE_URL`, `SITE_NAME` |
 | `lib/nav.ts` | Navigation items. | `NAV_ITEMS`, `NavLabel` |
 | `lib/filter.ts` | Tag query parsing and project filtering. | `parseTagParam`, `filterProjects` |
-| `lib/color.ts` | Picks readable text on a hex background. | `contrastText` |
+| `lib/halftone.ts` | Pure Bayer 4 by 4 dither helpers for `Halftone`. | `BAYER4`, `bayerThreshold`, `luminance`, `ditherPixel` |
+| `lib/og.tsx` | Fonts and the monochrome frame shared by both Open Graph images (server only). | `OG_SIZE`, `ogFonts`, `OgFrame` |
 | `lib/project-links.ts` | Turns the `links` object into labelled links. | `projectLinks`, `ProjectLink` |
 | `lib/fonts.ts` | Google fonts through `next/font`. | `display`, `sans` |
 | `lib/cn.ts` | Class name merge helper. | `cn` |

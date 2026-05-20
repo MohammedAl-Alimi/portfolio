@@ -30,6 +30,8 @@ test("home og image resolves to a png", async ({ page, request }) => {
   const res = await request.get(new URL(og as string).pathname);
   expect(res.status()).toBe(200);
   expect(res.headers()["content-type"]).toContain("image/png");
+  // A blank image is far smaller than this.
+  expect((await res.body()).byteLength).toBeGreaterThan(10 * 1024);
 });
 
 test("project page has a canonical link", async ({ page }) => {

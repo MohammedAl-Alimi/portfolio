@@ -2,9 +2,13 @@ import { cn } from "@/lib/cn";
 import type { Project } from "@/lib/content";
 import { ProjectCard } from "./ProjectCard";
 
-type ProjectGridProps = { projects: Project[] };
+type ProjectGridProps = {
+  projects: Project[];
+  /** Card numbers for the full list, from projectNumbers(), so a filter keeps the numbers. */
+  numbers: Map<string, number>;
+};
 
-export function ProjectGrid({ projects }: ProjectGridProps) {
+export function ProjectGrid({ projects, numbers }: ProjectGridProps) {
   if (projects.length === 0) {
     return (
       <p role="status" className="text-muted">
@@ -19,7 +23,12 @@ export function ProjectGrid({ projects }: ProjectGridProps) {
           key={project.frontmatter.slug}
           className={cn("min-w-0", project.frontmatter.featured && "lg:col-span-2")}
         >
-          <ProjectCard project={project} size={project.frontmatter.featured ? "lg" : "md"} />
+          <ProjectCard
+            project={project}
+            index={numbers.get(project.frontmatter.slug) ?? 0}
+            total={numbers.size}
+            size={project.frontmatter.featured ? "lg" : "md"}
+          />
         </div>
       ))}
     </div>

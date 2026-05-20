@@ -14,7 +14,7 @@ async function probe(page: Page): Promise<FigureProbe | null> {
 }
 
 async function waitForFigure(page: Page) {
-  await expect(page.locator("canvas")).toHaveCount(1);
+  await expect(page.locator("canvas:not([data-halftone])")).toHaveCount(1);
   await expect(page.locator("[data-hero-slot] [data-poster]")).toHaveCSS("opacity", "0", { timeout: 6000 });
   await page.waitForFunction(() => Boolean((window as unknown as { __figure?: FigureProbe }).__figure));
 }
@@ -123,7 +123,7 @@ test.describe("hero figure", () => {
     const missing = page.waitForResponse((r) => r.url().includes("/figure/missing.bin"));
     await page.goto("/?figure=missing");
     expect((await missing).status()).toBe(404);
-    await expect(page.locator("canvas")).toHaveCount(1);
+    await expect(page.locator("canvas:not([data-halftone])")).toHaveCount(1);
     await page.waitForTimeout(1500);
     const poster = page.locator("[data-hero-slot] [data-poster]");
     await expect(poster).toHaveCSS("opacity", "1");
@@ -140,7 +140,7 @@ test.describe("hero figure", () => {
     const poster = page.locator("[data-hero-slot] [data-poster]");
     await expect(poster).toHaveCSS("opacity", "1");
     await expect(poster.locator("img")).toHaveAttribute("src", /figure/);
-    await expect(page.locator("canvas")).toHaveCount(0);
+    await expect(page.locator("canvas:not([data-halftone])")).toHaveCount(0);
     const glyphs = decodedName(page).locator("[data-decode-glyphs]");
     await expect(glyphs).toHaveText(NAME);
     await expect(glyphs).toHaveCSS("opacity", "1");

@@ -40,3 +40,38 @@ test("projects page lists every project", async ({ page }) => {
   await page.goto("/projects");
   await expect(page.getByTestId("project-grid").getByRole("link")).toHaveCount(allProjects().length);
 });
+
+test("cards number themselves in the grid order, even when filtered", async ({ page }) => {
+  const projects = allProjects();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const position = (slug: string) =>
+    projects.toSorted((a, b) => b.year - a.year || a.order - b.order).findIndex((p) => p.slug === slug) + 1;
+  const card = (title: string) =>
+    page.locator("[data-project-card]").filter({ has: page.getByRole("link", { name: title, exact: true }) });
+
+  // The first card in the unfiltered grid is 01.
+  await page.goto("/projects");
+  await expect(page.locator("[data-project-card] [data-project-index]").first()).toHaveText(
+    `01 / ${pad(projects.length)}`,
+  );
+  for (const url of ["/projects", "/projects?tag=ai"]) {
+    await page.goto(url);
+    const crowd = projects.find((p) => p.slug === "crowd-detection")!;
+    await expect(card(crowd.title).locator("[data-project-index]")).toHaveText(
+      `${pad(position(crowd.slug))} / ${pad(projects.length)}`,
+    );
+  }
+});
+
+test("card covers are greyscale, with the dither on top once drawn", async ({ page }) => {
+  await page.goto("/projects");
+  const first = page.locator("[data-project-card]").first();
+  await expect(first.locator("img")).toHaveCSS("filter", "grayscale(1)");
+  await expect(page.locator("html")).toHaveAttribute("data-tier", /high|mid|low/);
+  // The low tier (no WebGL) shows the grey image only.
+  if ((await page.locator("html").getAttribute("data-tier")) === "low") {
+    await expect(first.locator("[data-halftone]")).toHaveCount(0);
+  } else {
+    await expect(first.locator("[data-halftone]")).toHaveAttribute("data-ready", "");
+  }
+});
