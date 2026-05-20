@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
 import { ImageResponse } from "next/og";
-import { contrastText } from "@/lib/color";
-import { getProject, getProjects } from "@/lib/content";
+import { getProfile, getProject, getProjects } from "@/lib/content";
+import { OG_SIZE, OgFrame, ogFonts } from "@/lib/og";
 
-export const size = { width: 1200, height: 630 };
+export const size = OG_SIZE;
 export const contentType = "image/png";
 
 export async function generateStaticParams() {
@@ -20,32 +20,13 @@ export async function generateImageMetadata({ params }: { params: Promise<{ slug
 
 export default async function OpengraphImage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const project = await getProject(slug);
+  const [project, profile] = await Promise.all([getProject(slug), getProfile()]);
   if (!project) notFound();
-  const { title, tagline, color } = project.frontmatter;
-  const text = contrastText(color);
+  const { title, tagline } = project.frontmatter;
+  const [first = profile.name] = profile.name.split(" ");
 
-  return new ImageResponse(
-    (
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          padding: 80,
-          backgroundColor: color,
-          color: text,
-        }}
-      >
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ fontSize: 96, fontWeight: 800, lineHeight: 1, letterSpacing: -2 }}>{title}</div>
-          <div style={{ fontSize: 36, marginTop: 32, maxWidth: 900 }}>{tagline}</div>
-        </div>
-        <div style={{ fontSize: 32, fontWeight: 700 }}>mohammed</div>
-      </div>
-    ),
-    { ...size },
-  );
+  return new ImageResponse(<OgFrame title={[title]} subtitle={tagline} wordmark={first} />, {
+    ...size,
+    fonts: await ogFonts(),
+  });
 }

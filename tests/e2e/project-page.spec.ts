@@ -45,6 +45,8 @@ test("project page has an og image", async ({ page, request }) => {
   const res = await request.get(new URL(og as string).pathname);
   expect(res.status()).toBe(200);
   expect(res.headers()["content-type"]).toContain("image/png");
+  // A blank image is far smaller than this.
+  expect((await res.body()).byteLength).toBeGreaterThan(10 * 1024);
 });
 
 test("unknown project returns 404", async ({ page }) => {
