@@ -59,7 +59,7 @@ portfolio/
 | File | Responsibility | Exports |
 | --- | --- | --- |
 | `lib/schemas.ts` | Zod schemas and enumerations for all content. See [Content schema](content-schema.md). | `SHAPE_NAMES`, `TAG_NAMES`, `projectFrontmatterSchema`, `labFrontmatterSchema`, `highlightSchema`, `profileSchema`, `aboutFrontmatterSchema`, types |
-| `lib/content-core.ts` | Reads and validates content from disk. | `getProjects`, `getProject`, `getLabItems`, `getLabItem`, `getHighlights`, `getProfile`, `getAdjacentProjects`, `getAbout` |
+| `lib/content-core.ts` | Reads and validates content from disk. | `getProjects`, `getProject`, `orderProjects`, `projectNumbers`, `getLabItems`, `getLabItem`, `getHighlights`, `getProfile`, `getAdjacentProjects`, `getAbout` |
 | `lib/content.ts` | Re-exports the loaders behind `server-only` (`lib/content.ts:1`). | everything from `content-core` |
 | `lib/csp.ts` | Builds the Content Security Policy string. | `buildCsp` |
 | `lib/lab-origins.ts` | Allowlist of iframe origins. | `LAB_FRAME_ORIGINS`, `isAllowedLabOrigin` |

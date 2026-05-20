@@ -41,14 +41,19 @@ test("projects page lists every project", async ({ page }) => {
   await expect(page.getByTestId("project-grid").getByRole("link")).toHaveCount(allProjects().length);
 });
 
-test("cards number themselves by order, even when filtered", async ({ page }) => {
+test("cards number themselves in the grid order, even when filtered", async ({ page }) => {
   const projects = allProjects();
   const pad = (n: number) => String(n).padStart(2, "0");
   const position = (slug: string) =>
-    projects.toSorted((a, b) => a.order - b.order || b.year - a.year).findIndex((p) => p.slug === slug) + 1;
+    projects.toSorted((a, b) => b.year - a.year || a.order - b.order).findIndex((p) => p.slug === slug) + 1;
   const card = (title: string) =>
     page.locator("[data-project-card]").filter({ has: page.getByRole("link", { name: title, exact: true }) });
 
+  // The first card in the unfiltered grid is 01.
+  await page.goto("/projects");
+  await expect(page.locator("[data-project-card] [data-project-index]").first()).toHaveText(
+    `01 / ${pad(projects.length)}`,
+  );
   for (const url of ["/projects", "/projects?tag=ai"]) {
     await page.goto(url);
     const crowd = projects.find((p) => p.slug === "crowd-detection")!;

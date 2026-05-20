@@ -89,11 +89,17 @@ export async function getProjects(dir: string = defaultDir()): Promise<Project[]
   );
 }
 
-export function sortProjectsByYear(projects: Project[]): Project[] {
+/** The order visitors see on /projects: newest year first, then `order`. Card numbers follow it too. */
+export function orderProjects(projects: Project[]): Project[] {
   return projects.toSorted(
     (a, b) =>
       b.frontmatter.year - a.frontmatter.year || a.frontmatter.order - b.frontmatter.order,
   );
+}
+
+/** 1-based card number per slug, in `orderProjects` order. Pass the full list, so filters keep the numbers. */
+export function projectNumbers(projects: Project[]): Map<string, number> {
+  return new Map(orderProjects(projects).map((p, i) => [p.frontmatter.slug, i + 1]));
 }
 
 export async function getProject(slug: string, dir?: string): Promise<Project | null> {

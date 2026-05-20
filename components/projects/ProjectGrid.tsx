@@ -4,11 +4,11 @@ import { ProjectCard } from "./ProjectCard";
 
 type ProjectGridProps = {
   projects: Project[];
-  /** Every slug, ordered by `order`. Cards number themselves from it, so a filter keeps the numbers. */
-  order: string[];
+  /** Card numbers for the full list, from projectNumbers(), so a filter keeps the numbers. */
+  numbers: Map<string, number>;
 };
 
-export function ProjectGrid({ projects, order }: ProjectGridProps) {
+export function ProjectGrid({ projects, numbers }: ProjectGridProps) {
   if (projects.length === 0) {
     return (
       <p role="status" className="text-muted">
@@ -25,8 +25,8 @@ export function ProjectGrid({ projects, order }: ProjectGridProps) {
         >
           <ProjectCard
             project={project}
-            index={order.indexOf(project.frontmatter.slug) + 1}
-            total={order.length}
+            index={numbers.get(project.frontmatter.slug) ?? 0}
+            total={numbers.size}
             size={project.frontmatter.featured ? "lg" : "md"}
           />
         </div>

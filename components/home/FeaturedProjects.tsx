@@ -1,11 +1,12 @@
 import { ProjectCard } from "@/components/projects/ProjectCard";
 import { Section } from "@/components/ui/Section";
-import type { Project } from "@/lib/content";
+import { projectNumbers, type Project } from "@/lib/content";
 
-/** `projects` is the full list from getProjects(), ordered by `order`; cards number from it. */
+/** `projects` is the full list from getProjects(); cards number from it like the /projects grid. */
 export function FeaturedProjects({ projects }: { projects: Project[] }) {
   const featured = projects.filter((p) => p.frontmatter.featured);
   if (featured.length === 0) return null;
+  const numbers = projectNumbers(projects);
 
   return (
     <Section title="Featured projects" decodeTitle>
@@ -17,7 +18,7 @@ export function FeaturedProjects({ projects }: { projects: Project[] }) {
         >
           {featured.map((project) => (
             <div key={project.frontmatter.slug} className="w-[85vw] shrink-0 snap-start md:w-[520px]">
-              <ProjectCard project={project} index={projects.indexOf(project) + 1} total={projects.length} size="lg" />
+              <ProjectCard project={project} index={numbers.get(project.frontmatter.slug) ?? 0} total={numbers.size} size="lg" />
             </div>
           ))}
         </div>
