@@ -4,15 +4,16 @@ import { OrthographicCamera } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { BufferAttribute, BufferGeometry, type ShaderMaterial } from "three";
-import type { Figure } from "@/lib/figure";
+import { loadFigure, type Figure } from "@/lib/figure";
 import { figureZoom, pointScaleFor } from "@/lib/figure-fx";
 import { mulberry32 } from "@/lib/rng";
 import { useSceneStore } from "@/lib/scene-store";
-import type { SlotSize } from "@/lib/use-slot";
+import { useSlot, type SlotSize } from "@/lib/use-slot";
 import { useMarkReady } from "./ready";
 
 const SCATTER_SEED = 404;
 const DEPTH = 0.5;
+const COUNT = 30000;
 
 // position: the figure. aScatter: a random spot in the slot. uMix 0 is static, 1 the whole figure.
 // Point size follows lib/figure-fx pointSizePx: 1.5 to 3.5 CSS px from luminance.
@@ -117,4 +118,36 @@ export function StaticFieldCloud({ figure, size, whole, durationMs }: Props) {
       </points>
     </>
   );
+}
+
+interface SceneProps {
+  /** CSS selector of the slot the view fills. */
+  slot: string;
+  whole: boolean;
+  durationMs: number;
+  /** Called with true once the figure has loaded, false if it fails. */
+  onFigure: (loaded: boolean) => void;
+}
+
+/** Loads the figure and measures the slot, then draws the cloud. Lives here so the page chunk stays small. */
+export function StaticFieldScene({ slot, whole, durationMs, onFigure }: SceneProps) {
+  const { size } = useSlot(slot);
+  const [figure, setFigure] = useState<Figure | null>(null);
+
+  useEffect(() => {
+    const ctrl = new AbortController();
+    // A failed load gives null: the poster stays and the click still flips the state.
+    void loadFigure("/figure/bust.bin", { count: COUNT, signal: ctrl.signal }).then((fig) => {
+      if (ctrl.signal.aborted) return;
+      setFigure(fig);
+      onFigure(fig !== null);
+    });
+    return () => {
+      ctrl.abort();
+      onFigure(false);
+    };
+  }, [onFigure]);
+
+  if (!figure || !size || size.width === 0) return null;
+  return <StaticFieldCloud figure={figure} size={size} whole={whole} durationMs={durationMs} />;
 }

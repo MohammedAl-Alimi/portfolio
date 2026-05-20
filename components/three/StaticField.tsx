@@ -1,21 +1,18 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
-import { loadFigure, type Figure } from "@/lib/figure";
 import { useSceneActive, useSceneStore } from "@/lib/scene-store";
-import { useSlot } from "@/lib/use-slot";
 import { ViewSlot } from "./ViewSlot";
 
-// three.js loads only when a canvas is active, never with the page.
-const StaticFieldCloud = dynamic(() => import("./StaticFieldCloud").then((m) => m.StaticFieldCloud), {
+// The figure loader, slot measuring and three.js load only when a canvas is active. The root
+// not-found is in every route's client manifest, so this file keeps to the button and the poster.
+const StaticFieldScene = dynamic(() => import("./StaticFieldCloud").then((m) => m.StaticFieldScene), {
   ssr: false,
 });
 
 const SLOT = "[data-static-field]";
-const COUNT = 30000;
 const REASSEMBLE_MS = 900;
 
 type FieldState = "scattered" | "whole";
@@ -27,20 +24,11 @@ type FieldState = "scattered" | "whole";
 export function StaticField() {
   const active = useSceneActive();
   const reducedMotion = useSceneStore((s) => s.reducedMotion);
-  const { size } = useSlot(SLOT);
-  const [figure, setFigure] = useState<Figure | null>(null);
+  // True once the scene has its figure; a failed load leaves it false and the poster path runs.
+  const [drawing, setDrawing] = useState(false);
   const [whole, setWhole] = useState(false);
   const [state, setState] = useState<FieldState>("scattered");
   const timer = useRef(0);
-
-  useEffect(() => {
-    if (!active) return;
-    const ctrl = new AbortController();
-    void loadFigure("/figure/bust.bin", { count: COUNT, signal: ctrl.signal }).then((fig) => {
-      if (!ctrl.signal.aborted) setFigure(fig);
-    });
-    return () => ctrl.abort();
-  }, [active]);
 
   useEffect(() => () => window.clearTimeout(timer.current), []);
 
@@ -48,7 +36,7 @@ export function StaticField() {
     const next = !whole;
     setWhole(next);
     window.clearTimeout(timer.current);
-    const animated = active && figure !== null && !reducedMotion;
+    const animated = active && drawing && !reducedMotion;
     // "whole" only once the points have landed; scattering starts at once.
     if (next && animated) {
       timer.current = window.setTimeout(() => setState("whole"), REASSEMBLE_MS);
@@ -67,19 +55,18 @@ export function StaticField() {
       <ViewSlot
         className="h-full w-full"
         poster={
-          <Image
-            src="/posters/figure.webp"
-            alt=""
-            fill
-            sizes="224px"
+          // A CSS background, not next/image: this file ships on every route (see above),
+          // and the 35 KB poster needs no resizing at 224 px.
+          <div
+            data-static-poster
             className={cn(
-              "object-cover grayscale motion-safe:transition-[opacity,filter] motion-safe:duration-[900ms]",
+              "absolute inset-0 bg-[url(/posters/figure.webp)] bg-cover bg-center grayscale motion-safe:transition-[opacity,filter] motion-safe:duration-[900ms]",
               whole ? "opacity-100" : "opacity-40 blur-[2px]",
             )}
           />
         }
       >
-        {figure && size && size.width > 0 ? <StaticFieldCloud figure={figure} size={size} whole={whole} durationMs={REASSEMBLE_MS} /> : null}
+        <StaticFieldScene slot={SLOT} whole={whole} durationMs={REASSEMBLE_MS} onFigure={setDrawing} />
       </ViewSlot>
       <button
         type="button"
