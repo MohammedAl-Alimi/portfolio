@@ -13,6 +13,12 @@ const nextConfig: NextConfig = {
   htmlLimitedBots: /.*/,
   // Always inlined, so production builds drop the e2e-only scene probe (window.__figure).
   env: { NEXT_PUBLIC_E2E: process.env.NEXT_PUBLIC_E2E === "1" ? "1" : "0" },
+  // lib/og.tsx reads the Open Graph fonts with fs. Both images prerender, but if one ever
+  // renders at request time the TTFs must be in its function bundle.
+  outputFileTracingIncludes: {
+    "/opengraph-image/*": ["./app/fonts/og/**"],
+    "/projects/*/opengraph-image/*": ["./app/fonts/og/**"],
+  },
   // The proxy skips static files, so send the baseline headers here too.
   async headers() {
     return [
