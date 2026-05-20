@@ -27,6 +27,8 @@ const OUTSET = 4;
 const ARM = 10;
 /** The native cursor shows over these, so the crosshair hides. */
 const FIELD = 'input, textarea, select, [contenteditable="true"]';
+/** The route-transition overlay takes the pointer while it covers the page. */
+const TRANSITION = "[data-transition]";
 
 function subscribe(onChange: () => void) {
   const mq = window.matchMedia(QUERY);
@@ -74,7 +76,7 @@ function ActiveCrosshair() {
   const reset = useRef<() => void>(() => {});
   const pathname = usePathname();
 
-  // A route change drops any bracket target: the page under the pointer is new.
+  // A route change re-checks the bracket target: the page under the pointer is new.
   useEffect(() => reset.current(), [pathname]);
 
   useEffect(() => {
@@ -82,10 +84,10 @@ function ActiveCrosshair() {
     if (!el) return;
     const html = document.documentElement;
     const readout = document.querySelector<HTMLElement>("[data-cursor-readout]");
-    html.dataset.cursor = "custom";
 
     let x = 0;
     let y = 0;
+    // Nothing shows, and the native cursor stays, until the first move gives a position.
     let visible = false;
     let overField = false;
     let target: Element | null = null;
@@ -104,6 +106,7 @@ function ActiveCrosshair() {
       if (target && !target.isConnected) target = null;
       const state: CursorState = !visible || overField ? "hidden" : target ? "brackets" : "cross";
       if (el.dataset.state !== state) el.dataset.state = state;
+      if (visible && html.dataset.cursor !== "custom") html.dataset.cursor = "custom";
       if (state === "brackets" && target) {
         const r = target.getBoundingClientRect();
         place(r.left + r.width / 2, r.top + r.height / 2, r.width / 2 + OUTSET, r.height / 2 + OUTSET);
@@ -116,28 +119,40 @@ function ActiveCrosshair() {
       if (!frame) frame = requestAnimationFrame(render);
     };
 
+    // Touch and pen input on a hybrid device keep the native behaviour.
     const onMove = (e: PointerEvent) => {
-      if (e.pointerType === "touch") return;
+      if (e.pointerType !== "mouse") return;
       x = e.clientX;
       y = e.clientY;
       visible = true;
       schedule();
     };
-    const onOver = (e: PointerEvent) => {
-      const hovered = e.target instanceof Element ? e.target : null;
+    const resolve = (hovered: Element | null) => {
       overField = hovered?.closest(FIELD) != null;
       target = overField ? null : (hovered?.closest(TARGET) ?? null);
       schedule();
     };
+    const onOver = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse") return;
+      const hovered = e.target instanceof Element ? e.target : null;
+      // The transition overlay only passes over: keep the target under it.
+      if (hovered?.closest(TRANSITION)) return;
+      resolve(hovered);
+    };
     // No related target: the pointer left the window or went into an iframe.
     const onOut = (e: PointerEvent) => {
-      if (e.relatedTarget) return;
+      if (e.pointerType !== "mouse" || e.relatedTarget) return;
       visible = false;
       schedule();
     };
 
+    // After a route change, look again at what is under the resting pointer
+    // (a persistent rail link keeps its brackets), skipping the transition overlay.
     reset.current = () => {
       target = null;
+      if (visible) {
+        resolve(document.elementsFromPoint(x, y).find((node) => !node.closest(TRANSITION)) ?? null);
+      }
       schedule();
     };
     const unsubscribeScroll = subscribeScroll(() => {
