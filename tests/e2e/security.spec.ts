@@ -78,6 +78,6 @@ test("the canvas mounts with no csp violation", async ({ page }, testInfo) => {
   });
   page.on("pageerror", (e) => violations.push(e.message));
   await page.goto("/");
-  await expect(page.locator("canvas")).toHaveCount(1);
+  await expect(page.locator("canvas:not([data-halftone])")).toHaveCount(1);
   expect(violations).toEqual([]);
 });

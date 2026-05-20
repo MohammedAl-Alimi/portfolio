@@ -2,9 +2,13 @@ import { cn } from "@/lib/cn";
 import type { Project } from "@/lib/content";
 import { ProjectCard } from "./ProjectCard";
 
-type ProjectGridProps = { projects: Project[] };
+type ProjectGridProps = {
+  projects: Project[];
+  /** Every slug, ordered by `order`. Cards number themselves from it, so a filter keeps the numbers. */
+  order: string[];
+};
 
-export function ProjectGrid({ projects }: ProjectGridProps) {
+export function ProjectGrid({ projects, order }: ProjectGridProps) {
   if (projects.length === 0) {
     return (
       <p role="status" className="text-muted">
@@ -19,7 +23,12 @@ export function ProjectGrid({ projects }: ProjectGridProps) {
           key={project.frontmatter.slug}
           className={cn("min-w-0", project.frontmatter.featured && "lg:col-span-2")}
         >
-          <ProjectCard project={project} size={project.frontmatter.featured ? "lg" : "md"} />
+          <ProjectCard
+            project={project}
+            index={order.indexOf(project.frontmatter.slug) + 1}
+            total={order.length}
+            size={project.frontmatter.featured ? "lg" : "md"}
+          />
         </div>
       ))}
     </div>

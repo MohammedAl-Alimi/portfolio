@@ -1,5 +1,5 @@
-import Image from "next/image";
 import { CountUp } from "@/components/motion/CountUp";
+import { Halftone } from "@/components/media/Halftone";
 import { TransitionLink } from "@/components/motion/TransitionLink";
 import { Card } from "@/components/ui/Card";
 import { Tag } from "@/components/ui/Tag";
@@ -7,10 +7,16 @@ import type { Project } from "@/lib/content";
 
 type ProjectCardProps = {
   project: Project;
+  /** 1-based position in the full list, ordered by `order`. */
+  index: number;
+  /** Number of projects in the full list. */
+  total: number;
   size?: "md" | "lg";
 };
 
-export function ProjectCard({ project, size = "md" }: ProjectCardProps) {
+const pad = (n: number) => String(n).padStart(2, "0");
+
+export function ProjectCard({ project, index, total, size = "md" }: ProjectCardProps) {
   const { title, slug, tagline, tags, year, cover } = project.frontmatter;
 
   return (
@@ -20,18 +26,18 @@ export function ProjectCard({ project, size = "md" }: ProjectCardProps) {
     >
       <div className="flex h-full flex-col">
         {cover ? (
-          <Image
+          <Halftone
             src={cover}
-            alt=""
-            width={1600}
-            height={900}
             sizes={size === "lg" ? "(min-width: 768px) 520px, 85vw" : "(min-width: 1024px) 380px, 100vw"}
-            className="aspect-video w-full object-cover"
+            className="aspect-video w-full border-b border-border"
           />
         ) : (
           <div aria-hidden="true" className="aspect-video w-full border-b border-border bg-surface-2" />
         )}
         <div className="flex flex-1 flex-col gap-3 p-6">
+          <p data-project-index className="font-mono uppercase tracking-[0.12em] text-[11px] text-muted">
+            {pad(index)} / {pad(total)}
+          </p>
           <h3
             className={size === "lg" ? "font-display text-2xl break-words md:text-3xl" : "font-display text-xl break-words md:text-2xl"}
           >

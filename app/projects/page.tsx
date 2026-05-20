@@ -18,7 +18,8 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
   const { tag } = await searchParams;
   const rawTag = Array.isArray(tag) ? tag[0] : tag;
   const active = parseTagParam(tag);
-  const projects = sortProjectsByYear(await getProjects());
+  const all = await getProjects();
+  const projects = sortProjectsByYear(all);
   const visible = rawTag !== undefined && active === null ? [] : filterProjects(projects, active);
 
   return (
@@ -28,7 +29,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
       <div className="mb-10">
         <TagFilter active={active} />
       </div>
-      <ProjectGrid projects={visible} />
+      <ProjectGrid projects={visible} order={all.map((p) => p.frontmatter.slug)} />
     </Section>
   );
 }

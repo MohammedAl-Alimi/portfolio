@@ -69,7 +69,7 @@ test.describe("hero figure", () => {
 
   test("default tier draws the figure and fades the poster", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator("canvas")).toHaveCount(1);
+    await expect(page.locator("canvas:not([data-halftone])")).toHaveCount(1);
     const poster = page.locator("[data-hero-slot] [data-poster]");
     await expect(poster).toHaveCSS("opacity", "0", { timeout: 6000 });
     await expect(page.getByRole("heading", { level: 1 })).toHaveAccessibleName("Mohammed Al-Alimi");
@@ -85,6 +85,6 @@ test.describe("hero figure", () => {
     const poster = page.locator("[data-hero-slot] [data-poster]");
     await expect(poster).toHaveCSS("opacity", "1");
     await expect(poster.locator("img")).toHaveAttribute("src", /figure\.webp/);
-    await expect(page.locator("canvas")).toHaveCount(0);
+    await expect(page.locator("canvas:not([data-halftone])")).toHaveCount(0);
   });
 });

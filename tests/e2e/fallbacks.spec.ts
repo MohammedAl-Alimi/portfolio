@@ -28,7 +28,7 @@ test.describe("canvas and fallbacks", () => {
     test.skip(testInfo.project.name !== "chromium-desktop", "Desktop only");
     const scripts = trackScripts(page);
     await page.goto("/");
-    await expect(page.locator("canvas")).toHaveCount(1);
+    await expect(page.locator("canvas:not([data-halftone])")).toHaveCount(1);
     await expect(page.locator("html")).toHaveAttribute("data-tier", /^(high|mid)$/);
     // Control: the detector does see the 3D chunk when it is loaded.
     expect(await scripts.has3d()).toBe(true);
@@ -42,7 +42,7 @@ test.describe("canvas and fallbacks", () => {
     await page.goto("/");
     await expect(page.locator("html")).toHaveAttribute("data-tier", "low");
     await expect(page.locator("html")).toHaveAttribute("data-reduced-motion", "true");
-    await expect(page.locator("canvas")).toHaveCount(0);
+    await expect(page.locator("canvas:not([data-halftone])")).toHaveCount(0);
     await expect(page.locator("h1")).toBeVisible();
     await page.waitForLoadState("networkidle");
     expect(await scripts.has3d()).toBe(false);
@@ -63,7 +63,7 @@ test.describe("canvas and fallbacks", () => {
     const scripts = trackScripts(page);
     await page.goto("/");
     await expect(page.locator("html")).toHaveAttribute("data-tier", "low");
-    await expect(page.locator("canvas")).toHaveCount(0);
+    await expect(page.locator("canvas:not([data-halftone])")).toHaveCount(0);
     await expect(page.locator("h1")).toBeVisible();
     await page.waitForLoadState("networkidle");
     expect(await scripts.has3d()).toBe(false);
