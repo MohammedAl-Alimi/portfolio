@@ -50,7 +50,7 @@ portfolio/
 | `components/projects/` | `AdjacentProjects`, `ProjectBody`, `ProjectCard`, `ProjectGrid`, `ProjectHero`, `ProjectMeta`, `TagFilter` | Project list and case study pieces. `ProjectCard` holds the stretched link (`components/projects/ProjectCard.tsx:46`). |
 | `components/media/` | `Halftone` | Cover images as a two-tone Bayer dither on a canvas over the greyscale image (`components/media/Halftone.tsx:31`). |
 | `components/about/` | `Timeline` | About timeline list. |
-| `components/lab/` | `ComponentSlot`, `HowItWorks`, `LabCard`, `LabFrame`, `registry` | Lab cards, sandboxed iframe (`components/lab/LabFrame.tsx:8`), and the registry of in-page experiments (`components/lab/registry.ts:4`). |
+| `components/lab/` | `ComponentSlot`, `FigureSandbox`, `HowItWorks`, `LabCard`, `LabFrame`, `registry` | Lab cards, sandboxed iframe (`components/lab/LabFrame.tsx:8`), the figure sandbox (`components/lab/FigureSandbox.tsx:108`), and the registry of in-page experiments (`components/lab/registry.ts:5`). |
 | `components/mdx/` | `components`, `MdxBody` | MDX rendering with link and image rules. `isSafeHref` is at `components/mdx/components.tsx:7`. |
 | `components/seo/` | `JsonLd` | JSON-LD script with escaped `<` (`components/seo/JsonLd.tsx:13`). |
 
