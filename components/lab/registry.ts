@@ -1,4 +1,7 @@
 import type { ComponentType } from "react";
+import { FigureSandbox } from "./FigureSandbox";
 
-// Later plans register SandboxScene, ShaderToy and NoahPreview here.
-export const labComponents: Record<string, ComponentType> = {};
+// Lab items with `kind: component` name one of these in their frontmatter.
+export const labComponents: Record<string, ComponentType> = {
+  FigureSandbox,
+};

@@ -4,6 +4,7 @@ import {
   figureZoom,
   GLITCH_BAND,
   glitchBands,
+  glitchDueAt,
   kindFromZ,
   nextGlitchDelay,
   pointScaleFor,
@@ -140,5 +141,25 @@ describe("framing", () => {
     // A tall slot is filled by its height, a wide one by its width.
     expect(figureZoom(800, 1200)).toBeCloseTo(564);
     expect(figureZoom(3200, 600)).toBeCloseTo(1128);
+  });
+});
+
+describe("glitchDueAt", () => {
+  it("waits the drawn delay at rate 1, as the hero does", () => {
+    expect(glitchDueAt(10, 7, 1)).toBe(17);
+  });
+
+  it("divides the delay by the rate", () => {
+    expect(glitchDueAt(10, 6, 2)).toBe(13);
+    expect(glitchDueAt(10, 6, 0.5)).toBe(22);
+  });
+
+  it("never glitches at rate 0", () => {
+    expect(glitchDueAt(10, 6, 0)).toBe(Number.POSITIVE_INFINITY);
+  });
+
+  it("treats a zero delay as a forced glitch, due at once at any rate", () => {
+    expect(glitchDueAt(10, 0, 0)).toBe(10);
+    expect(glitchDueAt(10, 0, 3)).toBe(10);
   });
 });

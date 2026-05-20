@@ -10,6 +10,7 @@ import {
   figureZoom,
   GLITCH_MS,
   glitchBands,
+  glitchDueAt,
   nextGlitchDelay,
   orbitFor,
   pointScaleFor,
@@ -39,11 +40,23 @@ export interface FigureCloudProps {
   slot?: string;
   /** CSS selector of the section whose scroll-out orbits the camera (0 to 0.52 rad). */
   orbitTrack?: string;
+  /** Live settings from the lab sandbox, read every frame. Missing fields keep the hero's values. */
+  controls?: FigureControls;
+}
+
+export interface FigureControls {
+  /** rad/s */
+  yawSpeed?: number;
+  /** Multiplier on the glitch cadence; 0 turns glitches off. */
+  glitchRate?: number;
+  scanline?: boolean;
+  windGain?: number;
 }
 
 const YAW_SPEED = 0.15; // rad/s
 const MAX_DT = 0.1; // a long gap (tab hidden, slot off screen) does not jump the rotation
 const WIND_GAIN = 0.03;
+const SCAN_PARKED = -10; // far below the figure, so the shader draws no band
 
 export interface FigureProbe {
   frames: number;
@@ -88,7 +101,7 @@ export function buildFigureGeometry(figure: Figure): BufferGeometry {
   return g;
 }
 
-export function FigureCloud({ figure, size, visible = true, slot, orbitTrack }: FigureCloudProps) {
+export function FigureCloud({ figure, size, visible = true, slot, orbitTrack, controls }: FigureCloudProps) {
   const dpr = useThree((s) => s.viewport.dpr);
   const gl = useThree((s) => s.gl);
   const invalidate = useThree((s) => s.invalidate);
@@ -96,6 +109,10 @@ export function FigureCloud({ figure, size, visible = true, slot, orbitTrack }: 
   // On a CPU renderer the figure holds still between redraws, and the wind runs lighter.
   const software = useMemo(() => isSoftwareRenderer(gl.getContext()) && !forceMotion(), [gl]);
   const animating = visible && !reducedMotion && !software;
+  const controlsRef = useRef(controls);
+  useEffect(() => {
+    controlsRef.current = controls;
+  }, [controls]);
   useMarkReady();
   usePointerForce(slot, !reducedMotion);
 
@@ -125,9 +142,18 @@ export function FigureCloud({ figure, size, visible = true, slot, orbitTrack }: 
 
   const clock = useRef({ lastT: -1, scanT: 0, frames: 0 });
   // Seeded from the clock on the first frame, so every visit glitches on its own schedule.
-  const glitch = useRef<{ rand: (() => number) | null; nextAt: number; endAt: number; holdMs: number }>({
+  // `from` is when the next glitch was scheduled and `delay` its wait at rate 1,
+  // so a rate change reschedules it without a new draw.
+  const glitch = useRef<{
+    rand: (() => number) | null;
+    from: number;
+    delay: number;
+    endAt: number;
+    holdMs: number;
+  }>({
     rand: null,
-    nextAt: -1,
+    from: -1,
+    delay: 0,
     endAt: 0,
     holdMs: GLITCH_MS,
   });
@@ -185,16 +211,22 @@ export function FigureCloud({ figure, size, visible = true, slot, orbitTrack }: 
     const c = clock.current;
     const dt = c.lastT < 0 ? 0 : Math.min(MAX_DT, Math.max(0, t - c.lastT));
     c.lastT = t;
+    const ctl = controlsRef.current;
     if (animating) {
-      u.uYaw.value = wrapAngle(u.uYaw.value + YAW_SPEED * dt);
+      u.uYaw.value = wrapAngle(u.uYaw.value + (ctl?.yawSpeed ?? YAW_SPEED) * dt);
       c.scanT += dt;
     }
-    u.uScanY.value = scanY(c.scanT);
+    u.uScanY.value = (ctl?.scanline ?? true) ? scanY(c.scanT) : SCAN_PARKED;
+    u.uWindGain.value = ctl?.windGain ?? WIND_GAIN;
 
     const g = glitch.current;
     const rand = (g.rand ??= mulberry32(Math.floor(performance.now())));
-    if (g.nextAt < 0) g.nextAt = t + nextGlitchDelay(rand);
-    if (animating && t >= g.nextAt && u.uGlitch.value === 0) {
+    if (g.from < 0) {
+      g.from = t;
+      g.delay = nextGlitchDelay(rand);
+    }
+    const dueAt = glitchDueAt(g.from, g.delay, ctl?.glitchRate ?? 1);
+    if (animating && t >= dueAt && u.uGlitch.value === 0) {
       const seed = Math.floor(rand() * 1e9);
       const bands = glitchBands(seed);
       bands.forEach((b, i) => u.uGlitchBands.value[i]?.set(b.y, b.x));
@@ -205,7 +237,8 @@ export function FigureCloud({ figure, size, visible = true, slot, orbitTrack }: 
     }
     if (u.uGlitch.value === 1 && t >= g.endAt) {
       u.uGlitch.value = 0;
-      g.nextAt = t + nextGlitchDelay(rand);
+      g.from = t;
+      g.delay = nextGlitchDelay(rand);
     }
 
     u.uPointScale.value = pointScaleFor(zoom, figure.count);
@@ -222,7 +255,8 @@ export function FigureCloud({ figure, size, visible = true, slot, orbitTrack }: 
         // A test can hold the slice longer than a real one, to look at it.
         glitch: (ms = GLITCH_MS) => {
           g.holdMs = ms;
-          g.nextAt = stormNow();
+          g.from = stormNow();
+          g.delay = 0;
           u.uGlitch.value = 0;
         },
       };
