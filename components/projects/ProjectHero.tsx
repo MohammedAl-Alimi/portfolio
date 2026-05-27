@@ -22,7 +22,7 @@ export function ProjectHero({ project }: { project: Project }) {
         </p>
         <h1
           id="project-title"
-          className="font-display text-[clamp(2.75rem,7vw,6rem)] leading-[0.95] mb-6 break-words"
+          className="font-display tracking-[-0.03em] text-[clamp(1.75rem,7vw,6rem)] leading-[0.9] mb-6 break-words"
         >
           {title}
         </h1>

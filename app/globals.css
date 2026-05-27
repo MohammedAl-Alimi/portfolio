@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
+@custom-variant light (&:where(.light, .light *));
 
 @theme inline {
   --color-bg: var(--bg);
@@ -19,38 +20,48 @@
   --radius-lg: var(--radius-lg-value);
   --font-display: var(--font-display-src), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-sans-src), ui-sans-serif, system-ui, sans-serif;
+  --font-pixel: var(--font-pixel-src), ui-monospace, monospace;
 }
 
 :root {
-  --bg: #fffbf5;
-  --surface: #ffffff;
-  --text: #17161a;
-  --muted: #5f5b66;
-  --border: #eae4da;
+  --bg: #0b0b10;
+  --surface: #141420;
+  --text: #f6f3ee;
+  --muted: #a39fad;
+  --border: #2a2833;
   --accent-1: #ff6b35;
   --accent-2: #ffd23f;
   --accent-3: #3bceac;
   --accent-4: #5c7cfa;
   --accent-5: #f06595;
   --accent-6: #a78bfa;
-  --radius-sm-value: 12px;
-  --radius-md-value: 20px;
-  --radius-lg-value: 32px;
+  --radius-sm-value: 4px;
+  --radius-md-value: 8px;
+  --radius-lg-value: 12px;
   --motion-fast: 150ms;
   --motion-base: 300ms;
   --motion-slow: 500ms;
   --motion-xslow: 800ms;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 .dark {
-  --bg: #121117;
-  --surface: #1b1a22;
+  --bg: #0b0b10;
+  --surface: #141420;
   --text: #f6f3ee;
   --muted: #a39fad;
   --border: #2a2833;
   color-scheme: dark;
+}
+
+.light {
+  --bg: #fffbf5;
+  --surface: #ffffff;
+  --text: #17161a;
+  --muted: #5f5b66;
+  --border: #eae4da;
+  color-scheme: light;
 }
 
 html {
@@ -59,4 +70,8 @@ html {
 
 body {
   @apply font-sans bg-bg text-text;
+}
+
+html[data-tier="mid"] [data-grain] {
+  display: none;
 }
