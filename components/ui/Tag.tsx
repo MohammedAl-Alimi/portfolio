@@ -10,11 +10,17 @@ export function Tag({ children, color }: TagProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full px-3 py-1 text-sm font-medium",
-        !color && "bg-surface border border-border text-muted",
+        "inline-flex items-center gap-2 rounded-[2px] border border-border px-2 py-1 font-pixel text-[11px] uppercase leading-none tracking-wider text-muted",
       )}
-      style={color ? { backgroundColor: `color-mix(in srgb, ${color} 14%, transparent)`, color } : undefined}
     >
+      {color ? (
+        <span
+          data-tag-dot
+          aria-hidden="true"
+          className="inline-block size-2 rounded-full"
+          style={{ backgroundColor: color }}
+        />
+      ) : null}
       {children}
     </span>
   );
