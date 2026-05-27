@@ -11,7 +11,7 @@ export function Hero({ profile }: { profile: Profile }) {
           <div className="order-2 lg:order-1 lg:col-span-5">
             <h1
               id="hero-title"
-              className="font-display font-bold leading-[0.9] tracking-[-0.03em] text-[clamp(2.75rem,8vw,7rem)]"
+              className="font-display font-bold leading-[0.9] tracking-[-0.03em] text-[clamp(2rem,8vw,7rem)]"
             >
               {profile.name}
             </h1>
