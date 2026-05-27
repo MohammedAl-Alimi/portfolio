@@ -85,7 +85,18 @@ Where the pixel font is used: tags (`components/ui/Tag.tsx:13`), nav links (`com
 
 ## Grain overlay
 
-`components/ui/Grain.tsx:1` draws a fixed, click-through noise layer (`feTurbulence`) at `6%` opacity, `4%` in the light theme (`components/ui/Grain.tsx:6`). It is mounted after the footer (`app/layout.tsx:48`). It is hidden when `<html>` has `data-tier="mid"` (`app/globals.css:75`).
+`components/ui/Grain.tsx:7` draws a fixed, click-through noise layer (`feTurbulence`) at `6%` opacity, `4%` in the light theme (`components/ui/Grain.tsx:12`). It is mounted after the footer (`app/layout.tsx:48`). It is hidden when `<html>` has `data-tier="mid"` (`app/globals.css:75`).
+
+## Layers
+
+| Layer | z-index | Location |
+| --- | --- | --- |
+| Nav | `40` | `components/ui/Nav.tsx:10` |
+| Mobile menu dialog | `50` | `components/ui/MobileMenu.tsx:103` |
+| Grain overlay | `60`, above the dialog so the grain covers every surface | `components/ui/Grain.tsx:12` |
+| Page transition overlay (future) | `70` | not built yet |
+
+The grain never takes clicks (`pointer-events-none`), so the layers below stay usable.
 
 ## Related
 
