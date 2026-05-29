@@ -18,6 +18,14 @@ test("every public page sends the security headers", async ({ request }) => {
   }
 });
 
+test("static files carry the baseline security headers", async ({ request }) => {
+  for (const path of ["/cv.pdf", "/robots.txt"]) {
+    const res = await request.get(path);
+    expect(res.status(), path).toBe(200);
+    expect(res.headers()["x-content-type-options"], path).toBe("nosniff");
+  }
+});
+
 test("pages render with the csp active and the theme still toggles", async ({ page }) => {
   const errors: string[] = [];
   page.on("console", (m) => {
