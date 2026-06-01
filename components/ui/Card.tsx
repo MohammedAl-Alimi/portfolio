@@ -21,10 +21,11 @@ export function Card({
     <div
       data-project-card={projectCard ? "" : undefined}
       className={cn(
-        "bg-surface border border-border rounded-[var(--radius-md)] p-6",
+        "bg-surface border-2 rounded-[var(--radius-md)] p-6",
+        !color && "border-border",
         className,
       )}
-      style={color ? { borderTop: `6px solid ${color}` } : undefined}
+      style={color ? { borderColor: color } : undefined}
     >
       {children}
     </div>
