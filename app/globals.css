@@ -59,6 +59,21 @@ body {
   line-height: 1.6;
 }
 
+/* Crosshair cursor (components/motion/Crosshair.tsx). While it runs the native
+   cursor hides everywhere except text fields, which keep their caret cursor.
+   The rail's coordinate readout shows only while it runs. */
+html[data-cursor="custom"] *:not(input):not(textarea):not(select):not([contenteditable="true"]) {
+  cursor: none;
+}
+
+html:not([data-cursor="custom"]) [data-cursor-readout] {
+  display: none;
+}
+
+[data-cursor-root][data-state="hidden"] {
+  opacity: 0;
+}
+
 html[data-tier="mid"] [data-overlay-scanlines],
 html[data-tier="mid"] [data-overlay-grain] {
   display: none;
