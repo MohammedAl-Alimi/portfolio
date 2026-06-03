@@ -9,9 +9,7 @@ export const metadata: Metadata = {
 };
 
 export default async function LabPage() {
-  const items = (await getLabItems()).toSorted(
-    (a, b) => a.frontmatter.order - b.frontmatter.order,
-  );
+  const items = await getLabItems();
 
   return (
     <Section>
