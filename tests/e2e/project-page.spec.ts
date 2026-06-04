@@ -1,5 +1,5 @@
-import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { expectNoSeriousViolations } from "./helpers/axe";
 
 test("project page renders hero, sections and only the links present", async ({ page }) => {
   await page.goto("/projects/crowd-detection");
@@ -26,10 +26,7 @@ test("unknown project returns 404", async ({ page }) => {
 
 test("project page passes axe", async ({ page }) => {
   await page.goto("/projects/crowd-detection");
-  const results = await new AxeBuilder({ page }).analyze();
-  expect(
-    results.violations.filter((v) => ["serious", "critical"].includes(v.impact ?? "")),
-  ).toEqual([]);
+  await expectNoSeriousViolations(page);
 });
 
 test("no horizontal scroll at 320px", async ({ page }) => {

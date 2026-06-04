@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
-import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { expectNoSeriousViolations } from "./helpers/axe";
 
 const slugs = fs
   .readdirSync(path.join(process.cwd(), "content/projects"))
@@ -39,12 +39,7 @@ for (const vp of viewports) {
           await page.goto(p);
 
           // The lab demo iframe is third-party content, so axe skips it.
-          const results = await new AxeBuilder({ page }).exclude("iframe").analyze();
-          expect(
-            results.violations.filter((v) =>
-              ["serious", "critical"].includes(v.impact ?? ""),
-            ),
-          ).toEqual([]);
+          await expectNoSeriousViolations(page, { exclude: ["iframe"] });
 
           const noOverflow = await page.evaluate(
             () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
