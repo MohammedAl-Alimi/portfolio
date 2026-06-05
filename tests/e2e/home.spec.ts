@@ -31,3 +31,20 @@ test("featured strip lists the featured projects", async ({ page }) => {
     await expect(region.getByRole("link", { name: title })).toBeVisible();
   }
 });
+
+test("hero name stays in its column on two lines", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium-desktop", "Desktop only");
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+  const h1 = await page.getByRole("heading", { level: 1 }).boundingBox();
+  const slot = await page.locator("[data-hero-slot]").boundingBox();
+  expect(h1).not.toBeNull();
+  expect(slot).not.toBeNull();
+  expect(h1!.x + h1!.width).toBeLessThanOrEqual(slot!.x);
+  const lines = page.locator("h1 [data-name-line]");
+  await expect(lines).toHaveCount(2);
+  const fits = await lines.evaluateAll((els) =>
+    els.map((el) => el.scrollWidth <= el.clientWidth && el.getClientRects().length === 1),
+  );
+  expect(fits).toEqual([true, true]);
+});
