@@ -2,12 +2,12 @@
 // Renders public/posters/pixel-name.webp: the pixel storm's name on two lines, drawn as the
 // same coloured squares, on a transparent 1600x900 canvas.
 //
-// Node has no Unbounded font and no 2D canvas, so the drawing happens in
+// Node has no Syne font and no 2D canvas, so the drawing happens in
 // headless Chromium (installed with Playwright). The sampler and the colour
 // code are the real modules from lib/, transpiled with TypeScript and run in
 // the page, so the poster matches the live storm.
 //
-// One-off font fetch: the first run downloads the Unbounded 700 latin woff2
+// One-off font fetch: the first run downloads the Syne 800 latin woff2
 // from Google Fonts (SIL OFL) into the OS temp directory, never into the repo.
 // Set FONT_CACHE to use another directory.
 import fs from "node:fs";
@@ -30,16 +30,16 @@ const CHROME_UA =
 
 async function fontFile() {
   const dir = process.env.FONT_CACHE ?? os.tmpdir();
-  const file = path.join(dir, "unbounded-700-latin.woff2");
+  const file = path.join(dir, "syne-800-latin.woff2");
   if (fs.existsSync(file)) return file;
   const css = await (
-    await fetch("https://fonts.googleapis.com/css2?family=Unbounded:wght@700", {
+    await fetch("https://fonts.googleapis.com/css2?family=Syne:wght@800", {
       headers: { "User-Agent": CHROME_UA },
     })
   ).text();
   const latin = css.split("/* latin */")[1] ?? css;
   const url = latin.match(/url\((https:\/\/fonts\.gstatic\.com\/[^)]+\.woff2)\)/)?.[1];
-  if (!url) throw new Error("Unbounded woff2 URL not found in the Google Fonts CSS");
+  if (!url) throw new Error("Syne woff2 URL not found in the Google Fonts CSS");
   const buf = Buffer.from(await (await fetch(url)).arrayBuffer());
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(file, buf);
@@ -59,20 +59,20 @@ const code = [transpile("lib/pixel-sampler.ts"), transpile("lib/storm-attributes
 const font = fs.readFileSync(await fontFile()).toString("base64");
 
 const html = `<!doctype html><html><head><style>
-@font-face { font-family: Unbounded; font-weight: 700; src: url(data:font/woff2;base64,${font}) format("woff2"); }
+@font-face { font-family: Syne; font-weight: 800; src: url(data:font/woff2;base64,${font}) format("woff2"); }
 body { margin: 0; background: transparent; }
 </style></head><body><canvas id="c" width="${W}" height="${H}"></canvas>
 <script>
 ${code}
 window.render = async function () {
-  await document.fonts.load("700 200px Unbounded");
-  if (!document.fonts.check("700 200px Unbounded")) throw new Error("font not loaded");
+  await document.fonts.load("800 200px Syne");
+  if (!document.fonts.check("800 200px Syne")) throw new Error("font not loaded");
   const getContext = (w, h) => {
     const c = document.createElement("canvas");
     c.width = w; c.height = h;
     return c.getContext("2d", { willReadFrequently: true });
   };
-  const raw = sampleTextToCount(["MOHAMMED", "AL-ALIMI"], { font: "700 220px Unbounded", width: 1600, height: 600, count: ${COUNT}, getContext });
+  const raw = sampleTextToCount(["MOHAMMED", "AL-ALIMI"], { font: "800 180px Syne", width: 1600, height: 600, count: ${COUNT}, getContext });
   const targets = fitToCount(centerAndFit(raw), ${COUNT});
   const a = buildStormAttributes(targets, ${COUNT}, STORM_COLORS);
   const ctx = document.getElementById("c").getContext("2d");
