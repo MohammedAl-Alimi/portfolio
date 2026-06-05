@@ -71,15 +71,15 @@ Motion variables are not mapped through `@theme inline`. Components reference th
 
 ## Fonts
 
-`display` and `sans` are self-hosted through `next/font/local`. `pixel` loads through `next/font/google`. All three use `display: "swap"`.
+All three fonts load through `next/font/google`, which downloads them at build time and serves them from the site itself. They are SIL OFL fonts, and no font files are kept in the repo. All use `display: "swap"`.
 
 | Export | Family | Weights | CSS variable set by Next | Tailwind key | Location |
 | --- | --- | --- | --- | --- | --- |
-| `display` | Clash Display | 600, 700 | `--font-display-src` | `--font-display` | `lib/fonts.ts:4` to `lib/fonts.ts:12`, `app/globals.css:21` |
-| `sans` | Satoshi | 400, 500 | `--font-sans-src` | `--font-sans` | `lib/fonts.ts:14` to `lib/fonts.ts:21`, `app/globals.css:22` |
-| `pixel` | Silkscreen | 400 | `--font-pixel-src` | `--font-pixel` | `lib/fonts.ts:23` to `lib/fonts.ts:28`, `app/globals.css:23` |
+| `display` | Unbounded | 600, 700 | `--font-display-src` | `--font-display` | `lib/fonts.ts:3` to `lib/fonts.ts:9`, `app/globals.css:21` |
+| `sans` | Manrope | 400, 500 | `--font-sans-src` | `--font-sans` | `lib/fonts.ts:11` to `lib/fonts.ts:16`, `app/globals.css:22` |
+| `pixel` | Silkscreen | 400 | `--font-pixel-src` | `--font-pixel` | `lib/fonts.ts:18` to `lib/fonts.ts:23`, `app/globals.css:23` |
 
-The woff2 files live in `public/fonts/`. The licence (ITF Free Font License, self-hosting allowed) is `public/fonts/LICENSE-fontshare.txt`. The display font is preloaded (`lib/fonts.ts:11`). The three variable classes are added to `<html>` in `app/layout.tsx:32`. Use the `font-display`, `font-sans` and `font-pixel` utilities.
+The display font is preloaded (`lib/fonts.ts:8`). The three variable classes are added to `<html>` in `app/layout.tsx:32`. Use the `font-display`, `font-sans` and `font-pixel` utilities.
 
 Where the pixel font is used: tags (`components/ui/Tag.tsx:13`), nav links (`components/ui/NavLinks.tsx:26`), card year (`components/projects/ProjectCard.tsx:57`), project meta labels (`components/projects/ProjectMeta.tsx:8`) and the footer line (`components/ui/Footer.tsx:26`). Section titles and page headings use `font-display tracking-[-0.03em] leading-[0.9]` (for example `components/ui/Section.tsx:17`).
 

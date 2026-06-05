@@ -13,7 +13,7 @@ export default async function LabPage() {
 
   return (
     <Section>
-      <h1 className="font-display tracking-[-0.03em] leading-[0.9] text-[clamp(2.5rem,6vw,5rem)]">Lab</h1>
+      <h1 className="font-display tracking-[-0.03em] leading-[0.9] text-[clamp(1.75rem,6vw,5rem)]">Lab</h1>
       <p className="mt-4 mb-10 text-muted">
         Small experiments and live demos. Click anything to try it.
       </p>

@@ -1,21 +1,16 @@
-import { Silkscreen } from "next/font/google";
-import localFont from "next/font/local";
+import { Manrope, Silkscreen, Unbounded } from "next/font/google";
 
-export const display = localFont({
-  src: [
-    { path: "../public/fonts/ClashDisplay-Semibold.woff2", weight: "600", style: "normal" },
-    { path: "../public/fonts/ClashDisplay-Bold.woff2", weight: "700", style: "normal" },
-  ],
+export const display = Unbounded({
+  subsets: ["latin"],
+  weight: ["600", "700"],
   variable: "--font-display-src",
   display: "swap",
   preload: true,
 });
 
-export const sans = localFont({
-  src: [
-    { path: "../public/fonts/Satoshi-Regular.woff2", weight: "400", style: "normal" },
-    { path: "../public/fonts/Satoshi-Medium.woff2", weight: "500", style: "normal" },
-  ],
+export const sans = Manrope({
+  subsets: ["latin"],
+  weight: ["400", "500"],
   variable: "--font-sans-src",
   display: "swap",
 });
