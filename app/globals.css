@@ -71,3 +71,7 @@ html {
 body {
   @apply font-sans bg-bg text-text;
 }
+
+html[data-tier="mid"] [data-grain] {
+  display: none;
+}
