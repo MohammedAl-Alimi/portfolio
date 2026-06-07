@@ -20,7 +20,7 @@ describe("computeBudgets", () => {
     });
     expect(r.firstLoadBytes).toBe(150);
     expect(r.threeBytes).toBe(900);
-    expect(r.threeFiles).toEqual(["static/chunks/three.js"]);
+    expect(r.threeFiles).toEqual([{ file: "static/chunks/three.js", bytes: 900 }]);
     expect(r.ok).toBe(true);
   });
   it("flags a first-load breach", () => {
@@ -46,5 +46,18 @@ describe("computeBudgets", () => {
       sizeOf: sizes({ "static/chunks/a.js": FIRST_LOAD_LIMIT, "static/chunks/three.js": THREE_LIMIT }),
     });
     expect(r.ok).toBe(true);
+  });
+  it("throws when there are no 3d files", () => {
+    expect(() =>
+      computeBudgets({ loadable: {}, firstLoad, sizeOf: sizes({}) }),
+    ).toThrow(/no 3D files/);
+  });
+  it("throws when the first-load list is empty", () => {
+    expect(() => computeBudgets({ loadable, firstLoad: [], sizeOf: sizes({}) })).toThrow(
+      /no first-load files/,
+    );
+    expect(() =>
+      computeBudgets({ loadable, firstLoad: ["static/chunks/three.js"], sizeOf: sizes({}) }),
+    ).toThrow(/no first-load files/);
   });
 });
