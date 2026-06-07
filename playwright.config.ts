@@ -23,6 +23,14 @@ export default defineConfig({
       name: "chromium-desktop",
       use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 800 } },
     },
+    {
+      name: "chromium-nowebgl",
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 1280, height: 800 },
+        launchOptions: { args: ["--disable-webgl", "--disable-webgl2"] },
+      },
+    },
     { name: "webkit-mobile", use: { ...devices["iPhone 13"] } },
     {
       name: "chromium-narrow",
