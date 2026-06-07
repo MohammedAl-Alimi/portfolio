@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import type { Profile } from "@/lib/schemas";
+import { ViewSlot } from "@/components/three/ViewSlot";
 import { HeroPoster } from "./HeroPoster";
+import { HeroStormLoader } from "./HeroStormLoader";
 
 export function Hero({ profile }: { profile: Profile }) {
   const [first = "", ...restParts] = profile.name.split(" ");
@@ -35,10 +37,17 @@ export function Hero({ profile }: { profile: Profile }) {
             </div>
           </div>
           <div className="order-1 lg:order-2 lg:col-span-6">
-            <div data-hero-slot className="relative aspect-[4/3]">
-              <HeroPoster />
+            <div data-hero-slot>
+              <ViewSlot
+                className="relative aspect-[4/3] lg:aspect-auto lg:h-[520px]"
+                poster={<HeroPoster src="/posters/pixel-name.webp" alt="" />}
+              >
+                <HeroStormLoader />
+              </ViewSlot>
             </div>
-            <p className="mt-3 text-left text-sm text-muted">Drag the shapes. Click one to open a project.</p>
+            <p className="mt-3 font-pixel text-[11px] tracking-wider text-muted uppercase">
+              MOVE YOUR MOUSE. CLICK A SHAPE.
+            </p>
           </div>
         </div>
       </Container>
