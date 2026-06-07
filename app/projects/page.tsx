@@ -23,7 +23,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
 
   return (
     <Section>
-      <h1 className="font-display tracking-[-0.03em] leading-[0.9] text-[clamp(2.5rem,6vw,5rem)]">Projects</h1>
+      <h1 className="font-display tracking-[-0.03em] leading-[0.9] text-[clamp(1.75rem,6vw,5rem)]">Projects</h1>
       <p className="mt-4 mb-8 text-muted">Things I have shipped. Newest first.</p>
       <div className="mb-10">
         <TagFilter active={active} />
