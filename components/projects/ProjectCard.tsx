@@ -54,7 +54,7 @@ export function ProjectCard({ project, size = "md" }: ProjectCardProps) {
                 {tag}
               </Tag>
             ))}
-            <span className="ml-auto text-sm text-muted">{year}</span>
+            <span className="ml-auto font-pixel text-[11px] uppercase tracking-wider text-muted">{year}</span>
           </div>
         </div>
       </div>
