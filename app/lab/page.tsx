@@ -18,7 +18,7 @@ export default async function LabPage() {
       <Decode as="h1" text={copy.title} trigger="load" className="font-display tracking-[-0.03em] leading-[0.9] text-[clamp(1.75rem,6vw,5rem)]" />
       <p className="mt-4 mb-10 font-mono text-muted">{copy.intro}</p>
       {items.length === 0 ? (
-        <p role="status">{copy.empty}</p>
+        <p role="status" className="font-mono text-muted">{copy.empty}</p>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {items.map((item, i) => (
