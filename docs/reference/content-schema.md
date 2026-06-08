@@ -106,49 +106,69 @@ File: `content/profile.json`. Schema: `profileSchema` (`lib/schemas.ts:90`).
 | `socials.linkedin` | string | `httpsUrl` (`lib/schemas.ts:97`) | required | `https://www.linkedin.com/in/...` |
 | `decorationColors` | array of string | 2 to 6 `hexColor` items (`lib/schemas.ts:98`) | required | `["#FFD23F", "#3BCEAC"]` |
 
+## Site copy
+
+File: `content/site.json`. Schema: `siteSchema` (`lib/schemas.ts:121`). Type: `Site` (`lib/schemas.ts:169`).
+
+Every visible UI string that is not page content lives here, grouped by surface. Every value is a non-empty string (`lib/schemas.ts:117`) and every object is strict, so a typo in a key fails the build. `npm run validate:content` loads it at `prebuild` (`scripts/validate-content.ts:36`).
+
+| Group | Keys | Used by |
+| --- | --- | --- |
+| `home` | `hero.work`, `hero.cv`, `hint.move`, `hint.tilt`, `ticker`, `whatIBuild.title`, `whatIBuild.items[]` (`title`, `text`, `href`; 1 to 6 items; `href` starts with `/`), `featured.title`, `rightNow.title`, `rightNow.loading`, `highlights.title` (`lib/schemas.ts:122`) | Home page and its sections |
+| `projects` | `title`, `intro`, `empty`, `all`, `meta.stack`, `meta.tags`, `adjacent.previous`, `adjacent.next` (`lib/schemas.ts:137`) | `/projects`, tag filter, project page |
+| `lab` | `title`, `intro`, `empty`, `try`, `howItWorks`, `back`, `building` (`lib/schemas.ts:145`) | `/lab` and lab item pages |
+| `about` | `outside`, `cv` (`lib/schemas.ts:154`) | `/about` |
+| `contact` | `title`, `rows.email`, `rows.github`, `rows.linkedin`, `rows.cv`, each `{ label, action }` (`lib/schemas.ts:155`) | `/contact` |
+| `footer` | `line` (`lib/schemas.ts:159`). `{year}` is the only placeholder; `fillYear` replaces it with the current year (`lib/site-copy.ts:2`). | Footer |
+| `notFound` | `title`, `text`, `home`, `projects` (`lib/schemas.ts:160`) | 404 page |
+| `error` | `title`, `text`, `retry`, `home`, `requestId` (`lib/schemas.ts:161`) | Route error page |
+
+Server components call `getSite()`. Client components get their strings as props from a server parent. The route error page is a client component that Next renders on its own, so it imports `content/site.json` directly instead of loading it from disk.
+
 ## Content loaders
 
-All loaders are in `lib/content-core.ts`. Components import them from `lib/content.ts`, which adds `server-only` (`lib/content.ts:1`). Every loader takes an optional content directory that defaults to `<cwd>/content` (`lib/content-core.ts:22`).
+All loaders are in `lib/content-core.ts`. Components import them from `lib/content.ts`, which adds `server-only` (`lib/content.ts:1`). Every loader takes an optional content directory that defaults to `<cwd>/content` (`lib/content-core.ts:24`).
 
 | Function | Signature | Returns | Sort order | Location |
 | --- | --- | --- | --- | --- |
-| `getProjects` | `(dir?: string) => Promise<Project[]>` | All projects | `order` ascending, then `year` descending | `lib/content-core.ts:84` |
-| `getProject` | `(slug: string, dir?: string) => Promise<Project \| null>` | One project or `null` | n/a | `lib/content-core.ts:92` |
-| `getLabItems` | `(dir?: string) => Promise<LabItem[]>` | All lab items | `order` ascending | `lib/content-core.ts:97` |
-| `getLabItem` | `(slug: string, dir?: string) => Promise<LabItem \| null>` | One lab item or `null` | n/a | `lib/content-core.ts:102` |
-| `getHighlights` | `(dir?: string) => Promise<Highlight[]>` | All highlights | `date` descending | `lib/content-core.ts:107` |
-| `getProfile` | `(dir?: string) => Promise<Profile>` | The profile | n/a | `lib/content-core.ts:116` |
-| `getAdjacentProjects` | `(slug: string, dir?: string) => Promise<{ previous, next }>` | Neighbours in the sorted project list, each `Project \| null` | n/a | `lib/content-core.ts:120` |
-| `getAbout` | `(dir?: string) => Promise<About>` | The about page | n/a | `lib/content-core.ts:130` |
+| `getProjects` | `(dir?: string) => Promise<Project[]>` | All projects | `order` ascending, then `year` descending | `lib/content-core.ts:86` |
+| `getProject` | `(slug: string, dir?: string) => Promise<Project \| null>` | One project or `null` | n/a | `lib/content-core.ts:107` |
+| `getLabItems` | `(dir?: string) => Promise<LabItem[]>` | All lab items | `order` ascending | `lib/content-core.ts:112` |
+| `getLabItem` | `(slug: string, dir?: string) => Promise<LabItem \| null>` | One lab item or `null` | n/a | `lib/content-core.ts:117` |
+| `getHighlights` | `(dir?: string) => Promise<Highlight[]>` | All highlights | `date` descending | `lib/content-core.ts:122` |
+| `getProfile` | `(dir?: string) => Promise<Profile>` | The profile | n/a | `lib/content-core.ts:131` |
+| `getSite` | `(dir?: string) => Promise<Site>` | The UI copy from `site.json` | n/a | `lib/content-core.ts:135` |
+| `getAdjacentProjects` | `(slug: string, dir?: string) => Promise<{ previous, next }>` | Neighbours in the sorted project list, each `Project \| null` | n/a | `lib/content-core.ts:139` |
+| `getAbout` | `(dir?: string) => Promise<About>` | The about page | n/a | `lib/content-core.ts:149` |
 
-Returned shapes: `Project`, `About` and `LabItem` are `{ frontmatter, body }` (`lib/content-core.ts:18` to `lib/content-core.ts:20`).
+Returned shapes: `Project`, `About` and `LabItem` are `{ frontmatter, body }` (`lib/content-core.ts:20` to `lib/content-core.ts:22`).
 
 ### Loader behaviour
 
 | Behaviour | Detail | Location |
 | --- | --- | --- |
-| File filter | Only names ending in `.mdx`, sorted by name. | `lib/content-core.ts:45` |
-| Missing folder | `projects/` or `lab/` missing returns an empty list. | `lib/content-core.ts:42` |
-| Invalid frontmatter | Throws `Invalid frontmatter in <file>: <path> <message>; ...`. | `lib/content-core.ts:52` |
-| Slug mismatch | Throws if `slug` does not match the file name. | `lib/content-core.ts:54` |
-| Missing `highlights.json` | Returns `[]`. | `lib/content-core.ts:68`, `lib/content-core.ts:111` |
-| Missing `profile.json` | Throws `Could not read profile.json: ...`. | `lib/content-core.ts:69` |
-| Bad JSON | Throws `Invalid JSON in <file>`. | `lib/content-core.ts:75` |
-| Schema failure in JSON | Throws `Invalid content in <file>: ...`. | `lib/content-core.ts:79` |
+| File filter | Only names ending in `.mdx`, sorted by name. | `lib/content-core.ts:47` |
+| Missing folder | `projects/` or `lab/` missing returns an empty list. | `lib/content-core.ts:44` |
+| Invalid frontmatter | Throws `Invalid frontmatter in <file>: <path> <message>; ...`. | `lib/content-core.ts:54` |
+| Slug mismatch | Throws if `slug` does not match the file name. | `lib/content-core.ts:57` |
+| Missing `highlights.json` | Returns `[]`. | `lib/content-core.ts:70`, `lib/content-core.ts:126` |
+| Missing `profile.json` or `site.json` | Throws `Could not read <file>: ...`. | `lib/content-core.ts:71` |
+| Bad JSON | Throws `Invalid JSON in <file>`. | `lib/content-core.ts:77` |
+| Schema failure in JSON | Throws `Invalid content in <file>: ...`. | `lib/content-core.ts:81` |
 
 ## Validation script
 
-Command: `npm run validate:content`, which runs `scripts/validate-content.ts`. The `prebuild` script runs it before every build (`package.json:7`). On any problem it prints each one as `validate-content: <message>` and exits with code 1 (`scripts/validate-content.ts:51` to `scripts/validate-content.ts:54`).
+Command: `npm run validate:content`, which runs `scripts/validate-content.ts`. The `prebuild` script runs it before every build (`package.json:7`). On any problem it prints each one as `validate-content: <message>` and exits with code 1 (`scripts/validate-content.ts:66` to `scripts/validate-content.ts:69`).
 
 | Check | Detail | Location |
 | --- | --- | --- |
-| All schemas | Loads projects, lab items, highlights, profile and about, so every schema runs. | `scripts/validate-content.ts:28` to `scripts/validate-content.ts:34` |
-| Unique slugs | Fails on a duplicate project slug or lab slug. | `scripts/validate-content.ts:14`, `scripts/validate-content.ts:36`, `scripts/validate-content.ts:37` |
-| Project covers exist | A `cover` must point to a file under `public/`. | `scripts/validate-content.ts:22`, `scripts/validate-content.ts:40` |
-| Lab thumbnails exist | A `thumbnail` must point to a file under `public/`. | `scripts/validate-content.ts:43` |
-| Iframe origin allowed | An `iframe` lab item must have a `url` whose origin is in `LAB_FRAME_ORIGINS`. | `scripts/validate-content.ts:44` |
+| All schemas | Loads projects, lab items, highlights, profile, site copy and about, so every schema runs. | `scripts/validate-content.ts:29` to `scripts/validate-content.ts:37` |
+| Unique slugs | Fails on a duplicate project slug or lab slug. | `scripts/validate-content.ts:16`, `scripts/validate-content.ts:39`, `scripts/validate-content.ts:40` |
+| Project covers exist | A `cover` must point to a file under `public/`. | `scripts/validate-content.ts:24`, `scripts/validate-content.ts:55` |
+| Lab thumbnails exist | A `thumbnail` must point to a file under `public/`. | `scripts/validate-content.ts:58` |
+| Iframe origin allowed | An `iframe` lab item must have a `url` whose origin is in `LAB_FRAME_ORIGINS`. | `scripts/validate-content.ts:59` |
 
-On success it prints the counts, for example `projects: 7, lab: 2, highlights: 0` (`scripts/validate-content.ts:55`).
+On success it prints the counts, for example `projects: 7, lab: 2, highlights: 0, site: ok` (`scripts/validate-content.ts:70`).
 
 ## Lab iframe origin allowlist
 

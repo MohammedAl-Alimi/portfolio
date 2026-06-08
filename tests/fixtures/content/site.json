@@ -1,0 +1,71 @@
+{
+  "home": {
+    "hero": { "work": "VIEW WORK", "cv": "DOWNLOAD CV" },
+    "hint": { "move": "MOVE TO DISTURB.", "tilt": "Enable tilt" },
+    "ticker": "AI · AGENTS · COMPUTER VISION · SECURITY · SYSTEMS",
+    "whatIBuild": {
+      "title": "What I build",
+      "items": [
+        {
+          "title": "AI and computer vision",
+          "text": "Models that see, count and respect privacy.",
+          "href": "/projects?tag=ai"
+        },
+        {
+          "title": "Agents and automation",
+          "text": "Assistants and pipelines that do real work on a schedule.",
+          "href": "/projects?tag=agents"
+        },
+        {
+          "title": "Security-minded web apps",
+          "text": "Fast, accessible apps with security built in from day one.",
+          "href": "/projects?tag=security"
+        }
+      ]
+    },
+    "featured": { "title": "Featured projects" },
+    "rightNow": { "title": "Right now", "loading": "Live activity loads here soon." },
+    "highlights": { "title": "Highlights" }
+  },
+  "projects": {
+    "title": "Projects",
+    "intro": "Things I have shipped. Newest first.",
+    "empty": "No projects with that tag yet.",
+    "all": "All",
+    "meta": { "stack": "Stack", "tags": "Tags" },
+    "adjacent": { "previous": "Previous", "next": "Next" }
+  },
+  "lab": {
+    "title": "Lab",
+    "intro": "Small experiments and live demos. Click anything to try it.",
+    "empty": "Nothing here yet. Check back soon.",
+    "try": "Try it",
+    "howItWorks": "How it works",
+    "back": "Back to Lab",
+    "building": "This experiment is still being built."
+  },
+  "about": { "outside": "Outside work", "cv": "Download CV" },
+  "contact": {
+    "title": "CONTACT",
+    "rows": {
+      "email": { "label": "EMAIL", "action": "EMAIL ME" },
+      "github": { "label": "GITHUB", "action": "GITHUB" },
+      "linkedin": { "label": "LINKEDIN", "action": "LINKEDIN" },
+      "cv": { "label": "CV", "action": "DOWNLOAD CV" }
+    }
+  },
+  "footer": { "line": "MA · {year} · Built with Next.js" },
+  "notFound": {
+    "title": "This page wandered off.",
+    "text": "The link may be old, or the page moved.",
+    "home": "Home",
+    "projects": "Projects"
+  },
+  "error": {
+    "title": "Something broke on our side.",
+    "text": "It has been logged. You can try again or head home.",
+    "retry": "Try again",
+    "home": "Home",
+    "requestId": "Request ID:"
+  }
+}

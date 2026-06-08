@@ -8,6 +8,25 @@ test("about has story, timeline and cv button", async ({ page }) => {
   await expect(page.getByRole("link", { name: "Download CV" }).first()).toHaveAttribute("href", "/cv");
 });
 
+test("the about title decodes at load and keeps its exact text", async ({ page }) => {
+  await page.goto("/about");
+  const h1 = page.getByRole("heading", { level: 1 });
+  await expect(h1).toHaveAccessibleName("About me");
+  await expect(h1.locator("[data-decode-glyphs]")).toHaveText("About me");
+  await expect(h1).toHaveAttribute("data-decode", /^(done|fade)$/);
+});
+
+test("timeline titles decode once they scroll into view", async ({ page }) => {
+  await page.goto("/about");
+  const titles = page.locator("[data-about-timeline] li [data-decode]");
+  await expect(titles).toHaveCount(4);
+  for (const title of await titles.all()) {
+    await title.scrollIntoViewIfNeeded();
+    // A GPU decodes; a CPU renderer or the low tier fades the final text in instead.
+    await expect(title).toHaveAttribute("data-decode", /^(done|fade)$/);
+  }
+});
+
 test("/cv redirects to the pdf", async ({ request }) => {
   const res = await request.get("/cv", { maxRedirects: 0 });
   expect(res.status()).toBe(308);

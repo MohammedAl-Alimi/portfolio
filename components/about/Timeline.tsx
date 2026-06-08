@@ -1,3 +1,4 @@
+import { Decode } from "@/components/motion/Decode";
 import type { AboutFrontmatter } from "@/lib/schemas";
 
 type TimelineProps = { entries: AboutFrontmatter["timeline"] };
@@ -15,9 +16,9 @@ export function Timeline({ entries }: TimelineProps) {
             aria-hidden="true"
             className="absolute top-2 -left-[28px] size-[6px] bg-text"
           />
-          <p className="font-mono text-sm text-muted">{entry.year}</p>
-          <p className="font-mono font-bold">{entry.title}</p>
-          <p className="text-muted">{entry.detail}</p>
+          <p className="font-mono uppercase tracking-[0.12em] text-[11px] text-muted">{entry.year}</p>
+          <Decode as="p" text={entry.title} trigger="enter" className="font-mono font-bold" />
+          <p className="font-mono text-muted">{entry.detail}</p>
         </li>
       ))}
     </ol>

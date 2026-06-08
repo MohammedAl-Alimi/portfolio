@@ -6,7 +6,7 @@ import { LabFrame } from "@/components/lab/LabFrame";
 import { MdxBody } from "@/components/mdx/MdxBody";
 import { Button } from "@/components/ui/Button";
 import { Section } from "@/components/ui/Section";
-import { getLabItem, getLabItems } from "@/lib/content";
+import { getLabItem, getLabItems, getSite } from "@/lib/content";
 import { SITE_NAME } from "@/lib/site";
 
 type PageProps = { params: Promise<{ slug: string }> };
@@ -33,8 +33,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function LabItemPage({ params }: PageProps) {
   const { slug } = await params;
-  const item = await getLabItem(slug);
+  const [item, site] = await Promise.all([getLabItem(slug), getSite()]);
   if (!item) notFound();
+  const copy = site.lab;
   const { title, description, kind, url, component } = item.frontmatter;
 
   return (
@@ -45,15 +46,15 @@ export default async function LabItemPage({ params }: PageProps) {
         {kind === "iframe" && url ? (
           <LabFrame url={url} title={title} />
         ) : (
-          <ComponentSlot name={component ?? ""} />
+          <ComponentSlot name={component ?? ""} buildingText={copy.building} />
         )}
       </div>
-      <HowItWorks>
+      <HowItWorks title={copy.howItWorks}>
         <MdxBody source={item.body} />
       </HowItWorks>
       <div className="mt-10">
         <Button href="/lab" variant="ghost">
-          Back to Lab
+          {copy.back}
         </Button>
       </div>
     </Section>

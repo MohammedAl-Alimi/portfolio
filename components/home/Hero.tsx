@@ -3,12 +3,12 @@ import { GridFloor } from "@/components/motion/GridFloor";
 import { ViewSlot } from "@/components/three/ViewSlot";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
-import type { Profile } from "@/lib/schemas";
+import type { Profile, Site } from "@/lib/schemas";
 import { HeroFigure } from "./HeroFigure";
 import { HeroHint } from "./HeroHint";
 import { HeroPoster } from "./HeroPoster";
 
-export function Hero({ profile }: { profile: Profile }) {
+export function Hero({ profile, copy }: { profile: Profile; copy: Site["home"] }) {
   return (
     <section data-hero aria-labelledby="hero-title" className="relative py-12 md:py-20">
       <GridFloor />
@@ -31,10 +31,10 @@ export function Hero({ profile }: { profile: Profile }) {
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Button variant="primary" size="lg" href="/projects" brackets>
-                VIEW WORK
+                {copy.hero.work}
               </Button>
               <Button variant="secondary" size="lg" href="/cv">
-                DOWNLOAD CV
+                {copy.hero.cv}
               </Button>
             </div>
           </div>
@@ -47,7 +47,7 @@ export function Hero({ profile }: { profile: Profile }) {
                 <HeroFigure />
               </ViewSlot>
             </div>
-            <HeroHint />
+            <HeroHint copy={copy.hint} />
           </div>
         </div>
       </Container>

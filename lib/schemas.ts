@@ -114,8 +114,56 @@ export const aboutFrontmatterSchema = z.strictObject({
   outside: z.array(z.string().min(1).max(80)).min(1).max(8),
 });
 
+const copy = z.string().min(1);
+const contactRow = z.strictObject({ label: copy, action: copy });
+
+/** Visible UI copy, grouped by surface (content/site.json). `{year}` is the only placeholder. */
+export const siteSchema = z.strictObject({
+  home: z.strictObject({
+    hero: z.strictObject({ work: copy, cv: copy }),
+    hint: z.strictObject({ move: copy, tilt: copy }),
+    ticker: copy,
+    whatIBuild: z.strictObject({
+      title: copy,
+      items: z
+        .array(z.strictObject({ title: copy, text: copy, href: z.string().startsWith("/") }))
+        .min(1)
+        .max(6),
+    }),
+    featured: z.strictObject({ title: copy }),
+    rightNow: z.strictObject({ title: copy, loading: copy }),
+    highlights: z.strictObject({ title: copy }),
+  }),
+  projects: z.strictObject({
+    title: copy,
+    intro: copy,
+    empty: copy,
+    all: copy,
+    meta: z.strictObject({ stack: copy, tags: copy }),
+    adjacent: z.strictObject({ previous: copy, next: copy }),
+  }),
+  lab: z.strictObject({
+    title: copy,
+    intro: copy,
+    empty: copy,
+    try: copy,
+    howItWorks: copy,
+    back: copy,
+    building: copy,
+  }),
+  about: z.strictObject({ outside: copy, cv: copy }),
+  contact: z.strictObject({
+    title: copy,
+    rows: z.strictObject({ email: contactRow, github: contactRow, linkedin: contactRow, cv: contactRow }),
+  }),
+  footer: z.strictObject({ line: copy }),
+  notFound: z.strictObject({ title: copy, text: copy, home: copy, projects: copy }),
+  error: z.strictObject({ title: copy, text: copy, retry: copy, home: copy, requestId: copy }),
+});
+
 export type ProjectFrontmatter = z.infer<typeof projectFrontmatterSchema>;
 export type LabFrontmatter = z.infer<typeof labFrontmatterSchema>;
 export type Highlight = z.infer<typeof highlightSchema>;
 export type Profile = z.infer<typeof profileSchema>;
 export type AboutFrontmatter = z.infer<typeof aboutFrontmatterSchema>;
+export type Site = z.infer<typeof siteSchema>;

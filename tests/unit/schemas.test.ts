@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
+import site from "@/content/site.json";
 import {
   highlightSchema,
   labFrontmatterSchema,
   profileSchema,
   projectFrontmatterSchema,
+  siteSchema,
 } from "@/lib/schemas";
 
 const validProject = {
@@ -150,5 +152,26 @@ describe("profileSchema", () => {
 
   it("needs between 2 and 6 decoration colors", () => {
     expect(profileSchema.safeParse({ ...validProfile, decorationColors: ["#FFD23F"] }).success).toBe(false);
+  });
+});
+
+describe("siteSchema", () => {
+  it("parses content/site.json", () => {
+    expect(siteSchema.safeParse(site).success).toBe(true);
+  });
+
+  it("rejects an unknown key at the top and inside a group", () => {
+    expect(siteSchema.safeParse({ ...site, extra: "x" }).success).toBe(false);
+    expect(siteSchema.safeParse({ ...site, lab: { ...site.lab, extra: "x" } }).success).toBe(false);
+  });
+
+  it("rejects an empty string", () => {
+    expect(siteSchema.safeParse({ ...site, footer: { line: "" } }).success).toBe(false);
+  });
+
+  it("rejects a missing group", () => {
+    const rest: Record<string, unknown> = { ...site };
+    delete rest.contact;
+    expect(siteSchema.safeParse(rest).success).toBe(false);
   });
 });

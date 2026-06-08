@@ -3,6 +3,7 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { useTiltForce } from "@/components/three/useTiltForce";
 import { cn } from "@/lib/cn";
+import type { Site } from "@/lib/schemas";
 import { useSceneActive, useSceneStore } from "@/lib/scene-store";
 import { useSlot } from "@/lib/use-slot";
 
@@ -19,7 +20,7 @@ function readSeen(): boolean {
 
 const noSubscribe = () => () => {};
 
-export function HeroHint() {
+export function HeroHint({ copy }: { copy: Site["home"]["hint"] }) {
   const active = useSceneActive();
   const reducedMotion = useSceneStore((s) => s.reducedMotion);
   const interacted = useSceneStore((s) => s.interacted);
@@ -52,7 +53,7 @@ export function HeroHint() {
           interacted && !seenBefore && "[transition:opacity_400ms_ease,visibility_0s_linear_400ms]",
         )}
       >
-        MOVE TO DISTURB.
+        {copy.move}
       </p>
       {tilt.needsTap ? (
         <button
@@ -60,7 +61,7 @@ export function HeroHint() {
           onClick={tilt.enable}
           className="min-h-11 border border-current px-3 font-mono uppercase tracking-[0.12em] text-[11px]"
         >
-          Enable tilt
+          {copy.tilt}
         </button>
       ) : null}
     </div>

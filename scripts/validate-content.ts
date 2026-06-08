@@ -6,6 +6,7 @@ import {
   getLabItems,
   getProfile,
   getProjects,
+  getSite,
 } from "../lib/content-core";
 import { isAllowedLabOrigin } from "../lib/lab-origins";
 import { findRawTag } from "../lib/mdx-guard";
@@ -32,6 +33,7 @@ async function main() {
     getHighlights(),
   ]);
   await getProfile();
+  await getSite();
   const about = await getAbout();
 
   assertUnique("project", projects.map((p) => p.frontmatter.slug));
@@ -65,7 +67,7 @@ async function main() {
     for (const message of errors) console.error(`validate-content: ${message}`);
     process.exit(1);
   }
-  console.log(`projects: ${projects.length}, lab: ${lab.length}, highlights: ${highlights.length}`);
+  console.log(`projects: ${projects.length}, lab: ${lab.length}, highlights: ${highlights.length}, site: ok`);
 }
 
 main().catch((error: unknown) => {

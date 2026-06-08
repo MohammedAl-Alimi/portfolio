@@ -6,13 +6,14 @@ type ProjectGridProps = {
   projects: Project[];
   /** Card numbers for the full list, from projectNumbers(), so a filter keeps the numbers. */
   numbers: Map<string, number>;
+  emptyText: string;
 };
 
-export function ProjectGrid({ projects, numbers }: ProjectGridProps) {
+export function ProjectGrid({ projects, numbers, emptyText }: ProjectGridProps) {
   if (projects.length === 0) {
     return (
       <p role="status" className="text-muted">
-        No projects with that tag yet.
+        {emptyText}
       </p>
     );
   }
