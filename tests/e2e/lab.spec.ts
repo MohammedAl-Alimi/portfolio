@@ -26,17 +26,31 @@ test("unknown lab slug returns 404", async ({ page }) => {
 });
 
 const CONTROLS = ["Rotation speed", "Point count", "Glitch rate", "Scanline", "Wind gain"];
-const UNAVAILABLE = "The live figure needs a graphics card. Here is a still image instead.";
+const UNAVAILABLE = "The live figure is off here: it needs a graphics card and motion enabled. This is a still image instead.";
 
 async function yaw(page: Page): Promise<number | null> {
   return page.evaluate(() => (window as unknown as { __figure?: { yaw: number } }).__figure?.yaw ?? null);
 }
 
-// True when the rotation reads the same twice, 300 ms apart.
-async function holdsStill(page: Page): Promise<boolean> {
+// Two rotation reads 300 ms apart. Both must come from a live probe, so a
+// vanished figure fails the test instead of looking still or moving.
+async function yawPair(page: Page): Promise<[number, number]> {
   const a = await yaw(page);
   await page.waitForTimeout(300);
-  return a !== null && (await yaw(page)) === a;
+  const b = await yaw(page);
+  expect(a, "window.__figure is present").not.toBeNull();
+  expect(b, "window.__figure is present").not.toBeNull();
+  return [a!, b!];
+}
+
+async function holdsStill(page: Page): Promise<boolean> {
+  const [a, b] = await yawPair(page);
+  return a === b;
+}
+
+async function turns(page: Page): Promise<boolean> {
+  const [a, b] = await yawPair(page);
+  return a !== b;
 }
 
 test.describe("figure sandbox", () => {
@@ -62,10 +76,31 @@ test.describe("figure sandbox", () => {
     await expect.poll(() => holdsStill(page)).toBe(true);
 
     await speed.fill("0.3");
-    await expect.poll(() => holdsStill(page)).toBe(false);
+    await expect.poll(() => turns(page)).toBe(true);
 
     await page.getByRole("button", { name: "Reset" }).click();
     await expect(speed).toHaveValue("0.15");
+  });
+
+  test("a new point count swaps the cloud and keeps the canvas", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium-desktop", "Desktop only");
+    await page.goto("/lab/figure?tier=high");
+    const slot = page.locator("[data-figure-sandbox-slot]");
+    const canvas = page.locator("canvas:not([data-halftone])");
+    await expect(slot).toHaveAttribute("data-point-count", "56000", { timeout: 10000 });
+    await expect(canvas).toHaveCount(1);
+
+    await page.getByLabel("Point count").fill("10000");
+    // Sampled together: the old cloud's canvas must be there at every sample until the new cloud is on screen.
+    const canvasCounts: number[] = [];
+    await expect
+      .poll(async () => {
+        canvasCounts.push(await canvas.count());
+        return slot.getAttribute("data-point-count");
+      })
+      .toBe("10000");
+    expect(canvasCounts.every((n) => n === 1)).toBe(true);
+    await expect(canvas).toHaveCount(1);
   });
 
   test("falls back to the poster with disabled controls without WebGL", async ({ page }, testInfo) => {
