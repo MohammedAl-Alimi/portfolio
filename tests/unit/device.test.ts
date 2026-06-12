@@ -45,3 +45,33 @@ describe("getDeviceTier", () => {
     ).toBe("low");
   });
 });
+
+import { medianFrameMs, tierAfterProbe } from "@/lib/device";
+
+describe("medianFrameMs", () => {
+  it("returns null when only warm-up frames exist", () => {
+    expect(medianFrameMs([1, 2, 3, 4, 5])).toBeNull();
+  });
+  it("drops the first 5 samples and takes the median of the rest", () => {
+    expect(medianFrameMs([100, 100, 100, 100, 100, 16, 17, 400])).toBe(17);
+    expect(medianFrameMs([0, 0, 0, 0, 0, 10, 20, 30, 40])).toBe(25);
+  });
+  it("does not sort the caller's array", () => {
+    const a = [0, 0, 0, 0, 0, 3, 1, 2];
+    medianFrameMs(a);
+    expect(a).toEqual([0, 0, 0, 0, 0, 3, 1, 2]);
+  });
+});
+
+describe("tierAfterProbe", () => {
+  const warm = [50, 50, 50, 50, 50];
+  it("stays high when the median is 20 ms or less", () => {
+    expect(tierAfterProbe(base, [...warm, 16, 16, 16, 90, 90])).toBe("high");
+  });
+  it("downgrades to mid when the median is over 20 ms", () => {
+    expect(tierAfterProbe(base, [...warm, 30, 30, 30, 5, 5])).toBe("mid");
+  });
+  it("stays high with no usable samples", () => {
+    expect(tierAfterProbe(base, warm)).toBe("high");
+  });
+});
