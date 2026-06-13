@@ -14,7 +14,7 @@ export function Section({ id, title, children, className }: SectionProps) {
     <section id={id} className={cn("py-[64px] md:py-[96px]", className)}>
       <Container>
         {title ? (
-          <h2 className="font-display text-3xl tracking-[-0.03em] leading-[0.9] md:text-5xl mb-10">{title}</h2>
+          <h2 className="font-display text-3xl tracking-[-0.02em] leading-[0.9] md:text-5xl mb-10">{title}</h2>
         ) : null}
         {children}
       </Container>
