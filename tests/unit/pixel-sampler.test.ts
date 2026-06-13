@@ -15,8 +15,9 @@ const PATTERN = [
   "#......#",
 ];
 
-function stubFactory(pattern = PATTERN) {
+function stubFactory(pattern = PATTERN, measure = 0) {
   const calls: string[] = [];
+  const lines: { text: string; y: number }[] = [];
   const getContext = (w: number, h: number): SamplerContext => {
     const data = new Uint8ClampedArray(w * h * 4);
     pattern.forEach((row, y) => {
@@ -32,14 +33,15 @@ function stubFactory(pattern = PATTERN) {
       textBaseline: "alphabetic",
       clearRect: () => {},
       setTransform: () => {},
-      fillText: (text: string) => {
+      fillText: (text: string, _x: number, y: number) => {
         calls.push(text);
+        lines.push({ text, y });
       },
-      measureText: () => ({ width: 0 }) as TextMetrics,
+      measureText: (text: string) => ({ width: text.length * measure }) as TextMetrics,
       getImageData: () => ({ data, width: w, height: h, colorSpace: "srgb" }) as ImageData,
     };
   };
-  return { getContext, calls };
+  return { getContext, calls, lines };
 }
 
 const base = { font: "700 10px Test", width: 8, height: 4 };
@@ -70,6 +72,69 @@ describe("sampleText", () => {
     const b = sampleText("HI", { ...base, step: 1, getContext: stubFactory().getContext });
     expect(a.length % 2).toBe(0);
     expect(Array.from(a)).toEqual(Array.from(b));
+  });
+});
+
+describe("sampleText with several lines", () => {
+  // Two bands of pixels, as two drawn lines would leave.
+  const TALL = [
+    "........",
+    ".##..##.",
+    "........",
+    "........",
+    "........",
+    "........",
+    ".##..##.",
+    "........",
+  ];
+
+  it("draws each line centred, 0.92 x font size apart", () => {
+    const { getContext, lines } = stubFactory();
+    sampleText(["AB", "CD"], { ...base, step: 1, getContext });
+    expect(lines.map((l) => l.text)).toEqual(["AB", "CD"]);
+    expect(lines[0]!.y).toBeCloseTo(-4.6);
+    expect(lines[1]!.y).toBeCloseTo(4.6);
+  });
+
+  it("returns points in two vertical bands", () => {
+    const { getContext } = stubFactory(TALL);
+    const pts = sampleText(["AB", "CD"], { ...base, height: 8, step: 1, getContext });
+    const ys = new Set<number>();
+    for (let i = 1; i < pts.length; i += 2) ys.add(pts[i]!);
+    expect([...ys]).toEqual([0.625, -0.625]);
+    expect(pts.length / 2).toBe(8);
+  });
+
+  it("sizes the font so the widest line spans the width minus 6%", () => {
+    const transforms: number[] = [];
+    const { getContext } = stubFactory(PATTERN, 2);
+    const wrapped = (w: number, h: number): SamplerContext => {
+      const ctx = getContext(w, h);
+      return {
+        ...ctx,
+        setTransform: (a: number) => {
+          transforms.push(a);
+        },
+      } as SamplerContext;
+    };
+    // Widest line "ABCD" measures 8 px at 10 px. 8 px wide canvas, 94% -> scale 0.94.
+    // The canvas is tall enough that the height does not limit the scale.
+    sampleText(["AB", "ABCD"], { ...base, height: 40, step: 1, getContext: wrapped });
+    expect(transforms[0]).toBeCloseTo(0.94);
+  });
+
+  it("shrinks to fit the height when the block is too tall", () => {
+    const transforms: number[] = [];
+    const { getContext } = stubFactory(PATTERN, 2);
+    const wrapped = (w: number, h: number): SamplerContext => ({
+      ...getContext(w, h),
+      setTransform: (a: number) => {
+        transforms.push(a);
+      },
+    }) as SamplerContext;
+    // Two lines at 10 px take 18.4 px; 4 px tall canvas, 94% -> 3.76 / 18.4.
+    sampleText(["AB", "ABCD"], { ...base, step: 1, getContext: wrapped });
+    expect(transforms[0]).toBeCloseTo(3.76 / 18.4);
   });
 });
 
