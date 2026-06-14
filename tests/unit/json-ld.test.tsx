@@ -11,5 +11,6 @@ describe("JsonLd", () => {
     expect(html).not.toContain("</script><img");
     expect(html.match(/<\/script/g)).toHaveLength(1);
     expect(html).toContain('type="application/ld+json"');
+    expect(html).toContain('nonce="abc"');
   });
 });
