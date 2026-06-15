@@ -10,6 +10,7 @@ import {
   ShaderMaterial,
   Vector2,
 } from "three";
+import { isSoftwareRenderer } from "@/lib/gpu";
 import { buildStormAttributes } from "@/lib/storm-attributes";
 import { useSceneStore } from "@/lib/scene-store";
 import { useMarkReady } from "./ready";
@@ -30,8 +31,11 @@ const FRAME_MS = 1000 / 30; // the idle shimmer does not need more than 30 fps
 export function PixelStorm({ count, targets, colors, pointSize = 3, animate = true }: PixelStormProps) {
   const invalidate = useThree((s) => s.invalidate);
   const dpr = useThree((s) => s.viewport.dpr);
+  const gl = useThree((s) => s.gl);
   const reducedMotion = useSceneStore((s) => s.reducedMotion);
-  const animating = animate && !reducedMotion;
+  // On a CPU renderer the storm still draws, but holds still between redraws.
+  const software = useMemo(() => isSoftwareRenderer(gl.getContext()), [gl]);
+  const animating = animate && !reducedMotion && !software;
   useMarkReady();
 
   const geometry = useMemo(() => {
