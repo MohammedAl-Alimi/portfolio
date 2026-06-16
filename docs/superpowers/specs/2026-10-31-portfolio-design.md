@@ -427,9 +427,9 @@ Mohammed reviewed the shipped foundation and rejected its look: generic layout, 
 
 ### 17.2 Type
 
-- Display: Clash Display (Fontshare, self-hosted woff2 via next/font/local), weights 600 and 700, used for the name, section titles and project titles. Tight tracking (-0.03em), tight leading (0.9).
+- Display: Unbounded (SIL OFL, Google Fonts via next/font/google, self-hosted at build), weights 600 and 700, used for the name, section titles and project titles. Tight tracking (-0.03em), tight leading (0.9). Clash Display was the first pick; dropped because the Fontshare licence forbids redistributing its files through a public repository.
 - Pixel: Silkscreen (Google Fonts via next/font/google) in caps for tags, year, nav labels, hints and the marquee's separators. Never for paragraphs.
-- Body: Satoshi (Fontshare, self-hosted) 400 and 500, 18 px base.
+- Body: Manrope (SIL OFL, Google Fonts) 400 and 500, 18 px base.
 - Kinetic marquee strip between Home sections: `AI · AGENTS · COMPUTER VISION · SECURITY · PLAYFUL TOOLS` in display type at about 96 px, scrolling continuously, direction follows scroll direction, speed eases with scroll velocity. Paused under reduced motion.
 
 ### 17.3 Motion
