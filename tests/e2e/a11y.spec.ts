@@ -119,22 +119,26 @@ test.describe("keyboard and motion", () => {
     expect(hidden).toEqual([]);
   });
 
-  test("reduced motion removes the card hover transform", async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/");
-    const card = page
-      .getByRole("region", { name: "Featured projects" })
-      .getByRole("link")
-      .first();
-    await card.hover();
-    await page.waitForTimeout(400);
-    const transform = await card.evaluate((el) => {
-      const t = getComputedStyle(el).transform;
-      const child = el.firstElementChild ? getComputedStyle(el.firstElementChild).transform : "none";
-      return [t, child];
+  for (const [mode, expectLift] of [
+    ["reduce", false],
+    ["no-preference", true],
+  ] as const) {
+    test(`card hover lift with reducedMotion ${mode}`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: mode });
+      await page.goto("/");
+      const card = page.locator("[data-project-card]").first();
+      await card.hover();
+      // Tailwind v4 lifts with the individual `translate` property, so read both.
+      const transform = () =>
+        card.evaluate((el) => {
+          const cs = getComputedStyle(el);
+          return `${cs.translate}|${cs.transform}`;
+        });
+      if (expectLift) {
+        await expect.poll(transform).not.toBe("none|none");
+      } else {
+        await expect.poll(transform).toBe("none|none");
+      }
     });
-    for (const t of transform) {
-      expect(["none", "matrix(1, 0, 0, 1, 0, 0)"]).toContain(t);
-    }
-  });
+  }
 });
