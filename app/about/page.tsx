@@ -6,7 +6,10 @@ import { Card } from "@/components/ui/Card";
 import { Section } from "@/components/ui/Section";
 import { getAbout } from "@/lib/content";
 
-export const metadata: Metadata = { title: "About | Mohammed Al-Alimi" };
+export const metadata: Metadata = {
+  title: "About",
+  alternates: { canonical: "/about" },
+};
 
 export default async function AboutPage() {
   const { frontmatter, body } = await getAbout();
