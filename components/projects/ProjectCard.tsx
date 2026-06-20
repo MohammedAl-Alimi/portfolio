@@ -15,6 +15,7 @@ export function ProjectCard({ project, size = "md" }: ProjectCardProps) {
 
   return (
     <Card
+      data-project-card
       color={color}
       className="relative h-full overflow-hidden p-0 motion-safe:transition-transform motion-safe:duration-[var(--motion-base)] motion-safe:hover:-translate-y-1 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-current"
     >
