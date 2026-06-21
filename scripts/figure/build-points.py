@@ -229,10 +229,10 @@ def render(xyz, photo_lum, kinds, yaw_deg, size=POSTER_SIZE):
     return Image.fromarray(np.stack([g, g, g], axis=-1), "RGB")
 
 
-def save_poster(img, path):
-    """Encode lossy (quality 80, method 6) and lossless, keep the smaller file.
+def encode_poster(img):
+    """Encode lossy (quality 80, method 6) and lossless, return the smaller.
 
-    Sparse 2 px dots on black are the worst case for lossy WebP: at quality 80
+    Sparse 3 px dots on black are the worst case for lossy WebP: at quality 80
     the poster is several times larger than the exact lossless encoding.
     """
     candidates = []
@@ -240,9 +240,8 @@ def save_poster(img, path):
         buf = io.BytesIO()
         img.save(buf, "WEBP", **opts)
         candidates.append((buf.tell(), buf.getvalue(), opts))
-    size, data, opts = min(candidates, key=lambda c: c[0])
-    Path(path).write_bytes(data)
-    return "lossless" if opts.get("lossless") else "lossy q80"
+    _, data, opts = min(candidates, key=lambda c: c[0])
+    return data, "lossless" if opts.get("lossless") else "lossy q80"
 
 
 def main(argv):
@@ -279,17 +278,20 @@ def main(argv):
     photo_lum = pts[:, 4]
 
     poster = render(qxyz, photo_lum, kinds, 0)
-    Path(args.poster).parent.mkdir(parents=True, exist_ok=True)
-    poster_mode = save_poster(poster, args.poster)
+    poster_data, poster_mode = encode_poster(poster)
+    poster_size = len(poster_data)
+
+    # Previews first, so an over-cap poster can still be inspected.
     if args.previews:
         out = Path(args.previews)
         out.mkdir(parents=True, exist_ok=True)
         for yaw in (0, 35, 90):
             render(qxyz, photo_lum, kinds, yaw).save(out / f"bust-{yaw}.png")
 
-    poster_size = Path(args.poster).stat().st_size
     if poster_size > POSTER_CAP:
         sys.exit(f"poster is {poster_size} bytes, over the {POSTER_CAP} byte cap")
+    Path(args.poster).parent.mkdir(parents=True, exist_ok=True)
+    Path(args.poster).write_bytes(poster_data)
 
     counts = np.bincount(kinds, minlength=3)
     print(f"points {len(xyz)} (front {counts[0]}, back {counts[1]}, interior {counts[2]})")
