@@ -42,7 +42,8 @@ test.describe("desktop rail", () => {
     await page.goto("/");
     const nav = page.getByRole("navigation", { name: "Main" });
     const label = nav.locator("[data-rail-label]").first();
-    expect((await nav.boundingBox())?.width).toBe(72);
+    await page.mouse.move(700, 400);
+    await expect.poll(async () => (await nav.boundingBox())?.width ?? 0).toBe(72);
     await expect(label).toHaveCSS("opacity", "0");
     await nav.hover();
     await expect(label).toHaveCSS("opacity", "1");
