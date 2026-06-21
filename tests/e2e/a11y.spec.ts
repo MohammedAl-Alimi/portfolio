@@ -125,6 +125,7 @@ test.describe("keyboard and motion", () => {
       "DOWNLOAD CV",
       "Crowd detection",
     ];
+    for (const name of expected) expect(indexOf(name), `${name} is a tab stop`).toBeGreaterThanOrEqual(0);
     for (let i = 1; i < expected.length; i++) {
       expect(indexOf(expected[i]!), `${expected[i]} after ${expected[i - 1]}`).toBeGreaterThan(
         indexOf(expected[i - 1]!),
