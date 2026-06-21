@@ -59,7 +59,13 @@ Check the previews before you commit. The 0° view should read as the person. Th
 4. The silhouette is sampled on a jittered grid. Each sample gives a front point at `+z` (photo luminance), a back point at `-z` (0.35 times the luminance) and, with probability 0.2, an interior point at a random depth (0.6 times the luminance). The grid step comes from the silhouette area, then a seeded trim or pad gives exactly `--count` points.
 5. Coordinates are centred and scaled so the figure is 1.9 units tall, unless that would make it wider than 1.98 units, in which case the width sets the scale. Every value stays inside -1..1.
 
-The poster is the front view: grey 2 px squares on `#050505` at 1600 by 1200, painted back to front, brightness `0.35 + 0.65 * lum` times a depth factor. It is encoded as WebP both lossy (quality 80, method 6) and lossless, and the smaller file is kept. Sparse dots on black compress far better lossless.
+The poster is the front view: grey 3 px squares on `#050505` at 1600 by 1200, painted back to front. Brightness uses the photo luminance `l` (0 to 1): front shell `0.55 + 0.45 * l` with no depth dimming, back shell `0.3 + 0.2 * l`, interior `0.4 + 0.3 * l`. Back and interior points are also dimmed with depth. It is encoded as WebP both lossy (quality 80, method 6) and lossless, and the smaller file is kept. Sparse dots on black compress far better lossless.
+
+## Brightness in renderers
+
+The stored luminance is raw: front points carry the photo value, back points 0.35 times it, interior points 0.6 times it. Mapped straight to grey, dark hair and a dark shirt sink into the black page and the face barely reads.
+
+Renderers should map `lum` with a floor of 0.55 on the front shell, as the poster does: `brightness = 0.55 + 0.45 * lum / 255`. Keep back-facing points dimmer than that so the front stays on top.
 
 ## Binary format `MA01`
 
