@@ -30,10 +30,10 @@ export function Hero({ profile }: { profile: Profile }) {
             <p className="mt-6 max-w-[32ch] text-xl text-muted md:text-2xl">{profile.headline}</p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Button variant="primary" size="lg" href="/projects">
-                See projects
+                VIEW WORK
               </Button>
               <Button variant="secondary" size="lg" href="/cv">
-                Download CV
+                DOWNLOAD CV
               </Button>
             </div>
           </div>

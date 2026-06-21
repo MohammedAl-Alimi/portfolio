@@ -1,9 +1,10 @@
-export type NavLabel = "Home" | "Projects" | "Lab" | "About" | "Contact";
+export type NavLabel = "HOME" | "WORK" | "LAB" | "ABOUT" | "CONTACT";
+export type NavIcon = "home" | "work" | "lab" | "about" | "contact";
 
 export const NAV_ITEMS = [
-  { label: "Home", href: "/" },
-  { label: "Projects", href: "/projects" },
-  { label: "Lab", href: "/lab" },
-  { label: "About", href: "/about" },
-  { label: "Contact", href: "#contact" },
-] as const satisfies readonly { label: NavLabel; href: string }[];
+  { label: "HOME", href: "/", icon: "home" },
+  { label: "WORK", href: "/projects", icon: "work" },
+  { label: "LAB", href: "/lab", icon: "lab" },
+  { label: "ABOUT", href: "/about", icon: "about" },
+  { label: "CONTACT", href: "/contact", icon: "contact" },
+] as const satisfies readonly { label: NavLabel; href: string; icon: NavIcon }[];

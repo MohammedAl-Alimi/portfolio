@@ -14,8 +14,8 @@ test("hero shows name, role and both buttons", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Mohammed Al-Alimi");
   await expect(page.getByText("I build AI systems, agents and playful tools")).toBeVisible();
-  await expect(page.getByRole("link", { name: "See projects" })).toHaveAttribute("href", "/projects");
-  await expect(page.getByRole("link", { name: "Download CV" }).first()).toHaveAttribute("href", "/cv");
+  await expect(page.getByRole("link", { name: "VIEW WORK" })).toHaveAttribute("href", "/projects");
+  await expect(page.getByRole("link", { name: "DOWNLOAD CV" }).first()).toHaveAttribute("href", "/cv");
   const noOverflow = await page.evaluate(
     () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
   );
@@ -60,8 +60,8 @@ test.describe("hero storm", () => {
     const poster = page.locator("[data-hero-slot] [data-poster]");
     await expect(poster).toHaveCSS("opacity", "0", { timeout: 5000 });
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Mohammed Al-Alimi");
-    await expect(page.getByRole("link", { name: "See projects" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Download CV" }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: "VIEW WORK" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "DOWNLOAD CV" }).first()).toBeVisible();
     await expect(page.getByText("MOVE YOUR MOUSE. CLICK A SHAPE.")).toBeVisible();
   });
 
