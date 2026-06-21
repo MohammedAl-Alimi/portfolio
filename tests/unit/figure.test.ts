@@ -8,17 +8,9 @@ import {
   subsample,
   type Figure,
 } from "@/lib/figure";
+import { makeTiny, TINY_POINTS } from "../fixtures/figure/make-tiny.mjs";
 
-const TINY: [number, number, number, number][] = [
-  [-127, -127, -127, 0],
-  [127, -127, -127, 36],
-  [-127, 127, -127, 73],
-  [127, 127, -127, 109],
-  [-127, -127, 127, 146],
-  [127, -127, 127, 182],
-  [0, 64, -64, 219],
-  [1, -1, 32, 255],
-];
+const TINY = TINY_POINTS;
 
 function tinyBuffer(): ArrayBuffer {
   const file = readFileSync(path.resolve(__dirname, "../fixtures/figure/tiny.bin"));
@@ -72,6 +64,28 @@ describe("parseFigure", () => {
 
   it("rejects a count of zero", () => {
     expect(() => parseFigure(makeBuffer(0))).toThrow(FigureFormatError);
+  });
+});
+
+describe("fixtures", () => {
+  it("tiny.bin matches its generator", () => {
+    const committed = readFileSync(path.resolve(__dirname, "../fixtures/figure/tiny.bin"));
+    expect(Buffer.compare(makeTiny(), committed)).toBe(0);
+  });
+
+  it("parses the shipped figure", () => {
+    const file = readFileSync(path.resolve(__dirname, "../../public/figure/bust.bin"));
+    expect(file.byteLength).toBeLessThanOrEqual(256000);
+    const fig = parseFigure(file.buffer.slice(file.byteOffset, file.byteOffset + file.byteLength));
+    expect(fig.count).toBe(56000);
+    let min = Infinity;
+    let max = -Infinity;
+    for (const v of fig.positions) {
+      if (v < min) min = v;
+      if (v > max) max = v;
+    }
+    expect(min).toBeGreaterThanOrEqual(-1);
+    expect(max).toBeLessThanOrEqual(1);
   });
 });
 

@@ -3,8 +3,8 @@
 import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
+/** @type {[number, number, number, number][]} x, y, z (int8), luminance (uint8) */
 export const TINY_POINTS = [
-  // x, y, z (int8), luminance (uint8)
   [-127, -127, -127, 0],
   [127, -127, -127, 36],
   [-127, 127, -127, 73],
