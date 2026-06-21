@@ -38,6 +38,17 @@ test.describe("desktop rail", () => {
     });
   }
 
+  test("collapsed rail keeps every tab icon visible", async ({ page }) => {
+    await page.goto("/");
+    await page.mouse.move(700, 400);
+    const nav = page.getByRole("navigation", { name: "Main" });
+    await expect.poll(async () => (await nav.boundingBox())?.width ?? 0).toBe(72);
+    for (const label of LABELS) {
+      const svg = nav.getByRole("link", { name: label, exact: true }).locator("svg");
+      expect((await svg.boundingBox())?.width ?? 0).toBeGreaterThanOrEqual(15);
+    }
+  });
+
   test("hovering the rail reveals the labels", async ({ page }) => {
     await page.goto("/");
     const nav = page.getByRole("navigation", { name: "Main" });
