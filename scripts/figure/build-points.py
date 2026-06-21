@@ -37,8 +37,8 @@ POSTER_CAP = 120 * 1024
 POSTER_SIZE = (1600, 1200)
 POSTER_BG = (5, 5, 5)    # #050505
 POINT_PX = 3             # square size at 1600 px width
-RENDER_FLOOR = (0.55, 0.30, 0.40)   # front, back, interior
-RENDER_GAIN = (0.45, 0.20, 0.30)
+RENDER_FLOOR = (0.12, 0.08, 0.10)   # front, back, interior
+RENDER_GAIN = (0.88, 0.30, 0.50)
 
 
 def load_cutout(path):
@@ -192,9 +192,9 @@ def render(xyz, photo_lum, kinds, yaw_deg, size=POSTER_SIZE):
     """Orthographic view, grey squares painted back to front.
 
     Brightness per kind, from the photo luminance l in 0..1:
-      front shell  0.55 + 0.45 * l   (no depth dimming, so the face reads on black)
-      back shell   0.30 + 0.20 * l
-      interior     0.40 + 0.30 * l
+      front shell  0.12 + 0.88 * l   (no depth dimming; dark hair stays dark, skin bright)
+      back shell   0.08 + 0.30 * l
+      interior     0.10 + 0.50 * l
     Back and interior points are also dimmed with depth.
     """
     w, h = size
