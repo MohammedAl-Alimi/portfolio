@@ -44,6 +44,8 @@ export interface FigureProbe {
   frames: number;
   trailCount: number;
   yaw: number;
+  /** True on a CPU renderer, where the figure holds still. */
+  software: boolean;
   /** Starts a glitch now, held for `ms` (default 120). */
   glitch: (ms?: number) => void;
 }
@@ -67,6 +69,14 @@ type FigureUniforms = WindUniforms & {
   uJitter: { value: number };
 };
 
+// Test-only: CI renders on the CPU, where the figure holds still. `?motion=force`
+// lets an e2e test watch the rotation there. Production builds inline "0" and drop it.
+function forceMotion(): boolean {
+  return (
+    process.env.NEXT_PUBLIC_E2E === "1" && new URLSearchParams(window.location.search).get("motion") === "force"
+  );
+}
+
 export function buildFigureGeometry(figure: Figure): BufferGeometry {
   const a = buildFigureAttributes(figure);
   const g = new BufferGeometry();
@@ -84,11 +94,12 @@ export function FigureCloud({ figure, size, visible = true, slot }: FigureCloudP
   const gl = useThree((s) => s.gl);
   const reducedMotion = useSceneStore((s) => s.reducedMotion);
   // On a CPU renderer the figure holds still between redraws, and the wind runs lighter.
-  const software = useMemo(() => isSoftwareRenderer(gl.getContext()), [gl]);
+  const software = useMemo(() => isSoftwareRenderer(gl.getContext()) && !forceMotion(), [gl]);
   const animating = visible && !reducedMotion && !software;
   useMarkReady();
   usePointerForce(slot, !reducedMotion);
 
+  const zoom = figureZoom(size.width, size.height);
   const geometry = useMemo(() => buildFigureGeometry(figure), [figure]);
   useEffect(() => () => geometry.dispose(), [geometry]);
 
@@ -160,7 +171,7 @@ export function FigureCloud({ figure, size, visible = true, slot }: FigureCloudP
       g.nextAt = t + nextGlitchDelay(rand);
     }
 
-    u.uPointScale.value = pointScaleFor(size.height);
+    u.uPointScale.value = pointScaleFor(zoom, figure.count);
     u.uDpr.value = dpr;
 
     if (process.env.NEXT_PUBLIC_E2E === "1") {
@@ -169,6 +180,7 @@ export function FigureCloud({ figure, size, visible = true, slot }: FigureCloudP
         frames: c.frames,
         trailCount: windTrail.count,
         yaw: u.uYaw.value,
+        software,
         // A test can hold the slice longer than a real one, to look at it.
         glitch: (ms = GLITCH_MS) => {
           g.holdMs = ms;
@@ -181,7 +193,7 @@ export function FigureCloud({ figure, size, visible = true, slot }: FigureCloudP
 
   return (
     <>
-      <OrthographicCamera makeDefault position={[0, 0, 5]} zoom={figureZoom(size.width, size.height)} near={0.1} far={20} />
+      <OrthographicCamera makeDefault position={[0, 0, 5]} zoom={zoom} near={0.1} far={20} />
       <points geometry={geometry} frustumCulled={false}>
         <shaderMaterial
           ref={materialRef}

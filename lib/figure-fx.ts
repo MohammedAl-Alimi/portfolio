@@ -85,9 +85,20 @@ export function wrapAngle(a: number): number {
   return ((a % TAU) + TAU) % TAU;
 }
 
-/** Point size multiplier: 1 at a 420 px slot, clamped to 0.8..2.2. */
-export function pointScaleFor(slotHeightPx: number): number {
-  return Math.min(2.2, Math.max(0.8, slotHeightPx / 420));
+/** Point count of the full figure; lower tiers draw a subset. */
+export const FULL_COUNT = 56000;
+
+/**
+ * Point size multiplier, clamped to 0.8..3.
+ * The points' spacing on screen grows with the camera zoom (px per world unit)
+ * and with fewer points (spacing goes as 1 / sqrt(count)), so the size follows
+ * both. At 190 px per unit with all 56,000 points (about a 400 px tall 4:3
+ * slot) bright skin points close up into a surface while dark hair and shirt
+ * points stay small and dotted, so the face reads and the cloud still looks like points.
+ */
+export function pointScaleFor(zoom: number, count = FULL_COUNT): number {
+  const density = Math.sqrt(FULL_COUNT / Math.max(1, count));
+  return Math.min(3, Math.max(0.8, (zoom / 190) * density));
 }
 
 // The poster (scripts/figure/build-points.py) draws 0.47 * height px per unit at 1600 by 1200.
@@ -95,7 +106,7 @@ const POSTER_W = 1600;
 const POSTER_H = 1200;
 const POSTER_UNIT = 0.47 * POSTER_H;
 
-/** Camera zoom (px per world unit) so the cloud lands exactly on the object-contain poster. */
+/** Camera zoom (px per world unit) so the cloud lands exactly on the object-cover poster. */
 export function figureZoom(slotW: number, slotH: number): number {
-  return POSTER_UNIT * Math.min(slotW / POSTER_W, slotH / POSTER_H);
+  return POSTER_UNIT * Math.max(slotW / POSTER_W, slotH / POSTER_H);
 }
