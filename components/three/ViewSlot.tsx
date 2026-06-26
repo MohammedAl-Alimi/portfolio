@@ -26,7 +26,7 @@ export function ViewSlot({ children, poster, className, index }: Props) {
       <div
         data-poster
         className={cn(
-          "pointer-events-none transition-opacity duration-300",
+          "pointer-events-none absolute inset-0 transition-opacity duration-300",
           active && ready ? "opacity-0" : "opacity-100",
         )}
       >
