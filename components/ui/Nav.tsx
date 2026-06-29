@@ -1,7 +1,6 @@
 import { Container } from "./Container";
 import { MobileMenu } from "./MobileMenu";
 import { NavLinks } from "./NavLinks";
-import { ThemeToggle } from "./ThemeToggle";
 import { Wordmark } from "./Wordmark";
 import { SearchIcon } from "./icons";
 
@@ -24,7 +23,6 @@ export function Nav() {
             <SearchIcon />
             <span className="hidden md:inline">Search</span>
           </button>
-          <ThemeToggle />
           <MobileMenu />
         </div>
       </Container>
