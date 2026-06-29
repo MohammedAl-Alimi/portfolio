@@ -9,7 +9,7 @@ export function Grain() {
     <div
       aria-hidden="true"
       data-grain
-      className="pointer-events-none fixed inset-0 z-[60] opacity-[0.06] mix-blend-overlay light:opacity-[0.04]"
+      className="pointer-events-none fixed inset-0 z-[60] opacity-[0.06] mix-blend-overlay"
     >
       <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" focusable="false">
         <filter id="grain">
