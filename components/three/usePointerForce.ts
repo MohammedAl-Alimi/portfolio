@@ -44,7 +44,10 @@ export function usePointerForce(selector: string | undefined, enabled = true): v
       useSceneStore.getState().setPointer({ x: next.x, y: next.y, vx: v.vx, vy: v.vy });
     };
 
+    const markInteracted = () => useSceneStore.getState().markInteracted();
+
     const onMove = (e: PointerEvent) => {
+      markInteracted();
       pending = { clientX: e.clientX, clientY: e.clientY };
       if (!raf) raf = requestAnimationFrame(flush);
     };
@@ -62,12 +65,14 @@ export function usePointerForce(selector: string | undefined, enabled = true): v
     };
 
     slot.addEventListener("pointermove", onMove, { passive: true });
+    slot.addEventListener("pointerdown", markInteracted, { passive: true });
     slot.addEventListener("pointerleave", onLeave);
     // A vertical swipe hands the touch to scrolling, which cancels the pointer.
     slot.addEventListener("pointercancel", onLeave);
     return () => {
       if (raf) cancelAnimationFrame(raf);
       slot.removeEventListener("pointermove", onMove);
+      slot.removeEventListener("pointerdown", markInteracted);
       slot.removeEventListener("pointerleave", onLeave);
       slot.removeEventListener("pointercancel", onLeave);
     };
