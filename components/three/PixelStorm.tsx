@@ -13,6 +13,8 @@ import {
 } from "three";
 import { isSoftwareRenderer } from "@/lib/gpu";
 import {
+  approach,
+  breezeLevel,
   SAMPLE_INTERVAL,
   SAMPLE_INTERVAL_SOFTWARE,
   stormNow,
@@ -45,6 +47,8 @@ const WIND_GAIN = 0.03;
 const IDLE_FPS = 30; // the idle shimmer does not need more than 30 fps
 const WIND_FPS = 60; // wind feels laggy at 30
 const SOFTWARE_FPS = 15;
+const BREEZE_FPS = 15; // a settled breeze is slow enough for 15 fps
+const BREEZE_FALL_S = 0.25; // a new sample fades the breeze out this fast, no pop
 
 declare global {
   interface Window {
@@ -82,6 +86,7 @@ export function PixelStorm({ count, targets, colors, pointSize = 3, animate = tr
 
   const materialRef = useRef<ShaderMaterial>(null);
   const frames = useRef(0);
+  const breeze = useRef({ level: 0, steady: false, lastT: 0 });
   const [uniforms] = useState(() => ({
     uTime: { value: 0 },
     uLive: { value: 0 },
@@ -112,8 +117,10 @@ export function PixelStorm({ count, targets, colors, pointSize = 3, animate = tr
     };
   }, [invalidate, geometry, pointSize]);
 
-  // Drives the demand loop. Wind runs at up to 60 fps until the trail settles,
-  // the idle shimmer at 30. With neither, the loop stops until the next sample.
+  // Drives the demand loop. Wind runs at up to 60 fps (15 on software) until
+  // the trail settles 1.5 s after its last sample. Then the shimmer and the
+  // fading-in breeze run at 30, and a steady breeze at 15. With nothing
+  // animating, the loop stops until the next sample wakes it.
   useEffect(() => {
     let raf = 0;
     let last = 0;
@@ -122,7 +129,7 @@ export function PixelStorm({ count, targets, colors, pointSize = 3, animate = tr
       const windy = windTrail.count > 0 && stormNow() < windTrail.latestTime + TRAIL_TTL;
       let fps = 0;
       if (windy) fps = software ? SOFTWARE_FPS : WIND_FPS;
-      else if (animating) fps = IDLE_FPS;
+      else if (animating) fps = breeze.current.steady ? BREEZE_FPS : IDLE_FPS;
       if (fps === 0) {
         invalidate(); // one more frame draws the settled state
         return;
@@ -152,6 +159,13 @@ export function PixelStorm({ count, targets, colors, pointSize = 3, animate = tr
     const t = stormNow();
     u.uTime.value = t;
     u.uLive.value = animating ? 1 : 0;
+    // Breeze eases in 2 to 3 s after the last sample and fades out fast on a new one.
+    const b = breeze.current;
+    const target = animating ? breezeLevel(t - windTrail.latestTime) : 0;
+    b.level = target >= b.level ? target : approach(b.level, target, t - b.lastT, BREEZE_FALL_S);
+    b.lastT = t;
+    b.steady = target === 1 && b.level === 1;
+    u.uBreeze.value = b.level;
     u.uPointSize.value = pointSize;
     u.uDpr.value = dpr;
     const cam = state.camera;
