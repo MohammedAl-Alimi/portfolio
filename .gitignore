@@ -46,3 +46,6 @@ Thumbs.db
 .claude/settings.local.json
 .playwright-mcp/
 .superpowers/
+
+# rtk test reports
+.vitest/
