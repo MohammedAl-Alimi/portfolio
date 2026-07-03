@@ -20,12 +20,16 @@ async function openProjects(page: Page) {
   });
   // Records the pathname at the moment each state change commits, with no auto-waiting.
   await page.evaluate(() => {
-    const w = window as Window & { __transitionLog?: { state: string; path: string }[] };
+    const w = window as Window & { __transitionLog?: { state: string; path: string; t: number }[] };
     w.__transitionLog = [];
     const root = document.querySelector("[data-transition]");
     if (!root) return;
     new MutationObserver(() => {
-      w.__transitionLog?.push({ state: root.getAttribute("data-state") ?? "", path: location.pathname });
+      w.__transitionLog?.push({
+        state: root.getAttribute("data-state") ?? "",
+        path: location.pathname,
+        t: performance.now(),
+      });
     }).observe(root, { attributes: true, attributeFilter: ["data-state"] });
   });
   return { overlay, link, href: href as string };
@@ -33,7 +37,8 @@ async function openProjects(page: Page) {
 
 async function transitionLog(page: Page) {
   return page.evaluate(
-    () => (window as Window & { __transitionLog?: { state: string; path: string }[] }).__transitionLog ?? [],
+    () =>
+      (window as Window & { __transitionLog?: { state: string; path: string; t: number }[] }).__transitionLog ?? [],
   );
 }
 
@@ -44,12 +49,17 @@ async function pathAtUncover(page: Page) {
 
 test("card click wipes to the project and ends idle within 1.2 s", async ({ page }) => {
   const { overlay, link, href } = await openProjects(page);
-  const start = Date.now();
   await link.click();
   await expect(overlay).not.toHaveAttribute("data-state", "idle");
   expect(await page.locator("[data-glitch-band]").count()).toBe(12);
-  await expect(overlay).toHaveAttribute("data-state", "idle", { timeout: 1200 });
-  expect(Date.now() - start).toBeLessThan(1200);
+  await expect(overlay).toHaveAttribute("data-state", "idle", { timeout: 2000 });
+  // Timed in the page, from the cover starting to idle, so runner round trips do not count.
+  const log = await transitionLog(page);
+  const covered = log.find((entry) => entry.state === "covering");
+  const idle = log.find((entry) => entry.state === "idle");
+  expect(covered).toBeDefined();
+  expect(idle).toBeDefined();
+  expect(idle!.t - covered!.t).toBeLessThan(1200);
   expect(await pathAtUncover(page)).toBe(href);
   // Read directly at idle: an auto-waiting toHaveURL would pass a late arrival.
   expect(new URL(page.url()).pathname).toBe(href);
