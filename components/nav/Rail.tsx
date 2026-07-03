@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { TransitionLink } from "@/components/motion/TransitionLink";
 import { NAV_ITEMS } from "@/lib/nav";
 import { NavGlyph, RailSearchIcon } from "./icons";
 import { ScrollReadout } from "./ScrollReadout";
@@ -17,13 +17,13 @@ export function Rail() {
       aria-label="Main"
       className="group/rail hidden lg:flex fixed left-0 top-0 z-40 h-dvh w-[72px] hover:w-[220px] has-[:focus-visible]:w-[220px] flex-col overflow-hidden border-r border-border bg-bg motion-safe:transition-[width] duration-[var(--motion-base)]"
     >
-      <Link
+      <TransitionLink
         href="/"
         className={`flex h-12 items-center px-[26px] font-mono text-[12px] font-bold text-text ${focusRing}`}
       >
         <span aria-hidden="true">MA</span>
         <span className="sr-only">Mohammed Al-Alimi, home</span>
-      </Link>
+      </TransitionLink>
       <div className="flex flex-1 flex-col justify-center">
         {NAV_ITEMS.map((item) => (
           <TabLink key={item.label} href={item.href} className={tab} activeClassName={tabActive}>

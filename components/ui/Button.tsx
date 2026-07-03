@@ -1,5 +1,5 @@
-import Link from "next/link";
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes } from "react";
+import { TransitionLink } from "@/components/motion/TransitionLink";
 import { cn } from "@/lib/cn";
 import { Brackets } from "./Brackets";
 
@@ -40,8 +40,9 @@ const sizes: Record<Size, string> = {
   lg: "px-7",
 };
 
+/** A path on this site. Hash-only links stay plain anchors (same-page jumps). */
 function isInternal(href: string) {
-  return (href.startsWith("/") && !href.startsWith("//")) || href.startsWith("#");
+  return href.startsWith("/") && !href.startsWith("//");
 }
 
 export function Button(props: ButtonProps) {
@@ -73,7 +74,7 @@ function renderButton(props: ButtonProps) {
     const opensNewTab = forceNewTab || anchorRest.target === "_blank";
     if (isInternal(href) && !external) {
       return (
-        <Link
+        <TransitionLink
           {...anchorRest}
           href={href}
           rel={anchorRest.target === "_blank" ? "noopener noreferrer" : anchorRest.rel}

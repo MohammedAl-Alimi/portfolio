@@ -1,6 +1,6 @@
 import Image from "next/image";
-import Link from "next/link";
 import { CountUp } from "@/components/motion/CountUp";
+import { TransitionLink } from "@/components/motion/TransitionLink";
 import { Card } from "@/components/ui/Card";
 import { Tag } from "@/components/ui/Tag";
 import type { Project } from "@/lib/content";
@@ -35,12 +35,12 @@ export function ProjectCard({ project, size = "md" }: ProjectCardProps) {
           <h3
             className={size === "lg" ? "font-display text-2xl break-words md:text-3xl" : "font-display text-xl break-words md:text-2xl"}
           >
-            <Link
+            <TransitionLink
               href={`/projects/${slug}`}
               className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none"
             >
               {title}
-            </Link>
+            </TransitionLink>
           </h3>
           <p className="text-muted">{tagline}</p>
           <div className="mt-auto flex flex-wrap items-center gap-2 pt-2">
