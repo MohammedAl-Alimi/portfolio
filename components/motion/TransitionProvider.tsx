@@ -22,7 +22,8 @@ import { GlitchOverlay } from "./GlitchOverlay";
  * - A click while covering is ignored. A click while uncovering is queued; the
  *   last one wins and runs once the overlay is idle.
  * - A 1.5 s watchdog forces idle and clears the overlay whatever happens
- *   (slow route, failed push, a route that never changes the pathname).
+ *   (slow route, failed push, a route that never changes the pathname). If the
+ *   push was already sent, a late arrival still scrolls to the top and gets focus.
  * - A link to the current pathname (a filter chip, the active tab) skips the
  *   wipe: there is no new page to reveal.
  * - Back and forward never animate. A popstate mid-transition cancels it.
@@ -67,9 +68,21 @@ type Run = {
   id: number;
   fromPath: string;
   reduced: boolean;
+  /** The href has a hash: Next scrolls to it, so no scroll to the top. */
+  hash: boolean;
   /** Set once router.push has been called. */
   pushed: boolean;
 };
+
+function focusMain() {
+  document.getElementById("main")?.focus({ preventScroll: true });
+}
+
+/** Puts the new page at the top (unless it targets a hash) and optionally moves focus into it. */
+function arrive(hash: boolean, focus: boolean) {
+  if (!hash) scrollToTop();
+  if (focus) focusMain();
+}
 
 export function TransitionProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -85,6 +98,8 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
   const overlay = useRef<OverlayHandle | null>(null);
   const pathnameRef = useRef(pathname);
   const navigateRef = useRef<(href: string) => boolean>(() => false);
+  /** A pushed run the watchdog ended before its page arrived. */
+  const late = useRef<Run | null>(null);
 
   const setState = useCallback((next: TransitionState) => {
     stateRef.current = next;
@@ -102,7 +117,7 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
       clearWatchdog();
       runRef.current = null;
       setState("idle");
-      if (moved) document.getElementById("main")?.focus({ preventScroll: true });
+      if (moved) focusMain();
       const next = queued.current;
       queued.current = null;
       if (next && !navigateRef.current(next)) router.push(next);
@@ -115,7 +130,10 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
     const run = runRef.current;
     if (!run && stateRef.current === "idle") return;
     overlay.current?.reset();
-    settle(Boolean(run && pathnameRef.current !== run.fromPath));
+    const moved = Boolean(run && pathnameRef.current !== run.fromPath);
+    // The push is out but its page is not in yet: handle it when it lands.
+    if (run?.pushed && !moved) late.current = run;
+    settle(moved);
   }, [settle]);
 
   const uncover = useCallback(async () => {
@@ -140,10 +158,12 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
       // Same pathname (query or hash change only): a normal navigation, no wipe.
       if (url.pathname === window.location.pathname) return false;
 
+      late.current = null;
       const run: Run = {
         id: ++nextId.current,
         fromPath: pathnameRef.current,
         reduced: prefersReducedMotion(),
+        hash: url.hash !== "",
         pushed: false,
       };
       runRef.current = run;
@@ -154,12 +174,10 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
       void (async () => {
         await (overlay.current?.cover(run.reduced) ?? wait(COVER_MS));
         if (runRef.current?.id !== run.id) return;
-        // Jump to the top while covered, so the new page never shows mid-scroll.
-        scrollToTop();
         run.pushed = true;
-        // A link to a section of another page keeps Next's scroll to the hash.
-        const scroll = url.hash !== "";
-        startTransition(() => router.push(href, { scroll }));
+        // Next scrolls only for a hash link; otherwise the scroll to the top waits
+        // until the new page is in place, so the old page never moves.
+        startTransition(() => router.push(href, { scroll: run.hash }));
       })();
       return true;
     },
@@ -170,11 +188,20 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
     navigateRef.current = navigate;
   }, [navigate]);
 
-  // The new page has committed: reveal it.
+  // The new page has committed: put it at the top while still covered, then reveal it.
   useEffect(() => {
     pathnameRef.current = pathname;
     const run = runRef.current;
-    if (run?.pushed && pathname !== run.fromPath) void uncover();
+    if (run?.pushed && pathname !== run.fromPath && stateRef.current === "covering") {
+      arrive(run.hash, false);
+      void uncover();
+    }
+    // A page that arrived after the watchdog: no wipe left to play, but scroll and focus.
+    const stale = late.current;
+    if (stale && pathname !== stale.fromPath) {
+      late.current = null;
+      arrive(stale.hash, true);
+    }
   }, [pathname, uncover]);
 
   // The push settled without a pathname change (redirect back, failed fetch): reveal anyway.
@@ -188,6 +215,8 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
     const onPop = () => {
       queued.current = null;
       forceIdle();
+      // A back or forward is the visitor's choice, not the late page arriving.
+      late.current = null;
     };
     const onShow = (e: PageTransitionEvent) => {
       if (e.persisted) forceIdle();
