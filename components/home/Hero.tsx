@@ -16,7 +16,7 @@ export function Hero({ profile }: { profile: Profile }) {
           <div className="order-2 lg:order-1 lg:col-span-6">
             <h1
               id="hero-title"
-              className="font-display font-bold leading-[0.9] tracking-[-0.03em] text-[clamp(2rem,5.6vw,5.5rem)]"
+              className="font-display leading-[0.9] tracking-[-0.02em] text-[clamp(1.75rem,4vw,4.5rem)]"
             >
               <span data-name-line className="block">
                 {first}

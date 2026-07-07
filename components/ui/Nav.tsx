@@ -1,7 +1,6 @@
 import { Container } from "./Container";
 import { MobileMenu } from "./MobileMenu";
 import { NavLinks } from "./NavLinks";
-import { ThemeToggle } from "./ThemeToggle";
 import { Wordmark } from "./Wordmark";
 import { SearchIcon } from "./icons";
 
@@ -19,12 +18,11 @@ export function Nav() {
             aria-label="Search"
             data-search-trigger
             disabled
-            className="inline-flex min-h-[44px] min-w-[44px] cursor-default items-center justify-center gap-2 rounded-[var(--radius-sm)] border-2 border-border bg-surface px-3 font-pixel text-[12px] uppercase tracking-wider text-text opacity-60"
+            className="inline-flex min-h-[44px] min-w-[44px] cursor-default items-center justify-center gap-2 border border-border bg-surface px-3 font-mono uppercase tracking-[0.12em] text-[12px] text-text opacity-60 focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-[var(--glow)]"
           >
             <SearchIcon />
             <span className="hidden md:inline">Search</span>
           </button>
-          <ThemeToggle />
           <MobileMenu />
         </div>
       </Container>

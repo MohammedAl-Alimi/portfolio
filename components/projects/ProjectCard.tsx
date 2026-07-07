@@ -10,13 +10,12 @@ type ProjectCardProps = {
 };
 
 export function ProjectCard({ project, size = "md" }: ProjectCardProps) {
-  const { title, slug, tagline, color, tags, year, cover } = project.frontmatter;
+  const { title, slug, tagline, tags, year, cover } = project.frontmatter;
 
   return (
     <Card
       data-project-card
-      color={color}
-      className="relative h-full overflow-hidden p-0 motion-safe:transition-transform motion-safe:duration-[var(--motion-base)] motion-safe:hover:-translate-y-1 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-current"
+      className="relative h-full overflow-hidden p-0 motion-safe:transition-transform motion-safe:duration-[var(--motion-base)] motion-safe:hover:-translate-y-1 focus-within:outline-1 focus-within:outline-offset-2 focus-within:outline-[var(--glow)]"
     >
       <div className="flex h-full flex-col">
         {cover ? (
@@ -29,7 +28,7 @@ export function ProjectCard({ project, size = "md" }: ProjectCardProps) {
             className="aspect-video w-full object-cover"
           />
         ) : (
-          <div aria-hidden="true" className="aspect-video w-full" style={{ backgroundColor: color }} />
+          <div aria-hidden="true" className="aspect-video w-full border-b border-border bg-surface-2" />
         )}
         <div className="flex flex-1 flex-col gap-3 p-6">
           <h3
@@ -46,15 +45,10 @@ export function ProjectCard({ project, size = "md" }: ProjectCardProps) {
           <div className="mt-auto flex flex-wrap items-center gap-2 pt-2">
             {tags.map((tag) => (
               <Tag key={tag}>
-                <span
-                  aria-hidden="true"
-                  className="mr-2 inline-block size-2 rounded-full"
-                  style={{ backgroundColor: color }}
-                />
                 {tag}
               </Tag>
             ))}
-            <span className="ml-auto font-pixel text-[11px] uppercase tracking-wider text-muted">{year}</span>
+            <span className="ml-auto font-mono uppercase tracking-[0.12em] text-[11px] text-muted">{year}</span>
           </div>
         </div>
       </div>
