@@ -1,8 +1,7 @@
 import { Card } from "@/components/ui/Card";
 import { Section } from "@/components/ui/Section";
+import { pad2 } from "@/lib/format";
 import type { Site } from "@/lib/schemas";
-
-const pad = (n: number) => String(n).padStart(2, "0");
 
 export function WhatIBuild({ copy }: { copy: Site["home"]["whatIBuild"] }) {
   return (
@@ -13,7 +12,7 @@ export function WhatIBuild({ copy }: { copy: Site["home"]["whatIBuild"] }) {
             {/* `01 AI AND COMPUTER VISION`: CSS does the caps, so the name reads as words. */}
             <h3 className="font-display text-xl uppercase leading-[1.1] tracking-[-0.02em] break-words md:text-2xl">
               <span aria-hidden="true" className="font-mono text-[11px] tracking-[0.12em] text-muted">
-                {pad(i + 1)}
+                {pad2(i + 1)}
               </span>{" "}
               {item.title}
             </h3>

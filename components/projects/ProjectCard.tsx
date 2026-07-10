@@ -4,6 +4,7 @@ import { TransitionLink } from "@/components/motion/TransitionLink";
 import { Card } from "@/components/ui/Card";
 import { Tag } from "@/components/ui/Tag";
 import type { Project } from "@/lib/content";
+import { pad2 } from "@/lib/format";
 
 type ProjectCardProps = {
   project: Project;
@@ -13,8 +14,6 @@ type ProjectCardProps = {
   total: number;
   size?: "md" | "lg";
 };
-
-const pad = (n: number) => String(n).padStart(2, "0");
 
 export function ProjectCard({ project, index, total, size = "md" }: ProjectCardProps) {
   const { title, slug, tagline, tags, year, cover } = project.frontmatter;
@@ -36,7 +35,7 @@ export function ProjectCard({ project, index, total, size = "md" }: ProjectCardP
         )}
         <div className="flex flex-1 flex-col gap-3 p-6">
           <p data-project-index className="font-mono uppercase tracking-[0.12em] text-[11px] text-muted">
-            {pad(index)} / {pad(total)}
+            {pad2(index)} / {pad2(total)}
           </p>
           <h3
             className={size === "lg" ? "font-display text-2xl break-words md:text-3xl" : "font-display text-xl break-words md:text-2xl"}

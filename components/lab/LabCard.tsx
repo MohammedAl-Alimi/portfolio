@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import type { LabItem } from "@/lib/content";
+import { pad2 } from "@/lib/format";
 
 type LabCardProps = {
   item: LabItem;
@@ -10,8 +11,6 @@ type LabCardProps = {
   total: number;
   tryLabel: string;
 };
-
-const pad = (n: number) => String(n).padStart(2, "0");
 
 export function LabCard({ item, index, total, tryLabel }: LabCardProps) {
   const { title, slug, description, thumbnail, thumbnailAlt } = item.frontmatter;
@@ -30,7 +29,7 @@ export function LabCard({ item, index, total, tryLabel }: LabCardProps) {
         <div className="flex flex-1 flex-col gap-3 p-6">
           {/* Same index line as ProjectCard. */}
           <p data-lab-index className="font-mono uppercase tracking-[0.12em] text-[11px] text-muted">
-            {pad(index)} / {pad(total)}
+            {pad2(index)} / {pad2(total)}
           </p>
           <h3 className="font-display text-2xl break-words">{title}</h3>
           <p className="font-mono text-muted">{description}</p>
