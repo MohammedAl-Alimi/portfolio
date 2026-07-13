@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { expectNoSeriousViolations } from "./helpers/axe";
 
 test("lab lists items with plain language and try buttons", async ({ page }) => {
@@ -7,7 +7,8 @@ test("lab lists items with plain language and try buttons", async ({ page }) => 
   await expect(
     page.getByText("Small experiments and live demos. Click anything to try it."),
   ).toBeVisible();
-  await expect(page.getByRole("link", { name: "Try it" })).toHaveCount(1);
+  await expect(page.getByRole("link", { name: "Try it" })).toHaveCount(2);
+  await expect(page.getByRole("heading", { level: 3 }).first()).toHaveText("Point cloud figure");
 });
 
 test("lab detail renders a sandboxed iframe and a how it works fold", async ({ page }) => {
@@ -24,11 +25,64 @@ test("unknown lab slug returns 404", async ({ page }) => {
   expect(res?.status()).toBe(404);
 });
 
-for (const path of ["/lab", "/lab/crowd-dashboard"]) {
+const CONTROLS = ["Rotation speed", "Point count", "Glitch rate", "Scanline", "Wind gain"];
+const UNAVAILABLE = "The live figure needs a graphics card. Here is a still image instead.";
+
+async function yaw(page: Page): Promise<number | null> {
+  return page.evaluate(() => (window as unknown as { __figure?: { yaw: number } }).__figure?.yaw ?? null);
+}
+
+// True when the rotation reads the same twice, 300 ms apart.
+async function holdsStill(page: Page): Promise<boolean> {
+  const a = await yaw(page);
+  await page.waitForTimeout(300);
+  return a !== null && (await yaw(page)) === a;
+}
+
+test.describe("figure sandbox", () => {
+  test("renders the slot, five labelled controls and a reset button", async ({ page }) => {
+    await page.goto("/lab/figure");
+    await expect(page.locator('[data-lab-slot="figure"]')).toBeVisible();
+    for (const label of CONTROLS) await expect(page.getByLabel(label)).toBeVisible();
+    await expect(page.getByRole("button", { name: "Reset" })).toBeVisible();
+  });
+
+  test("caps the count by tier and stops the rotation at speed 0", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium-desktop", "Desktop only");
+    // ?tier=high pins the tier; ?motion=force lets the figure turn on CI's CPU renderer.
+    await page.goto("/lab/figure?tier=high&motion=force");
+    const count = page.getByLabel("Point count");
+    await expect(count).toHaveAttribute("max", "56000");
+    await expect(count).toHaveValue("56000");
+    await expect.poll(() => yaw(page), { timeout: 10000 }).not.toBeNull();
+
+    const speed = page.getByLabel("Rotation speed");
+    await speed.fill("0");
+    await expect(speed).toHaveValue("0");
+    await expect.poll(() => holdsStill(page)).toBe(true);
+
+    await speed.fill("0.3");
+    await expect.poll(() => holdsStill(page)).toBe(false);
+
+    await page.getByRole("button", { name: "Reset" }).click();
+    await expect(speed).toHaveValue("0.15");
+  });
+
+  test("falls back to the poster with disabled controls without WebGL", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium-nowebgl", "No-WebGL project only");
+    await page.goto("/lab/figure");
+    await expect(page.getByText(UNAVAILABLE)).toBeVisible();
+    for (const label of CONTROLS) await expect(page.getByLabel(label)).toBeDisabled();
+    await expect(page.getByRole("button", { name: "Reset" })).toBeDisabled();
+    await expect(page.locator("canvas")).toHaveCount(0);
+  });
+});
+
+for (const path of ["/lab", "/lab/crowd-dashboard", "/lab/figure"]) {
   test(`axe has no serious issues on ${path}`, async ({ page }) => {
     await page.goto(path);
     // The embedded demo is third-party content, so axe skips the iframe.
-    await expectNoSeriousViolations(page, { exclude: ["iframe"] });
+    await expectNoSeriousViolations(page, path === "/lab/crowd-dashboard" ? { exclude: ["iframe"] } : {});
   });
 
   test(`no horizontal scroll at 320px on ${path}`, async ({ page }) => {
