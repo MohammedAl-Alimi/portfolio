@@ -64,7 +64,7 @@ A `kind: component` item renders the component its `component` field names from 
 
 | Name | Component | Used by |
 | --- | --- | --- |
-| `FigureSandbox` | The home page figure with live sliders (`components/lab/FigureSandbox.tsx:108`) | `content/lab/figure.mdx` |
+| `FigureSandbox` | The home page figure with live sliders (`components/lab/FigureSandbox.tsx:111`) | `content/lab/figure.mdx` |
 
 ## About frontmatter
 

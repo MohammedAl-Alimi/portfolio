@@ -25,16 +25,18 @@ const FigureCloud = dynamic(() => import("@/components/three/FigureCloud").then(
 const SLOT = "[data-figure-sandbox-slot]";
 const FIGURE_URL = "/figure/bust.bin";
 const RELOAD_MS = 150;
-const UNAVAILABLE = "The live figure needs a graphics card. Here is a still image instead.";
+const UNAVAILABLE = "The live figure is off here: it needs a graphics card and motion enabled. This is a still image instead.";
+const RELOAD_FAILED = "Could not load that many points. Kept the previous figure.";
 
 interface SandboxFigureProps {
   count: number;
   controls: FigureControls;
-  onFail: () => void;
+  /** Called after each load: the point count now on screen, or null when the load failed. */
+  onLoad: (count: number | null) => void;
 }
 
 /** Loads the cloud at `count` points. A new count keeps the old cloud on screen until the new one is parsed. */
-function SandboxFigure({ count, controls, onFail }: SandboxFigureProps) {
+function SandboxFigure({ count, controls, onLoad }: SandboxFigureProps) {
   const { size, visible } = useSlot(SLOT);
   const [figure, setFigure] = useState<Figure | null>(null);
   const loaded = useRef(false);
@@ -47,11 +49,12 @@ function SandboxFigure({ count, controls, onFail }: SandboxFigureProps) {
         void loadFigure(FIGURE_URL, { count, signal: ctrl.signal }).then((fig) => {
           if (ctrl.signal.aborted) return;
           if (!fig) {
-            onFail();
+            onLoad(null);
             return;
           }
           loaded.current = true;
           setFigure(fig);
+          onLoad(fig.count);
         });
       },
       loaded.current ? RELOAD_MS : 0,
@@ -60,7 +63,7 @@ function SandboxFigure({ count, controls, onFail }: SandboxFigureProps) {
       window.clearTimeout(timer);
       ctrl.abort();
     };
-  }, [count, onFail]);
+  }, [count, onLoad]);
 
   if (!figure || !size || size.width === 0) return null;
   return <FigureCloud figure={figure} size={size} visible={visible} slot={SLOT} controls={controls} />;
@@ -110,7 +113,10 @@ export function FigureSandbox() {
   const tier = useSceneStore((s) => s.tier);
   const sceneFailed = useSceneStore((s) => s.failed);
   const reducedMotion = useSceneStore((s) => s.reducedMotion);
-  const [loadFailed, setLoadFailed] = useState(false);
+  // The count on screen (null until the first figure draws) and whether the last reload failed.
+  const [shownCount, setShownCount] = useState<number | null>(null);
+  const [firstLoadFailed, setFirstLoadFailed] = useState(false);
+  const [reloadFailed, setReloadFailed] = useState(false);
   // null means "the defaults": they follow the motion preference and the tier until the visitor moves a control.
   const [picked, setPicked] = useState<SandboxSettings | null>(null);
   const [pickedCount, setPickedCount] = useState<number | null>(null);
@@ -120,10 +126,23 @@ export function FigureSandbox() {
   const cap = countCap(tier);
   const count = resolveCount(pickedCount, cap);
   const controls = useMemo<FigureControls>(() => ({ ...settings }), [settings]);
-  const markFailed = useCallback(() => setLoadFailed(true), []);
+  // A ref, so the callback stays stable and a first load does not trigger a second.
+  const hasFigure = useRef(false);
+  const handleLoad = useCallback((loadedCount: number | null) => {
+    if (loadedCount !== null) {
+      hasFigure.current = true;
+      setShownCount(loadedCount);
+      setReloadFailed(false);
+    } else if (hasFigure.current) {
+      // A figure is already on screen: keep it and the controls.
+      setReloadFailed(true);
+    } else {
+      setFirstLoadFailed(true);
+    }
+  }, []);
 
-  const unavailable = tier === "low" || sceneFailed || loadFailed;
-  const disabled = !active || loadFailed;
+  const unavailable = tier === "low" || sceneFailed || firstLoadFailed;
+  const disabled = !active || firstLoadFailed;
   const set = <K extends keyof SandboxSettings>(key: K, value: SandboxSettings[K]) =>
     setPicked({ ...settings, [key]: value });
   const reset = () => {
@@ -133,18 +152,27 @@ export function FigureSandbox() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-12">
-      <div data-figure-sandbox-slot className="touch-pan-y lg:col-span-8">
+      <div
+        data-figure-sandbox-slot
+        data-point-count={active && shownCount !== null ? shownCount : undefined}
+        className="touch-pan-y lg:col-span-8"
+      >
         <ViewSlot
           className="relative aspect-[4/5] border border-border bg-surface md:aspect-[16/10]"
           poster={<HeroPoster src="/posters/figure.webp" alt="" />}
         >
-          <SandboxFigure count={count} controls={controls} onFail={markFailed} />
+          <SandboxFigure count={count} controls={controls} onLoad={handleLoad} />
         </ViewSlot>
       </div>
       <div className="flex flex-col gap-6 lg:col-span-4">
         {unavailable ? (
           <p role="status" className="text-muted">
             {UNAVAILABLE}
+          </p>
+        ) : null}
+        {reloadFailed && !unavailable ? (
+          <p role="status" className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
+            {RELOAD_FAILED}
           </p>
         ) : null}
         <fieldset disabled={disabled} className="flex flex-col gap-5 disabled:opacity-50">
