@@ -1,5 +1,5 @@
-import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { expectNoSeriousViolations } from "./helpers/axe";
 
 test("lab lists items with plain language and try buttons", async ({ page }) => {
   await page.goto("/lab");
@@ -28,10 +28,7 @@ for (const path of ["/lab", "/lab/crowd-dashboard"]) {
   test(`axe has no serious issues on ${path}`, async ({ page }) => {
     await page.goto(path);
     // The embedded demo is third-party content, so axe skips the iframe.
-    const results = await new AxeBuilder({ page }).exclude("iframe").analyze();
-    expect(
-      results.violations.filter((v) => ["serious", "critical"].includes(v.impact ?? "")),
-    ).toEqual([]);
+    await expectNoSeriousViolations(page, { exclude: ["iframe"] });
   });
 
   test(`no horizontal scroll at 320px on ${path}`, async ({ page }) => {

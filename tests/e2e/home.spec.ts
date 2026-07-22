@@ -1,17 +1,13 @@
-import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { featuredProjects } from "./helpers/content";
+import { expectNoSeriousViolations } from "./helpers/axe";
 
 test("home renders the name and passes axe", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
     "Mohammed Al-Alimi",
   );
-  const results = await new AxeBuilder({ page }).analyze();
-  expect(
-    results.violations.filter((v) =>
-      ["serious", "critical"].includes(v.impact ?? ""),
-    ),
-  ).toEqual([]);
+  await expectNoSeriousViolations(page);
 });
 
 test("hero shows name, role and both buttons", async ({ page }) => {
@@ -26,16 +22,12 @@ test("hero shows name, role and both buttons", async ({ page }) => {
   expect(noOverflow).toBe(true);
 });
 
-test("featured strip lists the four featured projects", async ({ page }) => {
+test("featured strip lists the featured projects", async ({ page }) => {
+  const featured = featuredProjects();
   await page.goto("/");
   const region = page.getByRole("region", { name: "Featured projects" });
-  await expect(region.getByRole("link")).toHaveCount(4);
-  for (const title of [
-    "Crowd detection",
-    "Noah hub",
-    "Agent security playbook",
-    "Is my app safe",
-  ]) {
+  await expect(region.getByRole("link")).toHaveCount(featured.length);
+  for (const { title } of featured) {
     await expect(region.getByRole("link", { name: title })).toBeVisible();
   }
 });
