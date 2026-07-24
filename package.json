@@ -6,6 +6,7 @@
     "dev": "next dev",
     "prebuild": "npm run validate:content",
     "build": "next build",
+    "postbuild": "node scripts/check-chunk-budget.mjs",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
