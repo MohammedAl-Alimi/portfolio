@@ -42,7 +42,7 @@ export default function NotFound() {
           </g>
         </svg>
       </div>
-      <h1 className="font-display text-center text-[clamp(2.5rem,6vw,5rem)] leading-tight">
+      <h1 className="font-display text-center tracking-[-0.03em] leading-[0.9] text-[clamp(2.5rem,6vw,5rem)]">
         This page wandered off.
       </h1>
       <p className="mt-4 text-center text-muted">The link may be old, or the page moved.</p>
