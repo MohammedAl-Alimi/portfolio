@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { cn } from "@/lib/cn";
+import { useSceneStore } from "@/lib/scene-store";
 import { subscribeScroll } from "@/lib/scroll";
 
 const CELL = 56; // px, one grid square before perspective
@@ -11,15 +12,17 @@ const SPEED = 0.5; // grid px per scrolled px
  * A perspective floor of 1 px lines (white at 10%) that slides toward the viewer
  * as the page scrolls (spec 18.6). Scroll writes `--grid-y`; CSS turns it into
  * `background-position`. It sits under the canvas (z-index below the canvas's -1),
- * so the figure draws over it. Static under reduced motion.
+ * so the figure draws over it. Static under reduced motion and on the low tier
+ * (spec 18.2), and until the tier is known, so it never moves and then stops.
  * Its parent must be `relative` and must not create a stacking context.
  */
 export function GridFloor({ className }: { className?: string }) {
   const plane = useRef<HTMLDivElement>(null);
+  const moving = useSceneStore((s) => s.tier === "high" || s.tier === "mid");
 
   useEffect(() => {
     const el = plane.current;
-    if (!el) return;
+    if (!el || !moving) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
     let off: (() => void) | null = null;
     const sync = () => {
@@ -36,8 +39,9 @@ export function GridFloor({ className }: { className?: string }) {
     return () => {
       reduce.removeEventListener("change", sync);
       off?.();
+      el.style.setProperty("--grid-y", "0px");
     };
-  }, []);
+  }, [moving]);
 
   return (
     <div
