@@ -46,3 +46,18 @@ export function readDeviceSignals(): DeviceSignals {
     frameMs: null,
   };
 }
+
+const PROBE_WARMUP_FRAMES = 5;
+
+export function medianFrameMs(samples: number[]): number | null {
+  const rest = samples.slice(PROBE_WARMUP_FRAMES).sort((a, b) => a - b);
+  if (rest.length === 0) return null;
+  const mid = Math.floor(rest.length / 2);
+  const hi = rest[mid] ?? 0;
+  return rest.length % 2 === 1 ? hi : ((rest[mid - 1] ?? 0) + hi) / 2;
+}
+
+// Never upgrades: only a high tier can be downgraded to mid.
+export function tierAfterProbe(signals: DeviceSignals, samples: number[]): Tier {
+  return getDeviceTier({ ...signals, frameMs: medianFrameMs(samples) });
+}
