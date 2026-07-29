@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import type { Profile } from "@/lib/schemas";
 import { ViewSlot } from "@/components/three/ViewSlot";
+import { HeroHint } from "./HeroHint";
 import { HeroPoster } from "./HeroPoster";
 import { HeroStormLoader } from "./HeroStormLoader";
 
@@ -37,7 +38,7 @@ export function Hero({ profile }: { profile: Profile }) {
             </div>
           </div>
           <div className="order-1 lg:order-2 lg:col-span-6">
-            <div data-hero-slot>
+            <div data-hero-slot className="touch-pan-y">
               <ViewSlot
                 className="relative aspect-[4/3] lg:aspect-auto lg:h-[520px]"
                 poster={<HeroPoster src="/posters/pixel-name.webp" alt="" />}
@@ -45,9 +46,7 @@ export function Hero({ profile }: { profile: Profile }) {
                 <HeroStormLoader />
               </ViewSlot>
             </div>
-            <p className="mt-3 font-pixel text-[11px] tracking-wider text-muted uppercase">
-              MOVE YOUR MOUSE. CLICK A SHAPE.
-            </p>
+            <HeroHint />
           </div>
         </div>
       </Container>
