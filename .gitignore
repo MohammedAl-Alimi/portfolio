@@ -45,3 +45,4 @@ Thumbs.db
 # agent scratch
 .claude/settings.local.json
 .playwright-mcp/
+.superpowers/
