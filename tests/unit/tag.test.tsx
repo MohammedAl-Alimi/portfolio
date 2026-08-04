@@ -9,10 +9,10 @@ it("shows a colour dot when a colour is given", () => {
   expect(dot.style.backgroundColor).not.toBe("");
 });
 
-it("uses the pixel font and a hard border", () => {
+it("uses the mono font and a hard border", () => {
   render(<Tag>Plain</Tag>);
   const tag = screen.getByText("Plain");
-  expect(tag.className).toContain("font-pixel");
+  expect(tag.className).toContain("font-mono");
   expect(tag.className).toContain("border-border");
   expect(tag.getAttribute("style")).toBeNull();
 });
