@@ -19,6 +19,7 @@
   --radius-lg: var(--radius-lg-value);
   --font-display: var(--font-display-src), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-sans-src), ui-sans-serif, system-ui, sans-serif;
+  --font-pixel: var(--font-pixel-src), ui-monospace, monospace;
 }
 
 :root {
