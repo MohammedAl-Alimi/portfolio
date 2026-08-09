@@ -7,7 +7,7 @@ export async function Footer() {
   return (
     <footer id="contact" className="border-t border-border">
       <Section>
-        <h2 className="font-display text-5xl md:text-7xl">Say hi</h2>
+        <h2 className="font-display text-5xl tracking-[-0.03em] leading-[0.9] md:text-7xl">Say hi</h2>
         <p className="mt-4 text-lg text-muted">{profile.availability}</p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Button href={`mailto:${profile.email}`} size="lg">
@@ -23,7 +23,7 @@ export async function Footer() {
             Download CV
           </Button>
         </div>
-        <p className="mt-16 text-sm text-muted">
+        <p className="mt-16 font-pixel text-[12px] uppercase tracking-wider text-muted">
           © 2026 Mohammed Al-Alimi. Built with Next.js.
         </p>
       </Section>

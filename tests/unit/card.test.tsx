@@ -15,9 +15,10 @@ it("renders no link without href", () => {
   expect(screen.queryByRole("link")).toBeNull();
 });
 
-it("applies a top border in the given colour", () => {
+it("draws a full 2px border in the given colour", () => {
   render(<Card color="#3bceac">Coloured</Card>);
   const card = screen.getByText("Coloured");
-  expect(card.style.borderTopWidth).toBe("6px");
-  expect(card.style.borderTopColor).not.toBe("");
+  expect(card.className).toContain("border-2");
+  expect(card.style.borderColor).not.toBe("");
+  expect(card.style.borderTopWidth).toBe("");
 });

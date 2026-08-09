@@ -5,7 +5,7 @@ import type { Project } from "@/lib/content";
 import { projectLinks } from "@/lib/project-links";
 
 function Label({ children }: { children: string }) {
-  return <dt className="mb-2 text-sm font-semibold uppercase tracking-wider text-muted">{children}</dt>;
+  return <dt className="mb-2 font-pixel text-[11px] uppercase tracking-wider text-muted">{children}</dt>;
 }
 
 export function ProjectMeta({ project }: { project: Project }) {
