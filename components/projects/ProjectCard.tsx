@@ -33,7 +33,7 @@ export function ProjectCard({ project, size = "md" }: ProjectCardProps) {
         )}
         <div className="flex flex-1 flex-col gap-3 p-6">
           <h3
-            className={size === "lg" ? "font-display text-3xl" : "font-display text-2xl"}
+            className={size === "lg" ? "font-display text-2xl break-words md:text-3xl" : "font-display text-xl break-words md:text-2xl"}
           >
             <Link
               href={`/projects/${slug}`}
