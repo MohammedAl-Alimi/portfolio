@@ -3,7 +3,6 @@
 import { Canvas } from "@react-three/fiber";
 import { View } from "@react-three/drei";
 import { useSceneActive, useSceneStore } from "@/lib/scene-store";
-import { ReadyProbe } from "./ReadyProbe";
 import { SceneErrorBoundary } from "./SceneErrorBoundary";
 
 export default function CanvasRoot() {
@@ -26,7 +25,6 @@ export default function CanvasRoot() {
           });
         }}
       >
-        <ReadyProbe />
         <View.Port />
       </Canvas>
     </SceneErrorBoundary>
