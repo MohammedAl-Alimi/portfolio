@@ -48,3 +48,30 @@ test("hero name stays in its column on two lines", async ({ page }, testInfo) =>
   );
   expect(fits).toEqual([true, true]);
 });
+
+test.describe("hero storm", () => {
+  test.beforeEach(({}, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium-desktop", "Desktop only");
+  });
+
+  test("default tier draws the storm and fades the poster", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator("canvas")).toHaveCount(1);
+    const poster = page.locator("[data-hero-slot] [data-poster]");
+    await expect(poster).toHaveCSS("opacity", "0", { timeout: 5000 });
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Mohammed Al-Alimi");
+    await expect(page.getByRole("link", { name: "See projects" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Download CV" }).first()).toBeVisible();
+    await expect(page.getByText("MOVE YOUR MOUSE. CLICK A SHAPE.")).toBeVisible();
+  });
+
+  test("reduced motion keeps the poster and mounts no canvas", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    await expect(page.locator("html")).toHaveAttribute("data-tier", "low");
+    const poster = page.locator("[data-hero-slot] [data-poster]");
+    await expect(poster).toHaveCSS("opacity", "1");
+    await expect(poster.locator("img")).toHaveAttribute("src", /pixel-name/);
+    await expect(page.locator("canvas")).toHaveCount(0);
+  });
+});
