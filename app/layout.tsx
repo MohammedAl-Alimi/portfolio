@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { CanvasRootLoader } from "@/components/three/CanvasRootLoader";
 import { Footer } from "@/components/ui/Footer";
-import { Grain } from "@/components/ui/Grain";
 import { Nav } from "@/components/ui/Nav";
+import { Overlays } from "@/components/ui/Overlays";
 import { getProfile } from "@/lib/content";
 import { display, mono } from "@/lib/fonts";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
@@ -45,7 +45,7 @@ export default async function RootLayout({
           {children}
         </main>
         <Footer />
-        <Grain />
+        <Overlays />
       </body>
     </html>
   );
