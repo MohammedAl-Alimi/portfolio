@@ -19,13 +19,11 @@ export function Card({
   "data-project-card": projectCard,
 }: CardProps) {
   const surface = (
-    <Brackets>
-      <div
-        data-project-card={projectCard ? "" : undefined}
-        className={cn("bg-surface border border-border p-6", className)}
-      >
-        {children}
-      </div>
+    <Brackets
+      data-project-card={projectCard ? "" : undefined}
+      className={cn("bg-surface border border-border p-6", className)}
+    >
+      {children}
     </Brackets>
   );
 
