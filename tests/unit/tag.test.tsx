@@ -2,11 +2,9 @@ import { render, screen } from "@testing-library/react";
 import { expect, it } from "vitest";
 import { Tag } from "@/components/ui/Tag";
 
-it("shows a colour dot when a colour is given", () => {
+it("draws no colour dot, even when a colour is given", () => {
   const { container } = render(<Tag color="#ff6b35">React</Tag>);
-  const dot = container.querySelector("[data-tag-dot]") as HTMLElement;
-  expect(dot).not.toBeNull();
-  expect(dot.style.backgroundColor).not.toBe("");
+  expect(container.querySelector("[data-tag-dot]")).toBeNull();
 });
 
 it("uses the mono font and a hard border", () => {
