@@ -1,13 +1,19 @@
 import Image from "next/image";
 
-export function HeroPoster() {
+interface Props {
+  src: string;
+  alt: string;
+}
+
+// Static stand-in for the hero scene. Loads with priority, it is the LCP image.
+export function HeroPoster({ src, alt }: Props) {
   return (
     <Image
-      src="/posters/cluster.webp"
-      alt="Colourful floating shapes"
+      src={src}
+      alt={alt}
       fill
       priority
-      sizes="(min-width: 1024px) 58vw, 100vw"
+      sizes="(min-width: 1024px) 50vw, 100vw"
       className="object-contain"
     />
   );
