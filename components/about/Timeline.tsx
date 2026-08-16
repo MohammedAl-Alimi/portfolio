@@ -13,10 +13,10 @@ export function Timeline({ entries }: TimelineProps) {
         <li key={`${entry.year}-${entry.title}`} className="relative pb-6 last:pb-0">
           <span
             aria-hidden="true"
-            className="absolute top-1.5 -left-[31px] size-3 rounded-full bg-accent-1"
+            className="absolute top-2 -left-[28px] size-[6px] bg-text"
           />
           <p className="font-mono text-sm text-muted">{entry.year}</p>
-          <p className="font-bold">{entry.title}</p>
+          <p className="font-mono font-bold">{entry.title}</p>
           <p className="text-muted">{entry.detail}</p>
         </li>
       ))}

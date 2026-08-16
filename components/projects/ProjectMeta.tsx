@@ -9,7 +9,7 @@ function Label({ children }: { children: string }) {
 }
 
 export function ProjectMeta({ project }: { project: Project }) {
-  const { year, role, stack, tags, color, links } = project.frontmatter;
+  const { year, role, stack, tags, links } = project.frontmatter;
   const present = projectLinks(links);
 
   return (
@@ -37,11 +37,6 @@ export function ProjectMeta({ project }: { project: Project }) {
             <dd className="flex flex-wrap gap-2">
               {tags.map((tag) => (
                 <Tag key={tag}>
-                  <span
-                    aria-hidden="true"
-                    className="mr-2 inline-block size-2 rounded-full"
-                    style={{ backgroundColor: color }}
-                  />
                   {tag}
                 </Tag>
               ))}
