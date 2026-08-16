@@ -1,7 +1,7 @@
-import type { ElementType, ReactNode } from "react";
+import type { ElementType, HTMLAttributes, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
-type BracketsProps = {
+type BracketsProps = Omit<HTMLAttributes<HTMLElement>, "children" | "className"> & {
   children: ReactNode;
   className?: string;
   hover?: boolean;
@@ -18,9 +18,15 @@ const corners = [
 const growth =
   "group-hover/brackets:size-4 group-focus-within/brackets:size-4 motion-safe:transition-[width,height] motion-safe:duration-[var(--motion-fast)]";
 
-export function Brackets({ children, className, hover = true, as: Tag = "div" }: BracketsProps) {
+export function Brackets({
+  children,
+  className,
+  hover = true,
+  as: Tag = "div",
+  ...rest
+}: BracketsProps) {
   return (
-    <Tag className={cn("group/brackets relative", className)}>
+    <Tag {...rest} className={cn("group/brackets relative", className)}>
       {children}
       {corners.map((corner) => (
         <span
