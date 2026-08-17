@@ -415,6 +415,8 @@ CI runs on every pull request: lint, typecheck, secrets scan, unit, build, e2e, 
 
 ## 17. Visual direction v2: Pixel storm (added 2026-10-31)
 
+> Superseded on 2026-10-31 by section 18 (Monolith). The storm mechanics (GPU points, pointer wind, tiers, fallbacks) are kept and re-skinned; the rainbow name, candy accents and playful tone are dropped.
+
 Mohammed reviewed the shipped foundation and rejected its look: generic layout, stock-looking fonts, no 3D, no motion. This section replaces sections 6 and 9 for everything visible. Content model, navigation labels, security, CI and docs from the foundation stay.
 
 ### 17.1 Hero
@@ -462,4 +464,59 @@ Mohammed reviewed the shipped foundation and rejected its look: generic layout, 
 - Budgets: first-load JavaScript excluding the 3D chunk under 350 KB gzipped (enforced), 3D plus pixel chunk under 450 KB gzipped (enforced), LCP under 2.5 s on mobile (returns to a hard error in Lighthouse CI when this plan ships), 60 fps on an iPhone 13 class device for the hero, Lighthouse performance 85 or higher.
 - Device tiers from section 6 stay: high (full), mid (20k pixels, no grain, no cursor trail), low (static posters, no canvas).
 - All tests from section 12 apply; add: reduced-motion e2e proves no canvas is mounted and transitions are fades; a unit test that the pixel sampler produces a stable point count for the name; a visual baseline of the hero in both themes.
+
+## 18. Visual direction v3: Monolith (added 2026-10-31)
+
+Mohammed reviewed the pixel storm and rejected it: too colourful, a rainbow of his own name, not abstract, not "cyber". This section replaces section 17 for everything visible and section 4's top navigation. Content model, security, CI, docs, budgets and fallback rules stay. The persistent canvas, GPU points, pointer-wind physics, device tiers and posters from plan 2 are reused.
+
+### 18.1 Mood
+
+Dark, monochrome, abstract, technical. Black, greys and white only. Light comes from white glow, scanlines and grain, never from colour. Motion is constant but precise: decode, glitch, slice, orbit. Nothing bounces, nothing is cute.
+
+### 18.2 Colour and surface
+
+- Tokens: bg `#050505`, surface `#0F0F11`, surface-2 `#17171A`, border `#2A2A2E`, muted `#6B6B70`, text `#F2F2F0`, glow `#FFFFFF`. The six accents are removed from the UI; `--accent-*` tokens remain only for the Lab sandbox and are not used by any page.
+- Light theme is retired. The theme toggle is removed. `color-scheme: dark` everywhere.
+- Overlays: CRT scanlines (2 px period, 6% opacity), film grain (5%), vignette (radial, 35% at the edges). All static, pointer-events none, hidden on mid tier except the vignette.
+- A perspective grid floor (1 px lines, 10% white) behind the hero and the Work page, drifting slowly and parallaxing with scroll. Static image under reduced motion and low tier.
+- Surfaces use 1 px borders in `border`, corner brackets (8 px, 1 px, white) that extend to 16 px on hover, no radius, no shadow.
+
+### 18.3 Layout: side tabs
+
+- Desktop (≥ 1024 px): a fixed vertical rail on the left, 72 px wide, black with a 1 px right border. Five tabs stacked: HOME, WORK, LAB, ABOUT, CONTACT, each an icon (16 px, 1 px stroke, monochrome) with the label in mono caps rotated 90° or shown on hover when the rail expands to 220 px. The active tab has a 2 px white bar on the left edge and white text; inactive are `muted`. Bottom of the rail: a small coordinate readout `LAT/LNG`-style scroll position `00.00` in mono and the theme-free wordmark `MA`. Content area starts at 72 px.
+- Mobile (< 1024 px): a fixed bottom bar with the five tabs (icon over 10 px mono label), 56 px tall, safe-area aware. No hamburger menu.
+- Labels are plain words. Every page is reachable in one tap. Keyboard: tabs are links with `aria-current`.
+- Routes unchanged: `/`, `/projects` (shown as WORK), `/lab`, `/about`, `/#contact` becomes a real `/contact` page with the email and socials, so the rail has five real destinations.
+
+### 18.4 Hero: the figure
+
+- A point-cloud bust of Mohammed built from a single photo (bust, front-facing). Pipeline: person segmentation (Apple Vision, run locally once), silhouette inflated into a volume by a distance-to-edge profile, interior filled sparsely, luminance from the photo mapped to grey levels; roughly 50,000 to 60,000 points. The photo is never committed; the derived points are committed as a quantised binary (`public/figure/bust.bin`, 4 bytes per point: x, y, z, luminance as uint8) under 250 KB plus a static poster (`public/posters/figure.webp`).
+- The figure rotates continuously around its vertical axis at 0.15 rad/s. Because the volume is inflated from one photo, back-facing points fade to 25% brightness and the side view is accepted as an abstract lens; a full rotation reads as a hologram, not a scan.
+- Shader: square points, size from luminance (brighter = larger, 1.5 to 3.5 px), white-to-grey, additive-free normal blending on black, a horizontal scanline sweep (one bright band per 4 s), a glitch slice every 6 to 10 s (three horizontal bands offset by up to 24 px for 120 ms), depth fog (points further back fade). Pointer wind from plan 2 Task 4 applies in the camera plane; the figure reforms within 1.2 s.
+- Scroll on Home orbits the camera 30° around the figure over the first viewport and pulls back; the rail readout counts the scroll.
+- Beside or below the figure: `MOHAMMED AL-ALIMI` in mono caps decoding from random glyphs over 900 ms on load, the headline in display type, two bracketed buttons (`VIEW WORK`, `DOWNLOAD CV`). Hint in mono caps: `MOVE TO DISTURB.` fades after first interaction.
+- Fallbacks: reduced motion, low tier, no WebGL or any scene error show `figure.webp` in the same slot; the decode becomes a plain fade.
+
+### 18.5 Type
+
+- Display: Syne 800 (SIL OFL, Google Fonts via next/font/google) for page titles, project titles and the headline. Tight tracking (-0.02em), leading 0.9.
+- Mono: JetBrains Mono 400/700 (SIL OFL) for everything else: body, labels, nav, buttons, meta, code. Labels in caps with 0.12em tracking. Body 16 px mono at 1.6 line height (readability over size; mono needs it).
+- Silkscreen, Unbounded and Manrope are removed.
+- Text decode: headings decode from random glyphs when they enter the viewport (glyph pool `█▓▒░<>/\|_-=+*#01`), 24 ms per character, max 900 ms. Under reduced motion: no decode.
+
+### 18.6 Motion
+
+- Page transitions: glitch wipe. The outgoing page is sliced into 12 horizontal bands that shear left or right by 8 to 40 px and fade over 200 ms; the incoming page assembles in reverse over 200 ms. Reduced motion: 150 ms fade.
+- Cursor (pointer devices, high tier): a 1 px crosshair (two 12 px lines) with a 3 px square centre and a mono readout of the pointer coordinates in the bottom-right of the rail; over links and buttons the crosshair snaps to the element's corners as brackets. Hidden on touch and under reduced motion.
+- Cards: covers are rendered monochrome with a halftone dither (CSS filter plus an SVG feTurbulence displacement is not enough; use a small canvas or a WebGL View with a Bayer dither shader on the image) and resolve to the clean greyscale image on hover over 240 ms. Corner brackets extend; an index `01 / 07` in mono.
+- Numbers (year, counts) count up when entering view. A mono ticker strip between Home sections scrolls `AI · AGENTS · COMPUTER VISION · SECURITY · SYSTEMS` with a scanline.
+- Smooth scroll via Lenis; the grid floor and figure orbit are scroll-driven.
+- 404: the figure dissolved into static noise; clicking reassembles it.
+
+### 18.7 Still simple, still fast
+
+- Side tabs are the only navigation; labels are plain words; every page works without pointer effects or WebGL.
+- Budgets unchanged (first-load under 350 KB gzipped excluding 3D, 3D plus figure code under 450 KB, figure data under 250 KB fetched lazily, LCP under 2.5 s, performance 85 or higher, 60 fps on an iPhone 13 for the figure at 30,000 points on mid tier).
+- Tiers: high (full), mid (30k points, no scanlines/grain, no cursor), low (posters, no canvas).
+- Tests as in section 12 plus: decode and glitch respect reduced motion; the rail and bottom bar are keyboard operable with `aria-current`; the figure poster is the LCP element; visual baselines of the hero and a project page.
 
