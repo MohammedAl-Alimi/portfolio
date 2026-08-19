@@ -24,12 +24,15 @@ type ButtonAsAnchor = CommonProps &
 export type ButtonProps = ButtonAsButton | ButtonAsAnchor;
 
 const base =
-  "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[var(--radius-sm)] font-sans font-semibold transition-colors duration-[var(--motion-fast)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-4)] disabled:opacity-50";
+  "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[var(--radius-sm)] border-2 font-sans font-semibold duration-[var(--motion-fast)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-4)] disabled:opacity-50";
+
+const pixelHover =
+  "hover:shadow-[2px_2px_0_var(--accent-4)] hover:-translate-x-[1px] hover:-translate-y-[1px] motion-safe:transition-[transform,box-shadow]";
 
 const variants: Record<Variant, string> = {
-  primary: "bg-text text-bg hover:opacity-90",
-  secondary: "border border-border bg-surface text-text hover:border-text",
-  ghost: "bg-transparent text-text hover:bg-surface",
+  primary: `bg-text text-bg border-text ${pixelHover}`,
+  secondary: `bg-transparent border-border text-text ${pixelHover}`,
+  ghost: "border-transparent bg-transparent text-text hover:bg-surface",
 };
 
 const sizes: Record<Size, string> = {

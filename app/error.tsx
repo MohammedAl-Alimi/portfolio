@@ -17,7 +17,7 @@ export default function ErrorPage({
 
   return (
     <Section>
-      <h1 className="font-display text-center text-[clamp(2.5rem,6vw,5rem)] leading-tight">
+      <h1 className="font-display text-center tracking-[-0.03em] leading-[0.9] text-[clamp(1.75rem,6vw,5rem)]">
         Something broke on our side.
       </h1>
       <p className="mt-4 text-center text-muted">

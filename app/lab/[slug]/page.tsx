@@ -39,7 +39,7 @@ export default async function LabItemPage({ params }: PageProps) {
 
   return (
     <Section>
-      <h1 className="font-display text-[clamp(2.5rem,6vw,5rem)]">{title}</h1>
+      <h1 className="font-display tracking-[-0.03em] leading-[0.9] text-[clamp(1.75rem,6vw,5rem)]">{title}</h1>
       <p className="mt-4 mb-8 text-muted">{description}</p>
       <div data-lab-slot={slug}>
         {kind === "iframe" && url ? (
