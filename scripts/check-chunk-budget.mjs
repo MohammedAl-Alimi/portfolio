@@ -25,12 +25,22 @@ export function computeBudgets({ loadable, firstLoad, sizeOf }) {
   const firstLoadFiles = [...new Set(firstLoad)].filter(
     (f) => f.endsWith(".js") && !threeFiles.has(f),
   );
-  const sum = (files) => [...files].reduce((n, f) => n + sizeOf(f), 0);
-  const threeBytes = sum(threeFiles);
-  const firstLoadBytes = sum(firstLoadFiles);
+  // An empty list means the manifest shape changed, which would hide a breach.
+  if (threeFiles.size === 0) {
+    throw new Error("chunk-budget: no 3D files found in the loadable manifest");
+  }
+  if (firstLoadFiles.length === 0) {
+    throw new Error("chunk-budget: no first-load files found");
+  }
+  const sized = (files) => [...files].map((f) => ({ file: f, bytes: sizeOf(f) }));
+  const threeSized = sized(threeFiles);
+  const firstLoadSized = sized(firstLoadFiles);
+  const sum = (list) => list.reduce((n, e) => n + e.bytes, 0);
+  const threeBytes = sum(threeSized);
+  const firstLoadBytes = sum(firstLoadSized);
   return {
-    threeFiles: [...threeFiles],
-    firstLoadFiles,
+    threeFiles: threeSized,
+    firstLoadFiles: firstLoadSized,
     threeBytes,
     firstLoadBytes,
     ok: firstLoadBytes <= FIRST_LOAD_LIMIT && threeBytes <= THREE_LIMIT,
@@ -55,7 +65,16 @@ function main() {
     ...refFiles,
   ];
   const sizeOf = (f) => zlib.gzipSync(fs.readFileSync(path.join(root, f)), { level: 9 }).length;
-  const r = computeBudgets({ loadable, firstLoad, sizeOf });
+  let r;
+  try {
+    r = computeBudgets({ loadable, firstLoad, sizeOf });
+  } catch (e) {
+    console.error(e instanceof Error ? e.message : e);
+    process.exit(1);
+  }
+  for (const [label, list] of [["first-load", r.firstLoadFiles], ["3d", r.threeFiles]]) {
+    for (const e of list) console.log(`chunk-budget: ${label} file ${e.file} ${e.bytes} B gzip`);
+  }
   const kb = (n) => `${(n / 1024).toFixed(1)} KB`;
   console.log(`chunk-budget: first-load ${r.firstLoadBytes} B (${kb(r.firstLoadBytes)}) limit ${FIRST_LOAD_LIMIT}`);
   console.log(`chunk-budget: 3d chunk   ${r.threeBytes} B (${kb(r.threeBytes)}) limit ${THREE_LIMIT}`);
