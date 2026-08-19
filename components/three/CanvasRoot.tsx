@@ -3,12 +3,12 @@
 import { Canvas } from "@react-three/fiber";
 import { View } from "@react-three/drei";
 import { useSceneStore } from "@/lib/scene-store";
+import { ReadyProbe } from "./ReadyProbe";
 import { SceneErrorBoundary } from "./SceneErrorBoundary";
 
 export default function CanvasRoot() {
   const tier = useSceneStore((s) => s.tier);
   const failed = useSceneStore((s) => s.failed);
-  const setReady = useSceneStore((s) => s.setReady);
 
   if (tier === null || tier === "low" || failed) return null;
 
@@ -21,8 +21,8 @@ export default function CanvasRoot() {
         eventSource={document.body}
         eventPrefix="client"
         style={{ position: "fixed", inset: 0, zIndex: -1, pointerEvents: "none" }}
-        onCreated={() => setReady(true)}
       >
+        <ReadyProbe />
         <View.Port />
       </Canvas>
     </SceneErrorBoundary>
