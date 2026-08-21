@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type ElementType } from "react";
+import { cn } from "@/lib/cn";
 import { decodeDuration, decodeFrame } from "@/lib/decode";
 import { mulberry32 } from "@/lib/rng";
 import { useSceneStore } from "@/lib/scene-store";
@@ -25,6 +26,9 @@ interface Props {
  * Text that decodes from random glyphs, left to right. The real text is in the
  * DOM from the first byte (visually hidden, for screen readers and crawlers);
  * the glyphs are a decorative, aria-hidden layer.
+ * The final text is always the layout box (`data-decode-glyphs`); while decoding
+ * it is hidden and the frames draw in an absolute overlay over it, so a frame
+ * that wraps differently can never move the content below (no layout shift).
  * Fallbacks (spec 18.4): reduced motion, the low tier (which covers no WebGL)
  * and a CPU renderer get a plain fade of the final text instead of the decode.
  */
@@ -39,14 +43,14 @@ export function Decode({
   trigger = "load",
 }: Props) {
   const root = useRef<HTMLElement>(null);
-  const glyphs = useRef<HTMLSpanElement>(null);
+  const frames = useRef<HTMLSpanElement>(null);
 
   const tier = useSceneStore((st) => st.tier);
   const software = useSceneStore((st) => st.software);
 
   useEffect(() => {
     const el = root.current;
-    const layer = glyphs.current;
+    const layer = frames.current;
     // Wait for the device tier; the glyph layer stays hidden until then.
     if (!el || !layer || tier === null) return;
     // Already resolved (a later tier change re-runs this effect): never decode twice.
@@ -60,7 +64,6 @@ export function Decode({
     const plain =
       tier === "low" || software || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (plain) {
-      layer.textContent = text;
       el.dataset.decode = "fade";
       return;
     }
@@ -73,7 +76,7 @@ export function Decode({
       if (start < 0) start = now;
       const p = duration > 0 ? (now - start - delay) / duration : 1;
       if (p >= 1) {
-        layer.textContent = text;
+        layer.textContent = "";
         el.dataset.decode = "done";
         return;
       }
@@ -108,17 +111,23 @@ export function Decode({
         el.dataset.decode = "";
         return;
       }
-      layer.textContent = text;
+      layer.textContent = "";
       el.dataset.decode = "done";
     };
   }, [text, delay, charMs, maxMs, trigger, tier, software]);
 
   return (
-    <Tag ref={root} id={id} className={className} data-decode="">
+    <Tag ref={root} id={id} className={cn("relative", className)} data-decode="">
       <span className="sr-only">{text}</span>
-      <span ref={glyphs} aria-hidden="true" data-decode-glyphs="" className="whitespace-pre-wrap">
+      <span aria-hidden="true" data-decode-glyphs="" className="whitespace-pre-wrap">
         {text}
       </span>
+      <span
+        ref={frames}
+        aria-hidden="true"
+        data-decode-frames=""
+        className="pointer-events-none absolute inset-0 overflow-hidden whitespace-pre-wrap"
+      />
     </Tag>
   );
 }
