@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { getDeviceTier, readDeviceSignals, tierAfterProbe, type Tier } from "@/lib/device";
 import { useSceneStore } from "@/lib/scene-store";
+import { forceMotion } from "@/lib/test-flags";
 
 const PROBE_SAMPLES = 35; // 5 warm-up frames are dropped, 30 are measured
 const IDLE_FALLBACK_MS = 1500;
@@ -15,7 +16,8 @@ export function useTier(): Tier | null {
     const signals = readDeviceSignals();
     const initial = getDeviceTier(signals);
     // Set before the tier, so anything waiting on the tier sees both.
-    useSceneStore.getState().setSoftware(signals.software === true);
+    // `?motion=force` (E2E builds only) lets a test run the decode on a CPU renderer.
+    useSceneStore.getState().setSoftware(signals.software === true && !forceMotion());
     useSceneStore.getState().setTier(initial, signals.reducedMotion);
     document.documentElement.dataset.tier = initial;
     if (signals.reducedMotion) document.documentElement.dataset.reducedMotion = "true";

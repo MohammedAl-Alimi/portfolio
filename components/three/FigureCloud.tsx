@@ -21,6 +21,7 @@ import { stormNow, windTrail } from "@/lib/pointer-force";
 import { mulberry32 } from "@/lib/rng";
 import { useSceneStore } from "@/lib/scene-store";
 import { subscribeScroll } from "@/lib/scroll";
+import { forceMotion } from "@/lib/test-flags";
 import type { SlotSize } from "@/lib/use-slot";
 import { useMarkReady } from "./ready";
 import { figureFrag, figureVert } from "./shaders/figure";
@@ -74,14 +75,6 @@ type FigureUniforms = WindUniforms & {
   uDpr: { value: number };
   uJitter: { value: number };
 };
-
-// Test-only: CI renders on the CPU, where the figure holds still. `?motion=force`
-// lets an e2e test watch the rotation there. Production builds inline "0" and drop it.
-function forceMotion(): boolean {
-  return (
-    process.env.NEXT_PUBLIC_E2E === "1" && new URLSearchParams(window.location.search).get("motion") === "force"
-  );
-}
 
 export function buildFigureGeometry(figure: Figure): BufferGeometry {
   const a = buildFigureAttributes(figure);
