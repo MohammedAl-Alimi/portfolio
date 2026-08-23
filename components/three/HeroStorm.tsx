@@ -7,7 +7,7 @@ import { useSceneStore } from "@/lib/scene-store";
 import { pointSizeFor, STORM_COLORS } from "@/lib/storm-attributes";
 import { PixelStorm } from "./PixelStorm";
 
-const WORD = "MOHAMMED";
+const LINES = ["MOHAMMED", "AL-ALIMI"];
 const FAMILY = "Unbounded";
 const BITMAP_W = 1600;
 const BITMAP_H = 600;
@@ -41,7 +41,7 @@ export function sampleWord(count: number, family: string): Float32Array {
   const key = `${count}|${family}`;
   const hit = cache.get(key);
   if (hit) return hit;
-  const raw = sampleTextToCount(WORD, {
+  const raw = sampleTextToCount(LINES, {
     font: `700 220px ${family}`,
     width: BITMAP_W,
     height: BITMAP_H,
