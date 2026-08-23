@@ -6,6 +6,7 @@
     "dev": "next dev",
     "prebuild": "npm run validate:content",
     "build": "next build",
+    "postbuild": "node scripts/check-chunk-budget.mjs",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
@@ -17,6 +18,8 @@
     "lhci": "lhci autorun"
   },
   "dependencies": {
+    "@react-three/drei": "10.7.9",
+    "@react-three/fiber": "9.8.2",
     "clsx": "2.1.1",
     "gray-matter": "4.0.3",
     "next": "16.4.3",
@@ -26,7 +29,9 @@
     "react-dom": "19.3.0",
     "server-only": "0.0.1",
     "tailwind-merge": "3.7.0",
-    "zod": "4.6.7"
+    "three": "0.187.0",
+    "zod": "4.6.7",
+    "zustand": "5.0.16"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",
@@ -39,6 +44,7 @@
     "@types/node": "24.19.2",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
+    "@types/three": "0.187.0",
     "@vitejs/plugin-react": "6.1.2",
     "eslint": "9.39.5",
     "eslint-config-next": "16.4.3",
