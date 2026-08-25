@@ -37,7 +37,7 @@ export function Hero({ profile }: { profile: Profile }) {
             </div>
           </div>
           <div className="order-1 lg:order-2 lg:col-span-6">
-            <div data-hero-slot>
+            <div data-hero-slot className="touch-pan-y">
               <ViewSlot
                 className="relative aspect-[4/3] lg:aspect-auto lg:h-[520px]"
                 poster={<HeroPoster src="/posters/pixel-name.webp" alt="" />}

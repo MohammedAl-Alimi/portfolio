@@ -9,12 +9,25 @@ import {
   OrthographicCamera,
   ShaderMaterial,
   Vector2,
+  Vector4,
 } from "three";
 import { isSoftwareRenderer } from "@/lib/gpu";
+import {
+  SAMPLE_INTERVAL,
+  SAMPLE_INTERVAL_SOFTWARE,
+  stormNow,
+  TRAIL_MAX,
+  TRAIL_MAX_SOFTWARE,
+  TRAIL_TTL,
+  WIND_DAMPING,
+  WIND_OMEGA,
+  windTrail,
+} from "@/lib/pointer-force";
 import { buildStormAttributes } from "@/lib/storm-attributes";
 import { useSceneStore } from "@/lib/scene-store";
 import { useMarkReady } from "./ready";
-import { stormFrag, stormVert } from "./shaders/storm";
+import { stormFrag, stormVert, TRAIL_SLOTS } from "./shaders/storm";
+import { usePointerForce } from "./usePointerForce";
 
 export interface PixelStormProps {
   count: number;
@@ -23,20 +36,37 @@ export interface PixelStormProps {
   pointSize?: number;
   /** False pauses the idle shimmer, for example while the slot is off screen. */
   animate?: boolean;
+  /** CSS selector of the element the view fills. Pointer moves over it push the pixels. */
+  slot?: string;
 }
 
 const WIND_RADIUS_PX = 140;
-const FRAME_MS = 1000 / 30; // the idle shimmer does not need more than 30 fps
+const WIND_GAIN = 0.03;
+const IDLE_FPS = 30; // the idle shimmer does not need more than 30 fps
+const WIND_FPS = 60; // wind feels laggy at 30
+const SOFTWARE_FPS = 15;
 
-export function PixelStorm({ count, targets, colors, pointSize = 3, animate = true }: PixelStormProps) {
+declare global {
+  interface Window {
+    __storm?: { frames: number; trailCount: number };
+  }
+}
+
+export function PixelStorm({ count, targets, colors, pointSize = 3, animate = true, slot }: PixelStormProps) {
   const invalidate = useThree((s) => s.invalidate);
   const dpr = useThree((s) => s.viewport.dpr);
   const gl = useThree((s) => s.gl);
   const reducedMotion = useSceneStore((s) => s.reducedMotion);
-  // On a CPU renderer the storm still draws, but holds still between redraws.
+  // On a CPU renderer the storm holds still between redraws, and the wind runs lighter.
   const software = useMemo(() => isSoftwareRenderer(gl.getContext()), [gl]);
   const animating = animate && !reducedMotion && !software;
   useMarkReady();
+  usePointerForce(slot, !reducedMotion);
+
+  useEffect(() => {
+    if (software) windTrail.configure(TRAIL_MAX_SOFTWARE, SAMPLE_INTERVAL_SOFTWARE);
+    else windTrail.configure(TRAIL_MAX, SAMPLE_INTERVAL);
+  }, [software]);
 
   const geometry = useMemo(() => {
     const a = buildStormAttributes(targets, count, colors);
@@ -51,16 +81,21 @@ export function PixelStorm({ count, targets, colors, pointSize = 3, animate = tr
   }, [targets, count, colors]);
 
   const materialRef = useRef<ShaderMaterial>(null);
+  const frames = useRef(0);
   const [uniforms] = useState(() => ({
     uTime: { value: 0 },
+    uLive: { value: 0 },
     uMorph: { value: 0 },
     uPointSize: { value: pointSize },
     uDpr: { value: 1 },
-    uPointer: { value: new Vector2(0, 0) },
-    uPointerVel: { value: new Vector2(0, 0) },
     uRadius: { value: 0.25 },
-    uStiffness: { value: 0.12 },
-    uDamping: { value: 0.85 },
+    uTrail: { value: Array.from({ length: TRAIL_SLOTS }, () => new Vector4()) },
+    uTrailDir: { value: Array.from({ length: TRAIL_SLOTS }, () => new Vector2()) },
+    uTrailCount: { value: 0 },
+    uWindGain: { value: WIND_GAIN },
+    uDamping: { value: WIND_DAMPING },
+    uOmega: { value: WIND_OMEGA },
+    uBreeze: { value: 0 },
   }));
 
   useEffect(() => () => geometry.dispose(), [geometry]);
@@ -77,32 +112,74 @@ export function PixelStorm({ count, targets, colors, pointSize = 3, animate = tr
     };
   }, [invalidate, geometry, pointSize]);
 
-  // Drive the demand loop at most 30 times a second while the shimmer runs.
+  // Drives the demand loop. Wind runs at up to 60 fps until the trail settles,
+  // the idle shimmer at 30. With neither, the loop stops until the next sample.
   useEffect(() => {
-    if (!animating) return;
     let raf = 0;
     let last = 0;
     const tick = (now: number) => {
-      if (now - last >= FRAME_MS) {
+      raf = 0;
+      const windy = windTrail.count > 0 && stormNow() < windTrail.latestTime + TRAIL_TTL;
+      let fps = 0;
+      if (windy) fps = software ? SOFTWARE_FPS : WIND_FPS;
+      else if (animating) fps = IDLE_FPS;
+      if (fps === 0) {
+        invalidate(); // one more frame draws the settled state
+        return;
+      }
+      // 1 ms of slack so a 60 Hz display does not skip every other frame.
+      if (now - last >= 1000 / fps - 1) {
         last = now;
         invalidate();
       }
       raf = requestAnimationFrame(tick);
     };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [animating, invalidate]);
+    const wake = () => {
+      if (!raf) raf = requestAnimationFrame(tick);
+    };
+    wake();
+    const off = windTrail.subscribe(wake);
+    return () => {
+      off();
+      cancelAnimationFrame(raf);
+    };
+  }, [animating, software, invalidate]);
 
   useFrame((state) => {
     const mat = materialRef.current;
     if (!mat) return;
-    const u = mat.uniforms;
-    if (animating && u.uTime) u.uTime.value = state.clock.elapsedTime;
-    if (u.uPointSize) u.uPointSize.value = pointSize;
-    if (u.uDpr) u.uDpr.value = dpr;
+    const u = mat.uniforms as typeof uniforms;
+    const t = stormNow();
+    u.uTime.value = t;
+    u.uLive.value = animating ? 1 : 0;
+    u.uPointSize.value = pointSize;
+    u.uDpr.value = dpr;
     const cam = state.camera;
-    if (u.uRadius && cam instanceof OrthographicCamera && cam.zoom > 0) {
+    if (cam instanceof OrthographicCamera && cam.zoom > 0) {
       u.uRadius.value = WIND_RADIUS_PX / cam.zoom;
+      // Trail samples are in slot units (-1..1); the view's camera spans the slot.
+      const halfW = (cam.right - cam.left) / 2 / cam.zoom;
+      const halfH = (cam.top - cam.bottom) / 2 / cam.zoom;
+      windTrail.prune(t);
+      const samples = windTrail.samples;
+      const n = Math.min(samples.length, TRAIL_SLOTS);
+      for (let i = 0; i < n; i++) {
+        const s = samples[i];
+        const slotV = u.uTrail.value[i];
+        const dirV = u.uTrailDir.value[i];
+        if (!s || !slotV || !dirV) continue;
+        const vx = s.vx * halfW;
+        const vy = s.vy * halfH;
+        const speed = Math.hypot(vx, vy);
+        slotV.set(s.x * halfW, s.y * halfH, s.t, speed);
+        if (speed > 1e-6) dirV.set(vx / speed, vy / speed);
+        else dirV.set(0, 0);
+      }
+      u.uTrailCount.value = n;
+    }
+    if (process.env.NEXT_PUBLIC_E2E === "1") {
+      frames.current += 1;
+      window.__storm = { frames: frames.current, trailCount: windTrail.count };
     }
   });
 
