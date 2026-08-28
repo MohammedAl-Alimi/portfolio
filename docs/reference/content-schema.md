@@ -52,11 +52,19 @@ File: `content/lab/<slug>.mdx`. Schema: `labFrontmatterSchema` (`lib/schemas.ts:
 | `slug` | string | `^[a-z0-9-]+$` (`lib/schemas.ts:66`). Must equal the file name without `.mdx`. | required | `crowd-dashboard` |
 | `description` | string | 1 to 140 characters (`lib/schemas.ts:67`) | required | `A live dashboard...` |
 | `kind` | enum | `component` or `iframe` (`lib/schemas.ts:68`) | required | `iframe` |
-| `component` | string | At least 1 character (`lib/schemas.ts:69`). Required when `kind` is `component` (`lib/schemas.ts:76`). | none | `SandboxScene` |
+| `component` | string | At least 1 character (`lib/schemas.ts:69`). Required when `kind` is `component` (`lib/schemas.ts:76`). Must name a key of `labComponents`. | none | `FigureSandbox` |
 | `url` | string | `httpsUrl` (`lib/schemas.ts:70`). Required when `kind` is `iframe` (`lib/schemas.ts:79`). | none | `https://crowdmonitoringdashboard.vercel.app` |
 | `thumbnail` | string | Must start with `/lab/` (`lib/schemas.ts:71`) | required | `/lab/crowd-dashboard.webp` |
 | `thumbnailAlt` | string | At least 1 character (`lib/schemas.ts:72`) | required | `Crowd dashboard with counters` |
 | `order` | integer | none (`lib/schemas.ts:73`) | `99` | `1` |
+
+### Lab components
+
+A `kind: component` item renders the component its `component` field names from `labComponents` (`components/lab/registry.ts:5`). An unknown name shows "This experiment is still being built." (`components/lab/ComponentSlot.tsx:6`).
+
+| Name | Component | Used by |
+| --- | --- | --- |
+| `FigureSandbox` | The home page figure with live sliders (`components/lab/FigureSandbox.tsx:111`) | `content/lab/figure.mdx` |
 
 ## About frontmatter
 
@@ -140,7 +148,7 @@ Command: `npm run validate:content`, which runs `scripts/validate-content.ts`. T
 | Lab thumbnails exist | A `thumbnail` must point to a file under `public/`. | `scripts/validate-content.ts:43` |
 | Iframe origin allowed | An `iframe` lab item must have a `url` whose origin is in `LAB_FRAME_ORIGINS`. | `scripts/validate-content.ts:44` |
 
-On success it prints the counts, for example `projects: 7, lab: 1, highlights: 0` (`scripts/validate-content.ts:55`).
+On success it prints the counts, for example `projects: 7, lab: 2, highlights: 0` (`scripts/validate-content.ts:55`).
 
 ## Lab iframe origin allowlist
 

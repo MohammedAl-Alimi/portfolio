@@ -130,3 +130,15 @@ export function orbitFor(scrollY: number, heroEnd: number): number {
   if (!(heroEnd > 0) || !(scrollY > 0)) return 0;
   return ORBIT_MAX * Math.min(1, scrollY / heroEnd);
 }
+
+/**
+ * When the next glitch is due. `from` is when it was scheduled, `delay` the
+ * seconds `nextGlitchDelay` gave, `rate` a multiplier on the cadence (the lab
+ * sandbox's slider; the hero uses 1). A zero delay is a forced glitch, due at
+ * once; a rate of 0 means no glitch is ever due.
+ */
+export function glitchDueAt(from: number, delay: number, rate: number): number {
+  if (delay <= 0) return from;
+  if (!(rate > 0)) return Number.POSITIVE_INFINITY;
+  return from + delay / rate;
+}

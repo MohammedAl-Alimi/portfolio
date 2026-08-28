@@ -1,0 +1,16 @@
+---
+title: Point cloud figure
+slug: figure
+description: "Play with the point cloud from the home page: speed, density, glitches and wind."
+kind: component
+component: FigureSandbox
+thumbnail: /lab/figure.webp
+thumbnailAlt: "A grey point cloud of a head and shoulders"
+order: 1
+---
+
+The figure is a cloud of points made from a photo. The photo was processed once, offline, and only the points ship to your browser: about 56,000 of them in one small binary file.
+
+Your browser draws the points with WebGL. The sliders change how the cloud moves: how fast it turns, how many points it draws, how often it glitches, whether the scanline sweeps and how hard your pointer pushes it.
+
+On phones it draws fewer points. Without a graphics card, or when your device asks for less motion, it shows a still image instead.
