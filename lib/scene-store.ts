@@ -15,7 +15,7 @@ export interface SceneState {
   activeShape: string | null;
   pointer: Pointer;
   reducedMotion: boolean;
-  /** True after the first pointer move, touch or tilt sample on the storm. */
+  /** True after the first pointer move, touch or tilt sample on the hero figure. */
   interacted: boolean;
   setTier: (tier: Tier, reducedMotion?: boolean) => void;
   setReady: (ready: boolean) => void;

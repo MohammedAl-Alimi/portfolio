@@ -6,7 +6,7 @@ import { cn } from "@/lib/cn";
 import { useSceneActive, useSceneStore } from "@/lib/scene-store";
 import { useSlot } from "@/lib/use-slot";
 
-const SEEN_KEY = "storm-hint-seen";
+const SEEN_KEY = "hero-hint-seen";
 
 // Storage can throw in private windows or with site data blocked.
 function readSeen(): boolean {
