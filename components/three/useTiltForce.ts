@@ -54,6 +54,7 @@ export function useTiltForce(active: boolean): TiltForce {
       lastGamma = e.gamma;
       lastBeta = e.beta;
       lastPush = t;
+      useSceneStore.getState().markInteracted();
       // Tipping the top edge away lowers beta and moves the pointer up.
       const target = tiltToPointer(e.gamma, baseBeta - e.beta);
       if (!smoothed) {
