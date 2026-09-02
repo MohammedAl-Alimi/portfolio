@@ -17,6 +17,8 @@ export default defineConfig({
     url: "http://localhost:3000",
     reuseExistingServer: !isCI,
     timeout: 180000,
+    // Exposes window.__storm for tests/e2e/storm.spec.ts. Never set for production builds.
+    env: { NEXT_PUBLIC_E2E: "1" },
   },
   projects: [
     {
