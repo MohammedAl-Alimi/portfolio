@@ -18,6 +18,7 @@ export type SamplerContext = Pick<
 export type ContextFactory = (width: number, height: number) => SamplerContext;
 
 export interface SampleOptions {
+  /** CSS font with a px size, for example `700 220px Unbounded`. */
   font: string;
   width: number;
   height: number;
@@ -26,7 +27,8 @@ export interface SampleOptions {
 }
 
 const ALPHA_CUTOFF = 128;
-const MAX_TEXT_WIDTH = 0.96;
+const TEXT_SPAN = 0.94; // the widest line spans the bitmap minus 6%
+const LINE_HEIGHT = 0.92; // times the font size
 
 // Small seeded PRNG, so every run builds the same cloud.
 export function mulberry32(seed: number): () => number {
@@ -40,19 +42,33 @@ export function mulberry32(seed: number): () => number {
   };
 }
 
-function drawText(text: string, opts: Omit<SampleOptions, "step">): ImageData {
+function fontPx(font: string): number {
+  const m = /(\d+(?:\.\d+)?)px/.exec(font);
+  return m ? Number(m[1]) : 0;
+}
+
+function drawText(text: string | string[], opts: Omit<SampleOptions, "step">): ImageData {
   const { font, width, height, getContext } = opts;
+  const lines = Array.isArray(text) ? text : [text];
   const ctx = getContext(width, height);
   ctx.clearRect(0, 0, width, height);
   ctx.font = font;
   ctx.fillStyle = "#000";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  // Shrink uniformly when the word is wider than the bitmap, never squash it.
-  const measured = ctx.measureText(text).width;
-  const scale = measured > width * MAX_TEXT_WIDTH ? (width * MAX_TEXT_WIDTH) / measured : 1;
+  // Scale uniformly so the widest line spans the bitmap, never squash a line.
+  // The block must also fit the height.
+  const lineStep = fontPx(font) * LINE_HEIGHT;
+  const widest = Math.max(0, ...lines.map((l) => ctx.measureText(l).width));
+  let scale = widest > 0 ? (width * TEXT_SPAN) / widest : 1;
+  const blockHeight = lineStep * lines.length;
+  if (blockHeight * scale > height * TEXT_SPAN && blockHeight > 0) {
+    scale = (height * TEXT_SPAN) / blockHeight;
+  }
   ctx.setTransform(scale, 0, 0, scale, width / 2, height / 2);
-  ctx.fillText(text, 0, 0);
+  lines.forEach((line, i) => {
+    ctx.fillText(line, 0, (i - (lines.length - 1) / 2) * lineStep);
+  });
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   return ctx.getImageData(0, 0, width, height);
 }
@@ -74,16 +90,16 @@ function walk(img: ImageData, step: number): Float32Array {
   return new Float32Array(out);
 }
 
-// Draws `text` centred and returns xy pairs for every opaque sample, row by row.
+// Draws `text` (one line, or several stacked) centred and returns xy pairs for every opaque sample, row by row.
 // x spans -1..1 across the bitmap width, y uses the same scale.
-export function sampleText(text: string, opts: SampleOptions): Float32Array {
+export function sampleText(text: string | string[], opts: SampleOptions): Float32Array {
   return walk(drawText(text, opts), opts.step);
 }
 
 // Two passes: count filled pixels on a coarse grid, then pick the step that
 // lands close to `count` points.
 export function sampleTextToCount(
-  text: string,
+  text: string | string[],
   opts: Omit<SampleOptions, "step"> & { count: number },
 ): Float32Array {
   const img = drawText(text, opts);
