@@ -127,6 +127,7 @@ export default function HeroStorm({ slot }: Props) {
         colors={STORM_COLORS}
         pointSize={pointSizeFor(size.height)}
         animate={visible}
+        slot={slot}
       />
     </>
   );
