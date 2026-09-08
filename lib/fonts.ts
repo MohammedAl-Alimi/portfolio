@@ -1,23 +1,17 @@
-import { Manrope, Silkscreen, Unbounded } from "next/font/google";
+import { JetBrains_Mono, Syne } from "next/font/google";
 
-export const display = Unbounded({
+export const display = Syne({
   subsets: ["latin"],
-  weight: ["600", "700"],
+  weight: ["800"],
   variable: "--font-display-src",
   display: "swap",
   preload: true,
 });
 
-export const sans = Manrope({
+export const mono = JetBrains_Mono({
   subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-sans-src",
+  weight: ["400", "700"],
+  variable: "--font-mono-src",
   display: "swap",
-});
-
-export const pixel = Silkscreen({
-  subsets: ["latin"],
-  weight: "400",
-  variable: "--font-pixel-src",
-  display: "swap",
+  preload: true,
 });
