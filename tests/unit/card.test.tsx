@@ -15,10 +15,15 @@ it("renders no link without href", () => {
   expect(screen.queryByRole("link")).toBeNull();
 });
 
-it("draws a full 2px border in the given colour", () => {
-  render(<Card color="#3bceac">Coloured</Card>);
-  const card = screen.getByText("Coloured");
-  expect(card.className).toContain("border-2");
-  expect(card.style.borderColor).not.toBe("");
-  expect(card.style.borderTopWidth).toBe("");
+it("draws a 1px monochrome border and ignores the colour prop", () => {
+  const { container } = render(<Card color="#ff6b35">Body</Card>);
+  const card = container.querySelector(".bg-surface") as HTMLElement;
+  expect(card.className).toContain("border-border");
+  expect(card.className).not.toContain("border-2");
+  expect(card.style.borderColor).toBe("");
+});
+
+it("draws four corner brackets", () => {
+  const { container } = render(<Card>Body</Card>);
+  expect(container.querySelectorAll("[data-bracket]")).toHaveLength(4);
 });

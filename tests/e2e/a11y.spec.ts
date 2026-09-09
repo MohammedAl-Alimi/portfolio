@@ -27,40 +27,31 @@ const viewports = [
 test.describe.configure({ mode: "parallel" });
 
 for (const vp of viewports) {
-  for (const scheme of ["light", "dark"] as const) {
-    test.describe(`${vp.width}px ${scheme}`, () => {
-      for (const p of paths) {
-        test(`${p} passes axe and layout checks`, async ({ page }, testInfo) => {
-          test.skip(
-            testInfo.project.name !== vp.project,
-            `Runs only on ${vp.project}; webkit-mobile is slow and these runs cover the layouts`,
-          );
-          // System preference is ignored, so the theme comes from the stored choice.
-          await page.addInitScript((theme) => {
-            try {
-              localStorage.setItem("theme", theme);
-            } catch {}
-          }, scheme);
-          await page.goto(p);
-          await expect(page.locator("html")).toHaveClass(new RegExp(`\\b${scheme}\\b`));
+  test.describe(`${vp.width}px`, () => {
+    for (const p of paths) {
+      test(`${p} passes axe and layout checks`, async ({ page }, testInfo) => {
+        test.skip(
+          testInfo.project.name !== vp.project,
+          `Runs only on ${vp.project}; webkit-mobile is slow and these runs cover the layouts`,
+        );
+        await page.goto(p);
 
-          // The lab demo iframe is third-party content, so axe skips it.
-          await expectNoSeriousViolations(page, { exclude: ["iframe"] });
+        // The lab demo iframe is third-party content, so axe skips it.
+        await expectNoSeriousViolations(page, { exclude: ["iframe"] });
 
-          const noOverflow = await page.evaluate(
-            () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
-          );
-          expect(noOverflow).toBe(true);
-          await expect(page.locator("h1")).toHaveCount(1);
-          await expect(page.locator("main")).toHaveCount(1);
-          const missingAlt = await page.evaluate(
-            () => document.querySelectorAll("img:not([alt])").length,
-          );
-          expect(missingAlt).toBe(0);
-        });
-      }
-    });
-  }
+        const noOverflow = await page.evaluate(
+          () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+        );
+        expect(noOverflow).toBe(true);
+        await expect(page.locator("h1")).toHaveCount(1);
+        await expect(page.locator("main")).toHaveCount(1);
+        const missingAlt = await page.evaluate(
+          () => document.querySelectorAll("img:not([alt])").length,
+        );
+        expect(missingAlt).toBe(0);
+      });
+    }
+  });
 }
 
 test.describe("keyboard and motion", () => {
@@ -116,8 +107,6 @@ test.describe("keyboard and motion", () => {
     for (const label of ["Home", "Projects", "Lab", "About", "Contact"]) {
       expect(has("a", label, true), `main nav link ${label}`).toBe(true);
     }
-    // Dark is the default, so the toggle offers the light theme first.
-    expect(has("button", "Switch to light theme")).toBe(true);
     for (const label of ["See projects", "Download CV", "Crowd detection"]) {
       expect(has("a", label), `link ${label}`).toBe(true);
     }
