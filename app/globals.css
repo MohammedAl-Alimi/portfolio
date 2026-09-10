@@ -57,6 +57,7 @@ body {
   line-height: 1.6;
 }
 
-html[data-tier="mid"] [data-grain] {
+html[data-tier="mid"] [data-overlay-scanlines],
+html[data-tier="mid"] [data-overlay-grain] {
   display: none;
 }
