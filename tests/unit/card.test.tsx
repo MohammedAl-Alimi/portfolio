@@ -17,7 +17,7 @@ it("renders no link without href", () => {
 
 it("draws a 1px monochrome border and ignores the colour prop", () => {
   const { container } = render(<Card color="#ff6b35">Body</Card>);
-  const card = container.querySelector("div.bg-surface") as HTMLElement;
+  const card = container.querySelector(".bg-surface") as HTMLElement;
   expect(card.className).toContain("border-border");
   expect(card.className).not.toContain("border-2");
   expect(card.style.borderColor).toBe("");
