@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
+import { CanvasRootLoader } from "@/components/three/CanvasRootLoader";
 import { Footer } from "@/components/ui/Footer";
 import { Grain } from "@/components/ui/Grain";
 import { Nav } from "@/components/ui/Nav";
@@ -39,6 +40,7 @@ export default async function RootLayout({
         >
           Skip to content
         </a>
+        <CanvasRootLoader />
         <ThemeProvider nonce={nonce}>
           <Nav />
           <main id="main" tabIndex={-1} className="min-h-[60vh] outline-none">
