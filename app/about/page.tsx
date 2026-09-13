@@ -16,7 +16,7 @@ export default async function AboutPage() {
 
   return (
     <Section>
-      <h1 className="font-display text-[clamp(2.5rem,6vw,5rem)]">{frontmatter.title}</h1>
+      <h1 className="font-display tracking-[-0.03em] leading-[0.9] text-[clamp(1.75rem,6vw,5rem)]">{frontmatter.title}</h1>
       <p className="mt-4 mb-10 max-w-2xl text-lg text-muted">{frontmatter.intro}</p>
       <div className="grid gap-10 lg:grid-cols-12">
         <div className="lg:col-span-7">
