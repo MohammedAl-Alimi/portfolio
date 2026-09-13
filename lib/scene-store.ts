@@ -36,3 +36,8 @@ export const useSceneStore = create<SceneState>((set) => ({
   setActiveShape: (activeShape) => set({ activeShape }),
   setPointer: (pointer) => set({ pointer }),
 }));
+
+// True when a canvas should exist: the tier is known, not low, and nothing failed.
+export function useSceneActive(): boolean {
+  return useSceneStore((s) => s.tier !== null && s.tier !== "low" && !s.failed);
+}

@@ -35,7 +35,17 @@ function hasWebgl2(): boolean {
   }
 }
 
+const LOW_SIGNALS: DeviceSignals = {
+  reducedMotion: true,
+  saveData: true,
+  webgl2: false,
+  cores: 1,
+  memory: 1,
+  frameMs: null,
+};
+
 export function readDeviceSignals(): DeviceSignals {
+  if (typeof window === "undefined") return LOW_SIGNALS;
   const nav = navigator as NavigatorHints;
   return {
     reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
