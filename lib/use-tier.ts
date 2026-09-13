@@ -1,15 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import { getDeviceTier, readDeviceSignals, type Tier } from "@/lib/device";
+import { getDeviceTier, readDeviceSignals, tierAfterProbe, type Tier } from "@/lib/device";
 import { useSceneStore } from "@/lib/scene-store";
 
-const PROBE_FRAMES = 30;
-
-function applyTier(tier: Tier) {
-  document.documentElement.dataset.tier = tier;
-  useSceneStore.getState().setTier(tier);
-}
+const PROBE_SAMPLES = 35; // 5 warm-up frames are dropped, 30 are measured
+const IDLE_FALLBACK_MS = 1500;
 
 export function useTier(): Tier | null {
   const tier = useSceneStore((s) => s.tier);
@@ -23,26 +19,52 @@ export function useTier(): Tier | null {
     if (signals.reducedMotion) document.documentElement.dataset.reducedMotion = "true";
     if (initial !== "high") return;
 
-    // Measure 30 frames once, then downgrade high to mid if the device is slow.
     let raf = 0;
+    let started = false;
+    let cancelled = false;
+    const samples: number[] = [];
     let last = 0;
-    let count = 0;
-    let total = 0;
+
     const step = (now: number) => {
-      if (last !== 0) {
-        total += now - last;
-        count += 1;
-      }
+      if (cancelled || document.hidden) return; // a hidden tab gives no real timing
+      if (last !== 0) samples.push(now - last);
       last = now;
-      if (count < PROBE_FRAMES) {
+      if (samples.length < PROBE_SAMPLES) {
         raf = requestAnimationFrame(step);
         return;
       }
-      const next = getDeviceTier({ ...signals, frameMs: total / count });
-      if (next === "mid") applyTier(next);
+      if (tierAfterProbe(signals, samples) === "mid") {
+        document.documentElement.dataset.tier = "mid";
+        useSceneStore.getState().setTier("mid");
+      }
     };
-    raf = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(raf);
+    const start = () => {
+      if (started || cancelled) return;
+      started = true;
+      if (document.hidden) return;
+      raf = requestAnimationFrame(step);
+    };
+
+    // Start once the scene is ready, or when the browser is idle, whichever is first.
+    const unsubscribe = useSceneStore.subscribe((s) => {
+      if (s.ready) start();
+    });
+    if (useSceneStore.getState().ready) start();
+    let idle = 0;
+    let timer = 0;
+    if (typeof requestIdleCallback === "function") {
+      idle = requestIdleCallback(start, { timeout: IDLE_FALLBACK_MS });
+    } else {
+      timer = window.setTimeout(start, IDLE_FALLBACK_MS);
+    }
+
+    return () => {
+      cancelled = true;
+      unsubscribe();
+      cancelAnimationFrame(raf);
+      if (idle && typeof cancelIdleCallback === "function") cancelIdleCallback(idle);
+      window.clearTimeout(timer);
+    };
   }, []);
 
   return tier;
