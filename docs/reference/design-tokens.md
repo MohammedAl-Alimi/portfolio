@@ -1,102 +1,111 @@
 # Design tokens reference
 
-Complete reference for the CSS variables, Tailwind names and fonts that define the look of the site. All tokens live in `app/globals.css`.
+Complete reference for the CSS variables, Tailwind names, fonts and overlays that define the look of the site. The look is Monolith: dark only, monochrome, hard corners. All tokens live in `app/globals.css`.
 
 ## How tokens are wired
 
 | Item | Detail | Location |
 | --- | --- | --- |
-| Dark values (default) | Defined on `:root`, so dark applies with no class set | `app/globals.css:26` |
-| Dark class | `.dark` repeats the dark values so `next-themes` can write `dark` | `app/globals.css:49` |
-| Light values | Defined on `.light` | `app/globals.css:58` |
-| Variants | `dark:` matches `.dark`, `light:` matches `.light` and their descendants | `app/globals.css:3`, `app/globals.css:4` |
-| Theme class | `next-themes` writes `dark` or `light` on `<html>`. Default `dark`, system preference ignored. | `components/ui/ThemeProvider.tsx:16` to `components/ui/ThemeProvider.tsx:18` |
-| Tailwind names | `@theme inline` maps each variable to a Tailwind theme key | `app/globals.css:6` |
-| Root font size | `18px` | `app/globals.css:67` to `app/globals.css:69` |
-| Body | Applies `font-sans`, `bg-bg`, `text-text` | `app/globals.css:71` to `app/globals.css:73` |
+| Values | Defined on `:root`. There is one theme, dark. No `.light` or `.dark` block, no theme variants, no theme toggle. | `app/globals.css:25` to `app/globals.css:49` |
+| Color scheme | `color-scheme: dark` | `app/globals.css:48` |
+| Tailwind names | `@theme inline` maps each variable to a Tailwind theme key | `app/globals.css:3` to `app/globals.css:23` |
+| Root font size | `16px` | `app/globals.css:51` to `app/globals.css:53` |
+| Body | `font-sans` (which is mono), `bg-bg`, `text-text`, line height `1.6` | `app/globals.css:55` to `app/globals.css:58` |
 
 ## Colors
 
-Dark is the default. The muted colour needed no change: the axe sweep passes in both themes at 320 and 1280 pixels with the values below.
+| Variable | Value | Tailwind name | Location |
+| --- | --- | --- | --- |
+| `--bg` | `#050505` | `bg-bg` | `app/globals.css:26` |
+| `--surface` | `#0f0f11` | `bg-surface` | `app/globals.css:27` |
+| `--surface-2` | `#17171a` | `bg-surface-2` | `app/globals.css:28` |
+| `--border` | `#2a2a2e` | `border-border` | `app/globals.css:29` |
+| `--muted` | `#808086` | `text-muted` | `app/globals.css:30` |
+| `--text` | `#f2f2f0` | `text-text` | `app/globals.css:31` |
+| `--glow` | `#ffffff` | `text-glow`, `border-glow` | `app/globals.css:32` |
+| `--accent-1` to `--accent-6` | old palette, unused by pages | `bg-accent-1` to `bg-accent-6` | `app/globals.css:34` to `app/globals.css:39` |
 
-| Variable | Dark (default) | Light | Tailwind name | Location |
-| --- | --- | --- | --- | --- |
-| `--bg` | `#0b0b10` | `#fffbf5` | `bg-bg` | `app/globals.css:27`, `app/globals.css:59` |
-| `--surface` | `#141420` | `#ffffff` | `bg-surface` | `app/globals.css:28`, `app/globals.css:60` |
-| `--text` | `#f6f3ee` | `#17161a` | `text-text` | `app/globals.css:29`, `app/globals.css:61` |
-| `--muted` | `#a39fad` | `#5f5b66` | `text-muted` | `app/globals.css:30`, `app/globals.css:62` |
-| `--border` | `#2a2833` | `#eae4da` | `border-border` | `app/globals.css:31`, `app/globals.css:63` |
-| `--accent-1` | `#ff6b35` | same | `bg-accent-1` | `app/globals.css:32` |
-| `--accent-2` | `#ffd23f` | same | `bg-accent-2` | `app/globals.css:33` |
-| `--accent-3` | `#3bceac` | same | `bg-accent-3` | `app/globals.css:34` |
-| `--accent-4` | `#5c7cfa` | same | `bg-accent-4` | `app/globals.css:35` |
-| `--accent-5` | `#f06595` | same | `bg-accent-5` | `app/globals.css:36` |
-| `--accent-6` | `#a78bfa` | same | `bg-accent-6` | `app/globals.css:37` |
+The accents stay only because the pixel storm and the lab still read them (`app/globals.css:33`). They go when those are rebuilt.
 
-The Tailwind color keys are `--color-bg` through `--color-accent-6` (`app/globals.css:7` to `app/globals.css:17`). Each accent works with every color utility, for example `text-accent-1` or `border-accent-3`.
+### Muted contrast
 
-The color scheme hint is `dark` on `:root` and `.dark`, and `light` on `.light` (`app/globals.css:46`, `app/globals.css:55`, `app/globals.css:64`).
+The first choice, `#6b6b70`, measured 3.84:1 on `--bg`, 3.61:1 on `--surface` and 3.38:1 on `--surface-2`. The axe sweep failed on it. `#7a7a80` reaches 4.78:1 on `--bg` but only 4.49:1 on `--surface`, so it still fails inside cards. `#808086` gives 5.19:1, 4.88:1 and 4.56:1 on the three surfaces and passes AA at 320 and 1280 pixels.
 
 ## Radii
 
-Corners are hard. Small radii are for buttons, medium for cards, large for big panels.
+All radii are `0px`. The variables stay so older class names compile.
 
-| Variable | Value | Tailwind key | Location |
-| --- | --- | --- | --- |
-| `--radius-sm-value` | `4px` | `--radius-sm` | `app/globals.css:38`, `app/globals.css:18` |
-| `--radius-md-value` | `8px` | `--radius-md` | `app/globals.css:39`, `app/globals.css:19` |
-| `--radius-lg-value` | `12px` | `--radius-lg` | `app/globals.css:40`, `app/globals.css:20` |
-
-Components read the radius through `var(--radius-sm)` and `var(--radius-md)`, for example `components/ui/Card.tsx:24`. Tags use a fixed `2px` radius (`components/ui/Tag.tsx:13`).
+| Variable | Value | Location |
+| --- | --- | --- |
+| `--radius-sm-value` | `0px` | `app/globals.css:40` |
+| `--radius-md-value` | `0px` | `app/globals.css:41` |
+| `--radius-lg-value` | `0px` | `app/globals.css:42` |
 
 ## Surfaces
 
 | Surface | Rule | Location |
 | --- | --- | --- |
-| Button | `2px` border. Primary and secondary get a `2px 2px 0` accent-4 shadow and a one pixel lift on hover. | `components/ui/Button.tsx:27`, `components/ui/Button.tsx:29` to `components/ui/Button.tsx:34` |
-| Card | `2px` border, in the project colour when given, otherwise `border-border`. No shadow. | `components/ui/Card.tsx:24` |
-| Tag | Pixel font, uppercase, `11px`, `1px` border | `components/ui/Tag.tsx:13` |
+| Button, primary | `bg-text text-bg`, 1px `border-text`. Hover inverts to `bg-bg text-text`. | `components/ui/Button.tsx:31` |
+| Button, secondary | Transparent, 1px `border-border`, wrapped in `Brackets` | `components/ui/Button.tsx:32` |
+| Button, ghost | No border, `hover:bg-surface` | `components/ui/Button.tsx:33` |
+| Button labels and focus | Mono, uppercase, `13px`, tracking `0.12em`. Focus ring is a 1px `--glow` outline. | `components/ui/Button.tsx:27` to `components/ui/Button.tsx:29` |
+| Card | `bg-surface`, 1px `border-border`, brackets, no radius. The `color` prop is kept for callers and ignored. | `components/ui/Card.tsx:24` |
+| Card link lift | Lifts `4px` on hover, only with `motion-safe:` | `components/ui/Card.tsx:35` |
+| Tag | Mono caps, `10px`, tracking `0.12em`, 1px `border-border`, no colour dot | `components/ui/Tag.tsx:11` |
+| Section title | `font-display`, tracking `-0.02em`, line height `0.9` | `components/ui/Section.tsx:17` |
+| Skeleton | `bg-surface-2` | `components/ui/Skeleton.tsx:7` |
+
+### Brackets
+
+`Brackets` draws four corner marks, 8px square, with 1px `--glow` borders on the two outer sides. With `hover` on (the default) they grow to 16px on hover or focus-within. The growth is wrapped in `motion-safe:`. The marks are `aria-hidden` and take no clicks. Extra props, such as `data-*`, go to the wrapper. `components/ui/Brackets.tsx:11` to `components/ui/Brackets.tsx:19` holds the corners and the growth classes.
 
 ## Motion
 
 | Variable | Value | Used in |
 | --- | --- | --- |
-| `--motion-fast` | `150ms` (`app/globals.css:41`) | Button hover (`components/ui/Button.tsx:27`), nav link colour (`components/ui/NavLinks.tsx:26`), theme toggle (`components/ui/ThemeToggle.tsx:26`) |
-| `--motion-base` | `300ms` (`app/globals.css:42`) | Card hover lift (`components/ui/Card.tsx:39`) |
-| `--motion-slow` | `500ms` (`app/globals.css:43`) | not used by a component yet |
-| `--motion-xslow` | `800ms` (`app/globals.css:44`) | not used by a component yet |
-| `--ease-out` | `cubic-bezier(0.22, 1, 0.36, 1)` (`app/globals.css:45`) | not used by a component yet |
+| `--motion-fast` | `150ms` (`app/globals.css:43`) | Button colour (`components/ui/Button.tsx:27`), bracket growth (`components/ui/Brackets.tsx:19`), nav link colour (`components/ui/NavLinks.tsx:26`) |
+| `--motion-base` | `300ms` (`app/globals.css:44`) | Card hover lift (`components/ui/Card.tsx:35`) |
+| `--motion-slow` | `500ms` (`app/globals.css:45`) | not used by a component yet |
+| `--motion-xslow` | `800ms` (`app/globals.css:46`) | not used by a component yet |
+| `--ease-out` | `cubic-bezier(0.22, 1, 0.36, 1)` (`app/globals.css:47`) | not used by a component yet |
 
-Motion variables are not mapped through `@theme inline`. Components reference them as `duration-[var(--motion-base)]`. The card lift and the button shadow and shift are wrapped in `motion-safe:`, so reduced motion turns them off. The colour transitions run regardless of the motion preference.
+Motion variables are not mapped through `@theme inline`. Components reference them as `duration-[var(--motion-base)]`. Lifts and bracket growth are wrapped in `motion-safe:`, so reduced motion turns them off.
 
 ## Fonts
 
-All three fonts load through `next/font/google`, which downloads them at build time and serves them from the site itself. They are SIL OFL fonts, and no font files are kept in the repo. All use `display: "swap"`.
+Both fonts load through `next/font/google`, which downloads them at build time and serves them from the site itself. They are SIL OFL fonts, and no font files are kept in the repo. Both use `display: "swap"` and are preloaded.
 
 | Export | Family | Weights | CSS variable set by Next | Tailwind key | Location |
 | --- | --- | --- | --- | --- | --- |
-| `display` | Unbounded | 600, 700 | `--font-display-src` | `--font-display` | `lib/fonts.ts:3` to `lib/fonts.ts:9`, `app/globals.css:21` |
-| `sans` | Manrope | 400, 500 | `--font-sans-src` | `--font-sans` | `lib/fonts.ts:11` to `lib/fonts.ts:16`, `app/globals.css:22` |
-| `pixel` | Silkscreen | 400 | `--font-pixel-src` | `--font-pixel` | `lib/fonts.ts:18` to `lib/fonts.ts:23`, `app/globals.css:23` |
+| `display` | Syne | 800 | `--font-display-src` | `--font-display` | `lib/fonts.ts:3` to `lib/fonts.ts:9`, `app/globals.css:20` |
+| `mono` | JetBrains Mono | 400, 700 | `--font-mono-src` | `--font-mono` and `--font-sans` | `lib/fonts.ts:11` to `lib/fonts.ts:17`, `app/globals.css:21`, `app/globals.css:22` |
 
-The display font is preloaded (`lib/fonts.ts:8`). The three variable classes are added to `<html>` in `app/layout.tsx:32`. Use the `font-display`, `font-sans` and `font-pixel` utilities.
+The body is mono, so `font-sans` and `font-mono` resolve to the same face. Both variable classes are added to `<html>` in `app/layout.tsx:33`.
 
-Where the pixel font is used: tags (`components/ui/Tag.tsx:13`), nav links (`components/ui/NavLinks.tsx:26`), card year (`components/projects/ProjectCard.tsx:57`), project meta labels (`components/projects/ProjectMeta.tsx:8`) and the footer line (`components/ui/Footer.tsx:26`). Section titles and page headings use `font-display tracking-[-0.03em] leading-[0.9]` (for example `components/ui/Section.tsx:17`).
+Small labels use `font-mono uppercase tracking-[0.12em]`: tags (`components/ui/Tag.tsx:11`), nav links (`components/ui/NavLinks.tsx:26`), the footer line (`components/ui/Footer.tsx:26`), card year (`components/projects/ProjectCard.tsx:57`), project meta labels (`components/projects/ProjectMeta.tsx:8`) and the hero hint (`components/home/HeroHint.tsx:46`, `components/home/HeroHint.tsx:58`).
 
-## Grain overlay
+## Overlays
 
-`components/ui/Grain.tsx:7` draws a fixed, click-through noise layer (`feTurbulence`) at `6%` opacity, `4%` in the light theme (`components/ui/Grain.tsx:12`). It is mounted after the footer (`app/layout.tsx:48`). It is hidden when `<html>` has `data-tier="mid"` (`app/globals.css:75`).
+`components/ui/Overlays.tsx:9` draws one fixed, click-through, `aria-hidden` wrapper (`data-overlay`) with three layers, mounted after the footer (`app/layout.tsx:48`).
+
+| Layer | Attribute | Look | Location |
+| --- | --- | --- | --- |
+| Scanlines | `data-overlay-scanlines` | 2px repeating gradient, white at `0.06` | `components/ui/Overlays.tsx:12` |
+| Grain | `data-overlay-grain` | `feTurbulence` noise at `5%` opacity | `components/ui/Overlays.tsx:19` |
+| Vignette | `data-overlay-vignette` | Radial gradient from clear at `55%` to black at `0.35` | `components/ui/Overlays.tsx:28` |
+
+On the mid tier (`<html data-tier="mid">`) the scanlines and grain are hidden. The vignette stays (`app/globals.css:60` to `app/globals.css:63`).
 
 ## Layers
 
 | Layer | z-index | Location |
 | --- | --- | --- |
-| Nav | `40` | `components/ui/Nav.tsx:10` |
+| Nav | `40` | `components/ui/Nav.tsx:9` |
 | Mobile menu dialog | `50` | `components/ui/MobileMenu.tsx:103` |
-| Grain overlay | `60`, above the dialog so the grain covers every surface | `components/ui/Grain.tsx:12` |
+| Overlays | `60`, above the dialog so they cover every surface | `components/ui/Overlays.tsx:10` |
 | Page transition overlay (future) | `70` | not built yet |
 
-The grain never takes clicks (`pointer-events-none`), so the layers below stay usable.
+The overlays never take clicks (`pointer-events-none`), so the layers below stay usable.
 
 ## Related
 
