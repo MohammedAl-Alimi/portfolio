@@ -44,7 +44,7 @@ portfolio/
 
 | Folder | Files | Responsibility |
 | --- | --- | --- |
-| `components/ui/` | `Button`, `Card`, `Container`, `Footer`, `icons`, `MobileMenu`, `Nav`, `NavLinks`, `Section`, `Skeleton`, `Tag`, `ThemeProvider`, `ThemeToggle`, `Wordmark` | Shared building blocks and site chrome. `Nav` is a server component (`components/ui/Nav.tsx:8`). `ThemeProvider` is a client component (`components/ui/ThemeProvider.tsx:1`). |
+| `components/ui/` | `Brackets`, `Button`, `Card`, `Container`, `Footer`, `icons`, `MobileMenu`, `Nav`, `NavLinks`, `Overlays`, `Section`, `Skeleton`, `Tag`, `Wordmark` | Shared building blocks and site chrome. `Nav` is a server component (`components/ui/Nav.tsx:8`). `Overlays` draws the scanline, grain and vignette layers (`components/ui/Overlays.tsx`). |
 | `components/home/` | `FeaturedProjects`, `Hero`, `HeroPoster`, `WhatIBuild` | Home sections. `HeroPoster` shows the static poster image (`components/home/HeroPoster.tsx:6`). |
 | `components/projects/` | `AdjacentProjects`, `ProjectBody`, `ProjectCard`, `ProjectGrid`, `ProjectHero`, `ProjectMeta`, `TagFilter` | Project list and case study pieces. `ProjectCard` holds the stretched link (`components/projects/ProjectCard.tsx:40`). |
 | `components/about/` | `Timeline` | About timeline list. |
