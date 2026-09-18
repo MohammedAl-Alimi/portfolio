@@ -14,7 +14,7 @@
     "validate:content": "tsx scripts/validate-content.ts",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test",
+    "test:e2e": "NEXT_PUBLIC_E2E=1 playwright test",
     "lhci": "lhci autorun"
   },
   "dependencies": {
