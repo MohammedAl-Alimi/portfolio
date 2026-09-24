@@ -18,7 +18,28 @@ async function openProjects(page: Page) {
       (el as HTMLElement & { __kept?: boolean }).__kept = true;
     });
   });
+  // Records the pathname at the moment each state change commits, with no auto-waiting.
+  await page.evaluate(() => {
+    const w = window as Window & { __transitionLog?: { state: string; path: string }[] };
+    w.__transitionLog = [];
+    const root = document.querySelector("[data-transition]");
+    if (!root) return;
+    new MutationObserver(() => {
+      w.__transitionLog?.push({ state: root.getAttribute("data-state") ?? "", path: location.pathname });
+    }).observe(root, { attributes: true, attributeFilter: ["data-state"] });
+  });
   return { overlay, link, href: href as string };
+}
+
+async function transitionLog(page: Page) {
+  return page.evaluate(
+    () => (window as Window & { __transitionLog?: { state: string; path: string }[] }).__transitionLog ?? [],
+  );
+}
+
+/** The pathname when the reveal first started: the new page must already be in place. */
+async function pathAtUncover(page: Page) {
+  return (await transitionLog(page)).find((entry) => entry.state === "uncovering")?.path;
 }
 
 test("card click wipes to the project and ends idle within 1.2 s", async ({ page }) => {
@@ -29,6 +50,7 @@ test("card click wipes to the project and ends idle within 1.2 s", async ({ page
   expect(await page.locator("[data-glitch-band]").count()).toBe(12);
   await expect(overlay).toHaveAttribute("data-state", "idle", { timeout: 1200 });
   expect(Date.now() - start).toBeLessThan(1200);
+  expect(await pathAtUncover(page)).toBe(href);
   await expect(page).toHaveURL(new RegExp(`${href}$`));
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   // The layout (nav, canvas) stays mounted through the transition.
@@ -50,6 +72,7 @@ test("rapid double click still ends idle on the right page", async ({ page }) =>
   const { overlay, link, href } = await openProjects(page);
   await link.dblclick();
   await expect(overlay).toHaveAttribute("data-state", "idle", { timeout: 2000 });
+  expect(await pathAtUncover(page)).toBe(href);
   await expect(page).toHaveURL(new RegExp(`${href}$`));
 });
 
@@ -61,6 +84,7 @@ test("reduced motion uses the plain fade", async ({ page }) => {
   await expect(page.locator("[data-glitch-fade]")).toHaveCount(1);
   await expect(page.locator("[data-glitch-band]")).toHaveCount(0);
   await expect(overlay).toHaveAttribute("data-state", "idle", { timeout: 1200 });
+  expect(await pathAtUncover(page)).toBe(href);
   await expect(page).toHaveURL(new RegExp(`${href}$`));
 });
 
