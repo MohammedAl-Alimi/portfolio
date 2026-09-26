@@ -7,10 +7,8 @@ import { Ticker } from "@/components/motion/Ticker";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Section } from "@/components/ui/Section";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { getHighlights, getProfile, getProjects } from "@/lib/content";
+import { getHighlights, getProfile, getProjects, getSite } from "@/lib/content";
 import { SITE_URL } from "@/lib/site";
-
-const TICKER = "AI · AGENTS · COMPUTER VISION · SECURITY · SYSTEMS";
 
 export async function generateMetadata(): Promise<Metadata> {
   const profile = await getProfile();
@@ -18,12 +16,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Home() {
-  const [profile, projects, highlights, headerList] = await Promise.all([
+  const [profile, projects, highlights, site, headerList] = await Promise.all([
     getProfile(),
     getProjects(),
     getHighlights(),
+    getSite(),
     headers(),
   ]);
+  const copy = site.home;
   const nonce = headerList.get("x-nonce") ?? undefined;
 
   return (
@@ -40,21 +40,21 @@ export default async function Home() {
           email: `mailto:${profile.email}`,
         }}
       />
-      <Hero profile={profile} />
-      <Ticker text={TICKER} />
-      <WhatIBuild />
-      <FeaturedProjects projects={projects} />
-      <Ticker text={TICKER} />
-      <Section id="right-now" title="Right now" decodeTitle>
+      <Hero profile={profile} copy={copy} />
+      <Ticker text={copy.ticker} />
+      <WhatIBuild copy={copy.whatIBuild} />
+      <FeaturedProjects projects={projects} title={copy.featured.title} />
+      <Ticker text={copy.ticker} />
+      <Section id="right-now" title={copy.rightNow.title} decodeTitle>
         <div className="grid gap-6 md:grid-cols-3">
           <Skeleton className="h-[240px]" />
           <Skeleton className="h-[120px]" />
           <Skeleton className="h-[120px]" />
         </div>
-        <p className="sr-only">Live activity loads here soon.</p>
+        <p className="sr-only">{copy.rightNow.loading}</p>
       </Section>
       {highlights.length > 0 ? (
-        <Section id="highlights" title="Highlights" decodeTitle>
+        <Section id="highlights" title={copy.highlights.title} decodeTitle>
           <ul className="grid gap-4 md:grid-cols-3">
             {highlights.map((h) => (
               <li key={h.url}>

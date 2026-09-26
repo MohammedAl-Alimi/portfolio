@@ -3,9 +3,9 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import type { LabItem } from "@/lib/content";
 
-type LabCardProps = { item: LabItem };
+type LabCardProps = { item: LabItem; tryLabel: string };
 
-export function LabCard({ item }: LabCardProps) {
+export function LabCard({ item, tryLabel }: LabCardProps) {
   const { title, slug, description, thumbnail, thumbnailAlt } = item.frontmatter;
 
   return (
@@ -24,7 +24,7 @@ export function LabCard({ item }: LabCardProps) {
           <p className="text-muted">{description}</p>
           <div className="mt-auto pt-2">
             <Button href={`/lab/${slug}`} variant="secondary">
-              Try it
+              {tryLabel}
             </Button>
           </div>
         </div>

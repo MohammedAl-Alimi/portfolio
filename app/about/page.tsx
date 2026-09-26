@@ -4,7 +4,7 @@ import { MdxBody } from "@/components/mdx/MdxBody";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Section } from "@/components/ui/Section";
-import { getAbout } from "@/lib/content";
+import { getAbout, getSite } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "About",
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AboutPage() {
-  const { frontmatter, body } = await getAbout();
+  const [{ frontmatter, body }, site] = await Promise.all([getAbout(), getSite()]);
 
   return (
     <Section>
@@ -25,7 +25,7 @@ export default async function AboutPage() {
         <div className="lg:col-span-5">
           <Card>
             <Timeline entries={frontmatter.timeline} />
-            <h2 className="mt-8 mb-3 font-display text-xl">Outside work</h2>
+            <h2 className="mt-8 mb-3 font-display text-xl">{site.about.outside}</h2>
             <ul className="list-disc space-y-1 pl-5 text-muted">
               {frontmatter.outside.map((item) => (
                 <li key={item}>{item}</li>
@@ -33,7 +33,7 @@ export default async function AboutPage() {
             </ul>
             <div className="mt-8">
               <Button href="/cv" variant="primary">
-                Download CV
+                {site.about.cv}
               </Button>
             </div>
           </Card>

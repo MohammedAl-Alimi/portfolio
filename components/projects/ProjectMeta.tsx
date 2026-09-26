@@ -3,12 +3,13 @@ import { Brackets } from "@/components/ui/Brackets";
 import { Tag } from "@/components/ui/Tag";
 import type { Project } from "@/lib/content";
 import { projectLinks } from "@/lib/project-links";
+import type { Site } from "@/lib/schemas";
 
 function Label({ children }: { children: string }) {
   return <dt className="mb-2 font-mono uppercase tracking-[0.12em] text-[11px] text-muted">{children}</dt>;
 }
 
-export function ProjectMeta({ project }: { project: Project }) {
+export function ProjectMeta({ project, labels }: { project: Project; labels: Site["projects"]["meta"] }) {
   // Year and role are in the hero line above, so the panel starts at the stack.
   const { stack, tags, links } = project.frontmatter;
   const present = projectLinks(links);
@@ -18,7 +19,7 @@ export function ProjectMeta({ project }: { project: Project }) {
       <Brackets hover={false} className="bg-surface border border-border p-6">
         <dl className="space-y-6">
           <div>
-            <Label>Stack</Label>
+            <Label>{labels.stack}</Label>
             <dd className="flex flex-wrap gap-2">
               {stack.map((item) => (
                 <Tag key={item}>{item}</Tag>
@@ -26,7 +27,7 @@ export function ProjectMeta({ project }: { project: Project }) {
             </dd>
           </div>
           <div>
-            <Label>Tags</Label>
+            <Label>{labels.tags}</Label>
             <dd className="flex flex-wrap gap-2">
               {tags.map((tag) => (
                 <Tag key={tag}>

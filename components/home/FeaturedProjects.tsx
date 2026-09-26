@@ -3,13 +3,13 @@ import { Section } from "@/components/ui/Section";
 import { projectNumbers, type Project } from "@/lib/content";
 
 /** `projects` is the full list from getProjects(); cards number from it like the /projects grid. */
-export function FeaturedProjects({ projects }: { projects: Project[] }) {
+export function FeaturedProjects({ projects, title }: { projects: Project[]; title: string }) {
   const featured = projects.filter((p) => p.frontmatter.featured);
   if (featured.length === 0) return null;
   const numbers = projectNumbers(projects);
 
   return (
-    <Section title="Featured projects" decodeTitle>
+    <Section title={title} decodeTitle>
       <section aria-label="Featured projects">
         {/* Sideways swipes scroll the strip natively; Lenis keeps vertical ones. */}
         <div
