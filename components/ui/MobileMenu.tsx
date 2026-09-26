@@ -87,7 +87,7 @@ export function MobileMenu() {
         aria-haspopup="dialog"
         aria-controls={dialogId}
         onClick={() => setOpen(true)}
-        className="inline-flex h-[44px] w-[44px] items-center justify-center border-2 border-border bg-surface text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-4)]"
+        className="inline-flex h-[44px] w-[44px] items-center justify-center border border-border bg-surface text-text focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-[var(--glow)]"
       >
         <MenuIcon />
       </button>
@@ -108,7 +108,7 @@ export function MobileMenu() {
                   type="button"
                   aria-label="Close menu"
                   onClick={close}
-                  className="inline-flex h-[44px] w-[44px] items-center justify-center border-2 border-border bg-surface text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-4)]"
+                  className="inline-flex h-[44px] w-[44px] items-center justify-center border border-border bg-surface text-text focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-[var(--glow)]"
                 >
                   <CloseIcon />
                 </button>
@@ -119,7 +119,7 @@ export function MobileMenu() {
                     <Link
                       href={item.href}
                       onClick={() => setOpen(false)}
-                      className="flex min-h-[56px] items-center font-display text-3xl tracking-[-0.03em] text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-4)]"
+                      className="flex min-h-[56px] items-center font-display text-3xl tracking-[-0.03em] text-text focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-[var(--glow)]"
                     >
                       {item.label}
                     </Link>

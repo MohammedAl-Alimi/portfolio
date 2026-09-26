@@ -18,7 +18,7 @@ export function Nav() {
             aria-label="Search"
             data-search-trigger
             disabled
-            className="inline-flex min-h-[44px] min-w-[44px] cursor-default items-center justify-center gap-2 border-2 border-border bg-surface px-3 font-mono uppercase tracking-[0.12em] text-[12px] text-text opacity-60"
+            className="inline-flex min-h-[44px] min-w-[44px] cursor-default items-center justify-center gap-2 border border-border bg-surface px-3 font-mono uppercase tracking-[0.12em] text-[12px] text-text opacity-60 focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-[var(--glow)]"
           >
             <SearchIcon />
             <span className="hidden md:inline">Search</span>
