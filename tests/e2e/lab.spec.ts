@@ -3,7 +3,9 @@ import { expectNoSeriousViolations } from "./helpers/axe";
 
 test("lab lists items with plain language and try buttons", async ({ page }) => {
   await page.goto("/lab");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Lab");
+  // The title decodes, so its text node is doubled (sr-only + glyph layer); assert the name.
+  await expect(page.getByRole("heading", { level: 1 })).toHaveAccessibleName("Lab");
+  await expect(page.getByRole("heading", { level: 1 }).locator("[data-decode-glyphs]")).toHaveText("Lab");
   await expect(
     page.getByText("Small experiments and live demos. Click anything to try it."),
   ).toBeVisible();
