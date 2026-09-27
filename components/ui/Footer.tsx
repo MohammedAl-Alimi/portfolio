@@ -23,7 +23,7 @@ export async function Footer() {
             Download CV
           </Button>
         </div>
-        <p className="mt-16 font-pixel text-[12px] uppercase tracking-wider text-muted">
+        <p className="mt-16 font-mono uppercase tracking-[0.12em] text-[12px] text-muted">
           © 2026 Mohammed Al-Alimi. Built with Next.js.
         </p>
       </Section>
