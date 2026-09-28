@@ -1,6 +1,7 @@
 import type { NavIcon } from "@/lib/nav";
 
 const common = {
+  className: "shrink-0",
   width: 16,
   height: 16,
   viewBox: "0 0 16 16",

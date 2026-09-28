@@ -32,7 +32,7 @@ export function Rail() {
             <span
               aria-hidden="true"
               data-rail-label
-              className="whitespace-nowrap opacity-0 group-hover/rail:opacity-100 group-focus-within/rail:opacity-100 motion-safe:transition-opacity duration-[var(--motion-base)]"
+              className="absolute left-[60px] top-1/2 -translate-y-1/2 whitespace-nowrap opacity-0 group-hover/rail:opacity-100 group-focus-within/rail:opacity-100 motion-safe:transition-opacity duration-[var(--motion-base)]"
             >
               {item.label}
             </span>
