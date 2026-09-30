@@ -4,7 +4,6 @@ import { CanvasRootLoader } from "@/components/three/CanvasRootLoader";
 import { Footer } from "@/components/ui/Footer";
 import { Grain } from "@/components/ui/Grain";
 import { Nav } from "@/components/ui/Nav";
-import { ThemeProvider } from "@/components/ui/ThemeProvider";
 import { getProfile } from "@/lib/content";
 import { display, mono } from "@/lib/fonts";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
@@ -26,12 +25,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const nonce = (await headers()).get("x-nonce") ?? undefined;
+  // Reading request headers keeps rendering dynamic, so Next can apply the CSP nonce to its scripts.
+  await headers();
   return (
     <html
       lang="en"
       className={`${display.variable} ${mono.variable}`}
-      suppressHydrationWarning
     >
       <body>
         <a
@@ -41,14 +40,12 @@ export default async function RootLayout({
           Skip to content
         </a>
         <CanvasRootLoader />
-        <ThemeProvider nonce={nonce}>
-          <Nav />
-          <main id="main" tabIndex={-1} className="min-h-[60vh] outline-none">
-            {children}
-          </main>
-          <Footer />
-          <Grain />
-        </ThemeProvider>
+        <Nav />
+        <main id="main" tabIndex={-1} className="min-h-[60vh] outline-none">
+          {children}
+        </main>
+        <Footer />
+        <Grain />
       </body>
     </html>
   );
