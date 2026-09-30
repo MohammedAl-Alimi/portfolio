@@ -28,7 +28,7 @@ export function Hero({ profile }: { profile: Profile }) {
               {profile.headline}
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
-              <Button variant="primary" size="lg" href="/projects">
+              <Button variant="primary" size="lg" href="/projects" brackets>
                 VIEW WORK
               </Button>
               <Button variant="secondary" size="lg" href="/cv">
