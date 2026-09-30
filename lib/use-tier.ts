@@ -14,6 +14,8 @@ export function useTier(): Tier | null {
     if (useSceneStore.getState().tier !== null) return;
     const signals = readDeviceSignals();
     const initial = getDeviceTier(signals);
+    // Set before the tier, so anything waiting on the tier sees both.
+    useSceneStore.getState().setSoftware(signals.software === true);
     useSceneStore.getState().setTier(initial, signals.reducedMotion);
     document.documentElement.dataset.tier = initial;
     if (signals.reducedMotion) document.documentElement.dataset.reducedMotion = "true";

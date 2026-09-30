@@ -30,7 +30,7 @@
   --muted: #808086;
   --text: #f2f2f0;
   --glow: #ffffff;
-  /* Used only by the pixel storm and the lab. Page components must not read these. */
+  /* Used only by the lab. Page components must not read these. */
   --accent-1: #ff6b35;
   --accent-2: #ffd23f;
   --accent-3: #3bceac;
@@ -60,4 +60,30 @@ body {
 html[data-tier="mid"] [data-overlay-scanlines],
 html[data-tier="mid"] [data-overlay-grain] {
   display: none;
+}
+
+/* Text decode (components/motion/Decode.tsx). The glyph layer waits hidden for
+   the script. The script either runs the decode ("run", then "done") or, for
+   reduced motion, the low tier and CPU renderers, fades the final text in
+   ("fade"). Without a script the final text fades in after 1.2 s. */
+[data-decode-glyphs] {
+  animation: decode-fallback 300ms ease 1200ms both;
+}
+
+[data-decode="run"] [data-decode-glyphs],
+[data-decode="done"] [data-decode-glyphs] {
+  animation: none;
+}
+
+[data-decode="fade"] [data-decode-glyphs] {
+  animation: decode-fallback 300ms ease both;
+}
+
+@keyframes decode-fallback {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

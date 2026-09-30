@@ -1,7 +1,7 @@
-// Pure helpers and the shared pointer trail behind the storm's wind.
+// Pure helpers and the shared pointer trail behind the hero figure's wind.
 // The vertex shader cannot integrate a spring per point, so the CPU keeps the
 // last few pointer samples and the shader sums a closed-form, damped response
-// to each one (see components/three/shaders/storm.ts).
+// to each one (see components/three/shaders/wind.ts).
 // No three.js and no React here: the hint and the tilt hook load it with the page.
 
 export interface Vec {
@@ -45,7 +45,7 @@ export const WIND_OMEGA = 9;
 
 const T0 = typeof performance === "undefined" ? 0 : performance.now();
 
-/** Seconds since this module loaded. The storm's uTime runs on the same clock. */
+/** Seconds since this module loaded. The figure's uTime runs on the same clock. */
 export function stormNow(): number {
   return (performance.now() - T0) / 1000;
 }
@@ -62,7 +62,7 @@ export function pointerVelocity(prev: Vec, next: Vec, dt: number): { vx: number;
   return { vx: (next.x - prev.x) / dt, vy: (next.y - prev.y) / dt };
 }
 
-// Client pixels to slot units: -1..1 across the slot, y up like the storm.
+// Client pixels to slot units: -1..1 across the slot, y up like the scene.
 export function clientToSlot(clientX: number, clientY: number, rect: SlotRect): Vec {
   const x = rect.width > 0 ? ((clientX - rect.left) / rect.width) * 2 - 1 : 0;
   const y = rect.height > 0 ? 1 - ((clientY - rect.top) / rect.height) * 2 : 0;
@@ -108,7 +108,7 @@ export function tiltToPointer(gamma: number, beta: number, range = 30): Vec {
 
 type Listener = () => void;
 
-// The trail shared by the pointer hook, the tilt hook and the storm.
+// The trail shared by the pointer hook, the tilt hook and the figure.
 export class WindTrail {
   samples: TrailSample[] = [];
   /** Time of the newest sample, or the clock start, so the breeze begins 2 s after load. */
