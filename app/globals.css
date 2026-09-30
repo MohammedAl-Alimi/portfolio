@@ -27,7 +27,7 @@
   --surface: #0f0f11;
   --surface-2: #17171a;
   --border: #2a2a2e;
-  --muted: #6b6b70;
+  --muted: #808086;
   --text: #f2f2f0;
   --glow: #ffffff;
   /* Unused by pages. The pixel storm and the lab still read these until they are rebuilt. */
