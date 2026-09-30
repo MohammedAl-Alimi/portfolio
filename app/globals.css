@@ -63,8 +63,9 @@ html[data-tier="mid"] [data-overlay-grain] {
 }
 
 /* Text decode (components/motion/Decode.tsx). The glyph layer waits hidden for
-   the script to start the decode; without a script it fades in the final text
-   after 1.2 s. Under reduced motion it shows the final text at once. */
+   the script. The script either runs the decode ("run", then "done") or, for
+   reduced motion, the low tier and CPU renderers, fades the final text in
+   ("fade"). Without a script the final text fades in after 1.2 s. */
 [data-decode-glyphs] {
   animation: decode-fallback 300ms ease 1200ms both;
 }
@@ -74,10 +75,8 @@ html[data-tier="mid"] [data-overlay-grain] {
   animation: none;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [data-decode-glyphs] {
-    animation: none;
-  }
+[data-decode="fade"] [data-decode-glyphs] {
+  animation: decode-fallback 300ms ease both;
 }
 
 @keyframes decode-fallback {
