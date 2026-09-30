@@ -7,7 +7,7 @@ export function FeaturedProjects({ projects }: { projects: Project[] }) {
   if (featured.length === 0) return null;
 
   return (
-    <Section title="Featured projects">
+    <Section title="Featured projects" decodeTitle>
       <section aria-label="Featured projects">
         {/* Sideways swipes scroll the strip natively; Lenis keeps vertical ones. */}
         <div

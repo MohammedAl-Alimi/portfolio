@@ -77,6 +77,12 @@ html[data-tier="mid"] [data-overlay-grain] {
   animation: none;
 }
 
+/* An "enter" decode waiting for its heading to scroll into view shows the final
+   text, so nothing is ever hidden if the observer never fires. */
+[data-decode="wait"] [data-decode-glyphs] {
+  animation: none;
+}
+
 [data-decode="fade"] [data-decode-glyphs] {
   animation: decode-fallback 300ms ease both;
 }
