@@ -13,7 +13,15 @@ test("hero shows the name once, the headline and both buttons", async ({ page })
   const h1 = page.getByRole("heading", { level: 1 });
   await expect(h1).toHaveAccessibleName("Mohammed Al-Alimi");
   // The name is in the hero once for screen readers: the glyph layer is hidden from them.
-  await expect(page.locator("section[aria-labelledby=hero-title]").getByText("Mohammed Al-Alimi", { exact: true })).toHaveCount(1);
+  const exposed = await page.locator("section[aria-labelledby=hero-title]").evaluate((section) => {
+    const walker = document.createTreeWalker(section, NodeFilter.SHOW_TEXT);
+    let n = 0;
+    for (let t = walker.nextNode(); t; t = walker.nextNode()) {
+      if (/mohammed al-alimi/i.test(t.textContent ?? "") && !t.parentElement?.closest("[aria-hidden=true]")) n++;
+    }
+    return n;
+  });
+  expect(exposed).toBe(1);
   await expect(page.locator("[data-hero-headline]")).toHaveCSS("font-weight", "800");
   await expect(page.locator("[data-hero-headline]")).toHaveCSS("font-family", /Syne/i);
   await expect(page.getByText("I build AI systems, agents and playful tools")).toBeVisible();

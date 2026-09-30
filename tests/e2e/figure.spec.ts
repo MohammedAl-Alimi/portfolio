@@ -37,10 +37,10 @@ function decodedName(page: Page) {
 }
 
 test.describe("hero figure", () => {
-  test("draws, rotates, reacts to the pointer and hides the hint", async ({ page }, testInfo) => {
+  test("draws, rotates and hides the hint after a pointer move", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "chromium-desktop", "Desktop only");
     // CI renders WebGL on the CPU, where the figure holds still; the test-only
-    // flag lets the rotation run there too.
+    // flag lets the rotation run there too. The pointer wake-up is tested without it below.
     await page.goto("/?motion=force");
     await waitForFigure(page);
     const hint = page.locator("[data-hero-hint]");
@@ -54,20 +54,34 @@ test.describe("hero figure", () => {
     expect(b.yaw).not.toBe(a.yaw);
 
     await sweep(page);
-    await page.waitForTimeout(200);
-    expect((await probe(page))!.trailCount).toBeGreaterThan(0);
     await expect(hint).toBeHidden();
   });
 
-  test("holds still on a software renderer without the flag", async ({ page }, testInfo) => {
+  test("a pointer move wakes the demand loop, which rests without one", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "chromium-desktop", "Desktop only");
+    // No ?motion=force: on a CPU renderer (CI) the figure holds still, so the
+    // loop only runs when the wind wakes it. On a GPU the rotation keeps it running.
     await page.goto("/");
     await waitForFigure(page);
-    const a = (await probe(page))!;
-    test.skip(!a.software, "Only meaningful on a CPU renderer");
+    await page.waitForTimeout(400); // let the load and layout frames settle
+    const rest = (await probe(page))!;
     await page.waitForTimeout(800);
-    const b = (await probe(page))!;
-    expect(b.yaw).toBe(a.yaw);
+    const still = (await probe(page))!;
+    if (rest.software) {
+      // At rest: no frames, no rotation.
+      expect(still.frames).toBe(rest.frames);
+      expect(still.yaw).toBe(rest.yaw);
+    } else {
+      expect(still.frames).toBeGreaterThan(rest.frames);
+    }
+
+    await sweep(page);
+    await page.waitForTimeout(200);
+    const moved = (await probe(page))!;
+    expect(moved.trailCount).toBeGreaterThan(0);
+    expect(moved.frames).toBeGreaterThan(still.frames + 5);
+    // On a CPU renderer the frames came from the wind, not the rotation.
+    if (rest.software) expect(moved.yaw).toBe(rest.yaw);
   });
 
   test("the name is in the DOM at load and resolves to the final text", async ({ page, request }, testInfo) => {
