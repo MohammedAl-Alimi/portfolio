@@ -89,3 +89,58 @@ html[data-tier="mid"] [data-overlay-grain] {
     opacity: 1;
   }
 }
+
+/* Ticker strip (components/motion/Ticker.tsx): a continuous slide and a scanline
+   band (one sweep per 4 s, like the figure). Paused on hover; no motion under
+   reduced motion; no scanline on the mid tier. */
+[data-ticker-track] {
+  animation: ticker-slide 60s linear infinite;
+}
+
+[data-ticker]:hover [data-ticker-track] {
+  animation-play-state: paused;
+}
+
+[data-ticker]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent 44%,
+    color-mix(in srgb, var(--glow) 14%, transparent) 50%,
+    transparent 56%
+  );
+  animation: ticker-scan 4s linear infinite;
+}
+
+html[data-tier="mid"] [data-ticker]::after {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-ticker-track],
+  [data-ticker]::after {
+    animation: none;
+  }
+
+  [data-ticker]::after {
+    display: none;
+  }
+}
+
+@keyframes ticker-slide {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes ticker-scan {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
