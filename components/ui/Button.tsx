@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/cn";
+import { Brackets } from "./Brackets";
 
 type Variant = "primary" | "secondary" | "ghost";
 type Size = "md" | "lg";
@@ -24,20 +25,17 @@ type ButtonAsAnchor = CommonProps &
 export type ButtonProps = ButtonAsButton | ButtonAsAnchor;
 
 const base =
-  "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[var(--radius-sm)] border-2 font-sans font-semibold duration-[var(--motion-fast)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-4)] disabled:opacity-50";
-
-const pixelHover =
-  "hover:shadow-[2px_2px_0_var(--accent-4)] hover:-translate-x-[1px] hover:-translate-y-[1px] motion-safe:transition-[transform,box-shadow]";
+  "inline-flex min-h-[44px] items-center justify-center gap-2 border font-mono text-[13px] font-bold uppercase tracking-[0.12em] duration-[var(--motion-fast)] motion-safe:transition-colors focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-[var(--glow)] disabled:opacity-50";
 
 const variants: Record<Variant, string> = {
-  primary: `bg-text text-bg border-text ${pixelHover}`,
-  secondary: `bg-transparent border-border text-text ${pixelHover}`,
+  primary: "bg-text text-bg border-text hover:bg-bg hover:text-text",
+  secondary: "bg-transparent text-text border-border",
   ghost: "border-transparent bg-transparent text-text hover:bg-surface",
 };
 
 const sizes: Record<Size, string> = {
   md: "px-5",
-  lg: "px-7 text-lg",
+  lg: "px-7",
 };
 
 function isInternal(href: string) {
@@ -45,6 +43,16 @@ function isInternal(href: string) {
 }
 
 export function Button(props: ButtonProps) {
+  const button = renderButton(props);
+  if (props.variant !== "secondary") return button;
+  return (
+    <Brackets as="span" className="inline-flex">
+      {button}
+    </Brackets>
+  );
+}
+
+function renderButton(props: ButtonProps) {
   const { variant = "primary", size = "md", external, className, ...rest } = props;
   const classes = cn(base, variants[variant], sizes[size], className);
 
