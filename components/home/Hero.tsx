@@ -1,4 +1,5 @@
 import { Decode } from "@/components/motion/Decode";
+import { GridFloor } from "@/components/motion/GridFloor";
 import { ViewSlot } from "@/components/three/ViewSlot";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
@@ -9,7 +10,8 @@ import { HeroPoster } from "./HeroPoster";
 
 export function Hero({ profile }: { profile: Profile }) {
   return (
-    <section data-hero aria-labelledby="hero-title" className="py-12 md:py-20">
+    <section data-hero aria-labelledby="hero-title" className="relative py-12 md:py-20">
+      <GridFloor />
       <Container>
         <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12">
           <div className="order-2 lg:order-1 lg:col-span-6">
