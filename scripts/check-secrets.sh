@@ -15,7 +15,6 @@ patterns=(
   '-----BEGIN (RSA|EC|OPENSSH|PGP) PRIVATE KEY-----'
   'eyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}\.'
   '/Users/[a-z-]+/'
-  'alalimim14'
   'act\.3'
   'act3'
 )
@@ -30,6 +29,15 @@ for p in "${patterns[@]}"; do
     fi
   fi
 done
+
+# The contact email is allowed in content/profile.json only.
+if hits=$(git ls-files -z | xargs -0 grep -nEI --exclude='check-secrets.sh' --exclude='CLAUDE.md' --exclude='profile.json' -- 'alalimim14' 2>/dev/null); then
+  if [ -n "$hits" ]; then
+    echo "check-secrets: pattern 'alalimim14' found:" >&2
+    echo "$hits" >&2
+    status=1
+  fi
+fi
 
 if git ls-files | grep -Eq '(^|/)\.env($|\.(local|production|development)$)'; then
   echo "check-secrets: an .env file is tracked" >&2
