@@ -24,7 +24,7 @@ type ButtonAsAnchor = CommonProps &
 export type ButtonProps = ButtonAsButton | ButtonAsAnchor;
 
 const base =
-  "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[var(--radius-sm)] font-sans font-semibold transition-colors duration-[var(--motion-fast)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current disabled:opacity-50";
+  "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[var(--radius-sm)] font-sans font-semibold transition-colors duration-[var(--motion-fast)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-4)] disabled:opacity-50";
 
 const variants: Record<Variant, string> = {
   primary: "bg-text text-bg hover:opacity-90",
