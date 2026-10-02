@@ -38,7 +38,7 @@ const sizes: Record<Size, string> = {
 };
 
 function isInternal(href: string) {
-  return href.startsWith("/") || href.startsWith("#");
+  return (href.startsWith("/") && !href.startsWith("//")) || href.startsWith("#");
 }
 
 export function Button(props: ButtonProps) {
@@ -50,18 +50,26 @@ export function Button(props: ButtonProps) {
       AnchorHTMLAttributes<HTMLAnchorElement>,
       "href"
     > & { href: string };
-    if (external || !isInternal(href)) {
+    const opensNewTab = external || anchorRest.target === "_blank";
+    if (isInternal(href)) {
       return (
-        <a
+        <Link
           {...anchorRest}
           href={href}
-          target="_blank"
-          rel="noopener noreferrer"
+          rel={anchorRest.target === "_blank" ? "noopener noreferrer" : anchorRest.rel}
           className={classes}
         />
       );
     }
-    return <Link {...anchorRest} href={href} className={classes} />;
+    return (
+      <a
+        {...anchorRest}
+        href={href}
+        target={external ? "_blank" : anchorRest.target}
+        rel={opensNewTab ? "noopener noreferrer" : anchorRest.rel}
+        className={classes}
+      />
+    );
   }
 
   const buttonRest = rest as ButtonHTMLAttributes<HTMLButtonElement>;
