@@ -13,11 +13,11 @@ export function ProjectGrid({ projects }: ProjectGridProps) {
     );
   }
   return (
-    <div data-testid="project-grid" className="grid lg:grid-flow-dense gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div data-testid="project-grid" className="grid grid-cols-1 lg:grid-flow-dense gap-6 md:grid-cols-2 lg:grid-cols-3">
       {projects.map((project) => (
         <div
           key={project.frontmatter.slug}
-          className={cn(project.frontmatter.featured && "lg:col-span-2")}
+          className={cn("min-w-0", project.frontmatter.featured && "lg:col-span-2")}
         >
           <ProjectCard project={project} size={project.frontmatter.featured ? "lg" : "md"} />
         </div>

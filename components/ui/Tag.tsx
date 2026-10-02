@@ -1,26 +1,14 @@
 import type { ReactNode } from "react";
-import { cn } from "@/lib/cn";
 
 type TagProps = {
   children: ReactNode;
+  /** Kept so callers compile. Tags no longer draw a colour dot. */
   color?: string;
 };
 
-export function Tag({ children, color }: TagProps) {
+export function Tag({ children }: TagProps) {
   return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-2 rounded-[2px] border border-border px-2 py-1 font-pixel text-[11px] uppercase leading-none tracking-wider text-muted",
-      )}
-    >
-      {color ? (
-        <span
-          data-tag-dot
-          aria-hidden="true"
-          className="inline-block size-2 rounded-full"
-          style={{ backgroundColor: color }}
-        />
-      ) : null}
+    <span className="inline-flex items-center border border-border px-1.5 py-0.5 font-mono text-[10px] uppercase leading-none tracking-[0.12em] text-muted">
       {children}
     </span>
   );

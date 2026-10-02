@@ -81,7 +81,7 @@ The schemas are strict objects, so an unknown field is rejected instead of being
 
 ## Why pages are server components
 
-Pages only read files and produce HTML. They need no browser APIs, so they run on the server and ship no data-fetching code to the visitor. Client components are used only where the browser is the point: the theme provider and toggle (`components/ui/ThemeProvider.tsx:1`), the mobile menu (`components/ui/MobileMenu.tsx:1`), the active nav link (`components/ui/NavLinks.tsx:1`) and the error boundaries.
+Pages only read files and produce HTML. They need no browser APIs, so they run on the server and ship no data-fetching code to the visitor. Client components are used only where the browser is the point: the mobile menu (`components/ui/MobileMenu.tsx:1`), the active nav link (`components/ui/NavLinks.tsx:1`) and the error boundaries. The site has one dark theme, so there is no theme provider. Its colour tokens are plain CSS variables in `app/globals.css:25`.
 
 The loaders are imported through `lib/content.ts`, which imports `server-only` (`lib/content.ts:1`). If a client component ever imports a loader, the build fails instead of bundling file system code for the browser.
 

@@ -2,11 +2,10 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { CanvasRootLoader } from "@/components/three/CanvasRootLoader";
 import { Footer } from "@/components/ui/Footer";
-import { Grain } from "@/components/ui/Grain";
 import { Nav } from "@/components/ui/Nav";
-import { ThemeProvider } from "@/components/ui/ThemeProvider";
+import { Overlays } from "@/components/ui/Overlays";
 import { getProfile } from "@/lib/content";
-import { display, pixel, sans } from "@/lib/fonts";
+import { display, mono } from "@/lib/fonts";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -26,29 +25,27 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const nonce = (await headers()).get("x-nonce") ?? undefined;
+  // Reading request headers keeps rendering dynamic, so Next can apply the CSP nonce to its scripts.
+  await headers();
   return (
     <html
       lang="en"
-      className={`${display.variable} ${sans.variable} ${pixel.variable}`}
-      suppressHydrationWarning
+      className={`${display.variable} ${mono.variable}`}
     >
       <body>
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-[var(--radius-sm)] focus:bg-text focus:px-4 focus:py-3 focus:text-bg"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-text focus:px-4 focus:py-3 focus:text-bg focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-[var(--glow)]"
         >
           Skip to content
         </a>
         <CanvasRootLoader />
-        <ThemeProvider nonce={nonce}>
-          <Nav />
-          <main id="main" tabIndex={-1} className="min-h-[60vh] outline-none">
-            {children}
-          </main>
-          <Footer />
-          <Grain />
-        </ThemeProvider>
+        <Nav />
+        <main id="main" tabIndex={-1} className="min-h-[60vh] outline-none">
+          {children}
+        </main>
+        <Footer />
+        <Overlays />
       </body>
     </html>
   );
