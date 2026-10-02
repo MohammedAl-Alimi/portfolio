@@ -13,7 +13,7 @@ export function Tag({ children, color }: TagProps) {
         "inline-flex items-center rounded-full px-3 py-1 text-sm font-medium",
         !color && "bg-surface border border-border text-muted",
       )}
-      style={color ? { backgroundColor: color + "22", color } : undefined}
+      style={color ? { backgroundColor: `color-mix(in srgb, ${color} 14%, transparent)`, color } : undefined}
     >
       {children}
     </span>
