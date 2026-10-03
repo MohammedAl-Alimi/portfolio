@@ -1,0 +1,10 @@
+{
+  "name": "Test Person",
+  "headline": "I build things",
+  "bio": "Short bio.",
+  "email": "test@example.com",
+  "location": "Germany",
+  "availability": "Open to roles",
+  "socials": { "github": "https://github.com/example", "linkedin": "https://www.linkedin.com/in/example" },
+  "decorationColors": ["#FFD23F", "#3BCEAC"]
+}
