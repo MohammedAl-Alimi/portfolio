@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { NAV_ITEMS } from "@/lib/nav";
 import { CloseIcon, MenuIcon } from "./icons";
@@ -19,6 +19,7 @@ export function MobileMenu() {
     (next: boolean) => setOpenedAt(next ? pathname : null),
     [pathname],
   );
+  const dialogId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -83,6 +84,8 @@ export function MobileMenu() {
         type="button"
         aria-label="Menu"
         aria-expanded={open}
+        aria-haspopup="dialog"
+        aria-controls={dialogId}
         onClick={() => setOpen(true)}
         className="inline-flex h-[44px] w-[44px] items-center justify-center rounded-full border border-border bg-surface text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-4)]"
       >
@@ -92,6 +95,7 @@ export function MobileMenu() {
         ? createPortal(
             <div
               ref={dialogRef}
+              id={dialogId}
               role="dialog"
               aria-modal="true"
               aria-label="Menu"
