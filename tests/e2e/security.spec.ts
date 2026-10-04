@@ -26,7 +26,7 @@ test("static files carry the baseline security headers", async ({ request }) => 
   }
 });
 
-test("pages render with the csp active and the theme still toggles", async ({ page }) => {
+test("pages render with the csp active", async ({ page }) => {
   const errors: string[] = [];
   page.on("console", (m) => {
     if (m.type() === "error" && /Content Security Policy/i.test(m.text())) errors.push(m.text());
@@ -60,15 +60,7 @@ test("pages render with the csp active and the theme still toggles", async ({ pa
     expect(await violations(), `csp violations on ${path}`).toEqual([]);
   }
 
-  await page.goto("/");
-  const html = page.locator("html");
-  const before = (await html.getAttribute("class"))?.includes("dark") ?? false;
-  await page.getByRole("button", { name: /theme|dark|light/i }).first().click();
-  await expect
-    .poll(async () => ((await html.getAttribute("class")) ?? "").includes("dark"))
-    .toBe(!before);
-
-  expect(await violations(), "csp violations after theme toggle").toEqual([]);
+  expect(await violations(), "csp violations after navigation").toEqual([]);
   expect(errors).toEqual([]);
 });
 

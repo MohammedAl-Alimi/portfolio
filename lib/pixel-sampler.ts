@@ -18,7 +18,7 @@ export type SamplerContext = Pick<
 export type ContextFactory = (width: number, height: number) => SamplerContext;
 
 export interface SampleOptions {
-  /** CSS font with a px size, for example `700 220px Unbounded`. */
+  /** CSS font with a px size, for example `800 180px Syne`. */
   font: string;
   width: number;
   height: number;
