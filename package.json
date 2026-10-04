@@ -4,11 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "npm run validate:content",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "check:secrets": "bash scripts/check-secrets.sh",
+    "validate:content": "tsx scripts/validate-content.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test"
