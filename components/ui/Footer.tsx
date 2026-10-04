@@ -1,32 +1,9 @@
-import { getProfile } from "@/lib/content";
-import { Button } from "./Button";
-import { Section } from "./Section";
-
-export async function Footer() {
-  const profile = await getProfile();
+export function Footer() {
   return (
-    <footer id="contact" className="border-t border-border">
-      <Section>
-        <h2 className="font-display text-5xl tracking-[-0.03em] leading-[0.9] md:text-7xl">Say hi</h2>
-        <p className="mt-4 text-lg text-muted">{profile.availability}</p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Button href={`mailto:${profile.email}`} size="lg">
-            Say hi
-          </Button>
-          <Button href={profile.socials.github} variant="secondary" size="lg" external>
-            GitHub
-          </Button>
-          <Button href={profile.socials.linkedin} variant="secondary" size="lg" external>
-            LinkedIn
-          </Button>
-          <Button href="/cv" variant="secondary" size="lg">
-            Download CV
-          </Button>
-        </div>
-        <p className="mt-16 font-mono uppercase tracking-[0.12em] text-[12px] text-muted">
-          © 2026 Mohammed Al-Alimi. Built with Next.js.
-        </p>
-      </Section>
+    <footer className="border-t border-border px-6 py-6">
+      <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
+        MA · {new Date().getFullYear()} · Built with Next.js
+      </p>
     </footer>
   );
 }
