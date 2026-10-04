@@ -1,0 +1,68 @@
+---
+title: Crowd detection
+slug: crowd-detection
+tagline: Counts crowds in real time without ever identifying a person
+color: "#FF6B35"
+shape: icosahedron
+tags: [ai, computer-vision, privacy]
+year: 2026
+role: Solo developer, B.Sc. thesis
+featured: true
+order: 1
+links:
+  repo: https://github.com/MohammedAl-Alimi/ct_ai_analysis
+  demo: https://github.com/MohammedAl-Alimi/crowd_monitoring_dashboard
+cover: /projects/crowd-detection/cover.webp
+coverAlt: Dark dashboard with visitor counters and a venue floor plan overlaid with a colored heatmap
+stack:
+  - Python
+  - YOLO26s
+  - ByteTrack
+  - OpenCV
+  - Shapely
+  - SQLite
+  - FastAPI
+  - JavaScript
+  - heatmap.js
+  - Tailwind
+---
+
+## Problem
+
+A retail activation at the Cape Town Marathon Expo 2026 wanted to know how busy each area was. Cameras can answer that. But filming crowds raises a privacy question.
+
+I wanted the numbers without storing a single face or frame.
+
+## What I built
+
+A system that counts people, measures how long they stay in each zone, and draws heatmaps. It runs on one machine, on live camera streams.
+
+It stores only anonymous totals. A separate dashboard shows them in the browser.
+
+## How it works
+
+Each camera frame goes through the same steps:
+
+1. Capture a frame from the stream.
+2. Blur every face, before anything else sees the image.
+3. Detect and track people with YOLO26s and ByteTrack.
+4. Check which zones they cross into and out of.
+5. Save counts, dwell times and heatmap cells to SQLite.
+
+Frames live in memory for about one second, then they are gone. No face data is ever computed. Track IDs stay short-lived and never cross cameras.
+
+A read-only FastAPI server shares the totals, bound to localhost. The dashboard is plain HTML and JavaScript. It polls the API, and falls back to demo data when no backend is running.
+
+## Stack
+
+Python 3.11, YOLO26s for people, a YOLO face model used only for blurring, ByteTrack for tracking, OpenCV for capture, Shapely for zone geometry, SQLite for storage, and FastAPI for the API. The dashboard uses plain JavaScript, Tailwind, heatmap.js and Canvas.
+
+## Outcome
+
+It was validated on a live 3-day, 6-camera deployment at the expo. The test suite checks the privacy rules too, so a change that weakens them fails the build.
+
+## What I learned
+
+Privacy works best when the design enforces it. Blurring first means later stages cannot leak a face, even by mistake.
+
+Tests can protect promises, not just features. And a dashboard that depends only on an API contract is easy to swap, test and demo.
