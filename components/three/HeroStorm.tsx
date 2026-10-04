@@ -1,6 +1,7 @@
 "use client";
 
 import { OrthographicCamera } from "@react-three/drei";
+import { display } from "@/lib/fonts";
 import { useEffect, useMemo, useState } from "react";
 import { centerAndFit, fitToCount, sampleTextToCount, type SamplerContext } from "@/lib/pixel-sampler";
 import { useSceneStore } from "@/lib/scene-store";
@@ -8,7 +9,8 @@ import { pointSizeFor, STORM_COLORS } from "@/lib/storm-attributes";
 import { PixelStorm } from "./PixelStorm";
 
 const LINES = ["MOHAMMED", "AL-ALIMI"];
-const FAMILY = "Unbounded";
+// The next/font family list (name plus metric fallback) for Syne, loaded by the layout.
+const FAMILY = display.style.fontFamily;
 const BITMAP_W = 1600;
 const BITMAP_H = 600;
 const FONT_TIMEOUT_MS = 2000;
@@ -27,8 +29,8 @@ function getContext(w: number, h: number): SamplerContext {
 
 // Waits for the display face. Falls back to sans-serif after 2 s, silently.
 async function displayFamily(): Promise<string> {
-  const loaded = Promise.all([document.fonts.load(`700 200px ${FAMILY}`), document.fonts.ready]).then(() =>
-    document.fonts.check(`700 200px ${FAMILY}`),
+  const loaded = Promise.all([document.fonts.load(`800 200px ${FAMILY}`), document.fonts.ready]).then(() =>
+    document.fonts.check(`800 200px ${FAMILY}`),
   );
   const timeout = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), FONT_TIMEOUT_MS));
   const ok = await Promise.race([loaded, timeout]).catch(() => false);
@@ -42,7 +44,7 @@ export function sampleWord(count: number, family: string): Float32Array {
   const hit = cache.get(key);
   if (hit) return hit;
   const raw = sampleTextToCount(LINES, {
-    font: `700 220px ${family}`,
+    font: `800 180px ${family}`,
     width: BITMAP_W,
     height: BITMAP_H,
     count,
