@@ -40,9 +40,9 @@ export function MobileMenu() {
     const items = Array.from(
       dialogRef.current.querySelectorAll<HTMLElement>(FOCUSABLE),
     );
-    if (items.length === 0) return;
     const first = items[0];
     const last = items[items.length - 1];
+    if (!first || !last) return;
     const active = document.activeElement;
     if (event.shiftKey && active === first) {
       event.preventDefault();
