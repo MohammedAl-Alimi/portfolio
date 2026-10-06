@@ -20,7 +20,7 @@ export default async function ContactPage() {
   return (
     <section id="contact">
       <Section>
-        <h1 className="font-display uppercase tracking-[-0.03em] leading-[0.9] text-[clamp(2.5rem,6vw,5rem)]">
+        <h1 className="font-display uppercase tracking-[-0.03em] leading-[0.9] text-[clamp(1.75rem,6vw,5rem)]">
           CONTACT
         </h1>
         <p className="mt-6 max-w-2xl text-lg text-muted">{profile.availability}</p>
