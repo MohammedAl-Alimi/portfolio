@@ -16,6 +16,7 @@ const paths = [
   "/lab",
   "/lab/crowd-dashboard",
   "/about",
+  "/contact",
   "/nope",
 ];
 
@@ -77,9 +78,12 @@ test.describe("keyboard and motion", () => {
         const wrapper = el.closest("[class*='focus-within']");
         const visible =
           ring(el) || getComputedStyle(el).boxShadow !== "none" || ring(wrapper);
+        // Hidden decorative copies (aria-hidden) are not part of the accessible name.
+        const clone = el.cloneNode(true) as HTMLElement;
+        clone.querySelectorAll("[aria-hidden='true']").forEach((n) => n.remove());
         return {
           tag: el.tagName.toLowerCase(),
-          name: (el.getAttribute("aria-label") || el.textContent || "").trim(),
+          name: (el.getAttribute("aria-label") || clone.textContent || "").trim(),
           inMainNav: el.closest("nav[aria-label='Main']") !== null,
           visible,
           isBody: el === document.body,
@@ -104,11 +108,27 @@ test.describe("keyboard and motion", () => {
           s.name === name &&
           (inMainNav === undefined || s.inMainNav === inMainNav),
       );
-    for (const label of ["Home", "Projects", "Lab", "About", "Contact"]) {
+    for (const label of ["Mohammed Al-Alimi, home", "HOME", "WORK", "LAB", "ABOUT", "CONTACT"]) {
       expect(has("a", label, true), `main nav link ${label}`).toBe(true);
     }
-    for (const label of ["See projects", "Download CV", "Crowd detection"]) {
-      expect(has("a", label), `link ${label}`).toBe(true);
+    const order = seen.map((s) => s.name);
+    const indexOf = (name: string) => order.indexOf(name);
+    const expected = [
+      "Skip to content",
+      "Mohammed Al-Alimi, home",
+      "HOME",
+      "WORK",
+      "LAB",
+      "ABOUT",
+      "CONTACT",
+      "VIEW WORK",
+      "DOWNLOAD CV",
+      "Crowd detection",
+    ];
+    for (let i = 1; i < expected.length; i++) {
+      expect(indexOf(expected[i]!), `${expected[i]} after ${expected[i - 1]}`).toBeGreaterThan(
+        indexOf(expected[i - 1]!),
+      );
     }
     expect(hidden).toEqual([]);
   });
