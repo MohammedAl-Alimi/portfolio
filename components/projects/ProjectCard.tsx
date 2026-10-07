@@ -9,16 +9,16 @@ type ProjectCardProps = {
 };
 
 export function ProjectCard({ project, size = "md" }: ProjectCardProps) {
-  const { title, slug, tagline, color, tags, year, cover, coverAlt } = project.frontmatter;
-  const titleId = `project-card-${slug}`;
+  const { title, slug, tagline, color, tags, year, cover } = project.frontmatter;
+  const titleId = `project-title-${slug}`;
 
   return (
-    <Card href={`/projects/${slug}`} color={color} className="h-full p-0 overflow-hidden">
-      <div aria-labelledby={titleId} role="group" className="flex h-full flex-col">
+    <Card href={`/projects/${slug}`} color={color} aria-labelledby={titleId} className="h-full p-0 overflow-hidden">
+      <div className="flex h-full flex-col">
         {cover ? (
           <Image
             src={cover}
-            alt={coverAlt ?? ""}
+            alt=""
             width={1600}
             height={900}
             sizes={size === "lg" ? "(min-width: 768px) 520px, 85vw" : "(min-width: 1024px) 380px, 100vw"}
