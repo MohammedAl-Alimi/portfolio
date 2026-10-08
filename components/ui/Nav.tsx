@@ -8,12 +8,12 @@ import { SearchIcon } from "./icons";
 export function Nav() {
   return (
     <header className="sticky top-0 z-40 h-[72px] border-b border-border bg-bg/80 backdrop-blur">
-      <Container className="flex h-full items-center justify-between gap-4">
+      <Container className="flex h-full items-center justify-between gap-2 md:gap-4">
         <Wordmark />
         <nav aria-label="Main" className="hidden md:block">
           <NavLinks />
         </nav>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 md:gap-2">
           <button
             type="button"
             aria-label="Search"
