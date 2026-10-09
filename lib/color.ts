@@ -21,10 +21,7 @@ function contrast(a: number, b: number): number {
   return (hi + 0.05) / (lo + 0.05);
 }
 
-// Light text is preferred on mid tones: dark text must beat light text by this factor.
-const DARK_BIAS = 1.75;
-
 export function contrastText(hex: string): "#17161A" | "#F6F3EE" {
   const l = luminance(hex);
-  return contrast(l, luminance(DARK)) >= DARK_BIAS * contrast(l, luminance(LIGHT)) ? DARK : LIGHT;
+  return contrast(l, luminance(DARK)) >= contrast(l, luminance(LIGHT)) ? DARK : LIGHT;
 }
