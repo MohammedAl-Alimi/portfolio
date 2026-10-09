@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { KeyboardEvent } from "react";
 import { createPortal } from "react-dom";
 import { NAV_ITEMS } from "@/lib/nav";
 import { CloseIcon, MenuIcon } from "./icons";
@@ -25,33 +24,39 @@ export function MobileMenu() {
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     closeRef.current?.focus();
+
+    function onKeyDown(event: globalThis.KeyboardEvent) {
+      const dialog = dialogRef.current;
+      if (!dialog) return;
+      if (event.key === "Escape") {
+        event.preventDefault();
+        close();
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const items = Array.from(dialog.querySelectorAll<HTMLElement>(FOCUSABLE));
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (!first || !last) return;
+      const active = document.activeElement;
+      if (!active || !dialog.contains(active) || active === dialog) {
+        event.preventDefault();
+        first.focus();
+      } else if (event.shiftKey && active === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener("keydown", onKeyDown);
     return () => {
+      document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = previous;
     };
-  }, [open]);
-
-  function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    if (event.key === "Escape") {
-      event.preventDefault();
-      close();
-      return;
-    }
-    if (event.key !== "Tab" || !dialogRef.current) return;
-    const items = Array.from(
-      dialogRef.current.querySelectorAll<HTMLElement>(FOCUSABLE),
-    );
-    const first = items[0];
-    const last = items[items.length - 1];
-    if (!first || !last) return;
-    const active = document.activeElement;
-    if (event.shiftKey && active === first) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && active === last) {
-      event.preventDefault();
-      first.focus();
-    }
-  }
+  }, [open, close]);
 
   return (
     <div className="md:hidden">
@@ -72,7 +77,7 @@ export function MobileMenu() {
               role="dialog"
               aria-modal="true"
               aria-label="Menu"
-              onKeyDown={onKeyDown}
+              tabIndex={-1}
               className="fixed inset-0 z-50 flex flex-col bg-bg px-4 py-4"
             >
               <div className="flex justify-end">
