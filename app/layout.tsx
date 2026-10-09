@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
+import { Rail } from "@/components/nav/Rail";
+import { TabBar } from "@/components/nav/TabBar";
 import { CanvasRootLoader } from "@/components/three/CanvasRootLoader";
 import { Footer } from "@/components/ui/Footer";
-import { Nav } from "@/components/ui/Nav";
 import { Overlays } from "@/components/ui/Overlays";
 import { getProfile } from "@/lib/content";
 import { display, mono } from "@/lib/fonts";
@@ -39,12 +40,15 @@ export default async function RootLayout({
         >
           Skip to content
         </a>
+        <Rail />
+        <TabBar />
         <CanvasRootLoader />
-        <Nav />
-        <main id="main" tabIndex={-1} className="min-h-[60vh] outline-none">
-          {children}
-        </main>
-        <Footer />
+        <div className="pb-[calc(56px+env(safe-area-inset-bottom))] lg:pb-0 lg:pl-[72px]">
+          <main id="main" tabIndex={-1} className="min-h-dvh outline-none">
+            {children}
+          </main>
+          <Footer />
+        </div>
         <Overlays />
       </body>
     </html>
