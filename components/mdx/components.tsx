@@ -30,10 +30,18 @@ function textOf(node: ReactNode): string {
 }
 
 export function slugify(text: string): string {
-  return text
+  const slug = text
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+  return slug || "section";
+}
+
+function uniqueId(text: string, seen: Map<string, number>): string {
+  const base = slugify(text);
+  const count = (seen.get(base) ?? 0) + 1;
+  seen.set(base, count);
+  return count === 1 ? base : `${base}-${count}`;
 }
 
 function Anchor({ href, children, ...rest }: AnchorHTMLAttributes<HTMLAnchorElement>) {
@@ -68,14 +76,15 @@ function MdxImage({ src, alt }: ImgHTMLAttributes<HTMLImageElement>) {
   );
 }
 
-export const mdxComponents = {
+export function createMdxComponents(seen: Map<string, number> = new Map()) {
+  return {
   h2: ({ children }: ComponentPropsWithoutRef<"h2">) => (
-    <h2 id={slugify(textOf(children))} className="font-display text-3xl md:text-4xl mt-16 mb-6 scroll-mt-24">
+    <h2 id={uniqueId(textOf(children), seen)} className="font-display text-3xl md:text-4xl mt-16 mb-6 scroll-mt-24">
       {children}
     </h2>
   ),
   h3: ({ children }: ComponentPropsWithoutRef<"h3">) => (
-    <h3 id={slugify(textOf(children))} className="font-display text-2xl md:text-3xl mt-10 mb-4 scroll-mt-24">
+    <h3 id={uniqueId(textOf(children), seen)} className="font-display text-2xl md:text-3xl mt-10 mb-4 scroll-mt-24">
       {children}
     </h3>
   ),
@@ -106,4 +115,5 @@ export const mdxComponents = {
       {children}
     </pre>
   ),
-};
+  };
+}
