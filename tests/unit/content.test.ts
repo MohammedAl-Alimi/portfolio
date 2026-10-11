@@ -1,6 +1,7 @@
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  getAbout,
   getAdjacentProjects,
   getHighlights,
   getLabItem,
@@ -12,6 +13,7 @@ import {
 
 const fixturesDir = path.join(__dirname, "..", "fixtures", "content");
 const invalidFixturesDir = path.join(__dirname, "..", "fixtures", "content-invalid");
+const invalidAboutDir = path.join(__dirname, "..", "fixtures", "content-invalid-about");
 const emptyDir = path.join(__dirname, "..", "fixtures", "does-not-exist");
 
 describe("project loaders", () => {
@@ -67,5 +69,18 @@ describe("lab, highlights and profile loaders", () => {
 
   it("throws a clear error for a missing profile", async () => {
     await expect(getProfile(emptyDir)).rejects.toThrow(/profile\.json/);
+  });
+});
+
+describe("about loader", () => {
+  it("loads title and timeline", async () => {
+    const about = await getAbout(fixturesDir);
+    expect(about.frontmatter.title).toBe("About test");
+    expect(about.frontmatter.timeline).toHaveLength(2);
+    expect(about.body.trim()).toBe("Body of about.");
+  });
+
+  it("throws naming the file when the timeline is empty", async () => {
+    await expect(getAbout(invalidAboutDir)).rejects.toThrow(/about\.mdx.*timeline/);
   });
 });

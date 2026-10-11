@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import path from "node:path";
 import {
+  getAbout,
   getHighlights,
   getLabItems,
   getProfile,
@@ -29,6 +30,7 @@ async function main() {
     getHighlights(),
   ]);
   await getProfile();
+  await getAbout();
 
   assertUnique("project", projects.map((p) => p.frontmatter.slug));
   assertUnique("lab", lab.map((p) => p.frontmatter.slug));
