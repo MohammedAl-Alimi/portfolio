@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 import { Tag } from "@/components/ui/Tag";
 import type { Project } from "@/lib/content";
@@ -13,7 +14,10 @@ export function ProjectCard({ project, size = "md" }: ProjectCardProps) {
   const titleId = `project-title-${slug}`;
 
   return (
-    <Card href={`/projects/${slug}`} color={color} aria-labelledby={titleId} className="h-full p-0 overflow-hidden">
+    <Card
+      color={color}
+      className="relative h-full overflow-hidden p-0 motion-safe:transition-transform motion-safe:duration-[var(--motion-base)] motion-safe:hover:-translate-y-1 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-current"
+    >
       <div className="flex h-full flex-col">
         {cover ? (
           <Image
@@ -32,7 +36,12 @@ export function ProjectCard({ project, size = "md" }: ProjectCardProps) {
             id={titleId}
             className={size === "lg" ? "font-display text-3xl" : "font-display text-2xl"}
           >
-            {title}
+            <Link
+              href={`/projects/${slug}`}
+              className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none"
+            >
+              {title}
+            </Link>
           </h3>
           <p className="text-muted">{tagline}</p>
           <div className="mt-auto flex flex-wrap items-center gap-2 pt-2">
