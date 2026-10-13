@@ -7,6 +7,7 @@ import {
   getProfile,
   getProjects,
 } from "../lib/content-core";
+import { isAllowedLabOrigin } from "../lib/lab-origins";
 
 const errors: string[] = [];
 
@@ -40,6 +41,11 @@ async function main() {
   }
   for (const { frontmatter } of lab) {
     assertPublicFile(`Thumbnail for ${frontmatter.slug}`, frontmatter.thumbnail);
+    if (frontmatter.kind === "iframe" && (!frontmatter.url || !isAllowedLabOrigin(frontmatter.url))) {
+      errors.push(
+        `Lab item ${frontmatter.slug} embeds an origin not in LAB_FRAME_ORIGINS (lib/lab-origins.ts)`,
+      );
+    }
   }
 
   if (errors.length > 0) {
