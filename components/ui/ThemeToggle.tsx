@@ -14,7 +14,8 @@ export function ThemeToggle() {
     () => false,
   );
 
-  const isDark = mounted && resolvedTheme === "dark";
+  // Dark is the default, so the server render and first paint assume dark.
+  const isDark = !mounted || resolvedTheme === "dark";
   const label = isDark ? "Switch to light theme" : "Switch to dark theme";
 
   return (
