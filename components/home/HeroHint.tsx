@@ -52,7 +52,7 @@ export function HeroHint() {
           interacted && !seenBefore && "[transition:opacity_400ms_ease,visibility_0s_linear_400ms]",
         )}
       >
-        MOVE YOUR MOUSE. CLICK A SHAPE.
+        MOVE TO DISTURB.
       </p>
       {tilt.needsTap ? (
         <button
