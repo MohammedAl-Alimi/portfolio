@@ -2,12 +2,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Tag } from "@/components/ui/Tag";
 import type { Project } from "@/lib/content";
-
-const linkLabels = [
-  ["repo", "Repo"],
-  ["live", "Live"],
-  ["demo", "Demo"],
-] as const;
+import { projectLinks } from "@/lib/project-links";
 
 function Label({ children }: { children: string }) {
   return <dt className="mb-2 text-sm font-semibold uppercase tracking-wider text-muted">{children}</dt>;
@@ -15,7 +10,7 @@ function Label({ children }: { children: string }) {
 
 export function ProjectMeta({ project }: { project: Project }) {
   const { year, role, stack, tags, color, links } = project.frontmatter;
-  const present = linkLabels.filter(([key]) => Boolean(links[key]));
+  const present = projectLinks(links);
 
   return (
     <aside aria-label="Project details">
@@ -55,9 +50,9 @@ export function ProjectMeta({ project }: { project: Project }) {
         </dl>
         {present.length > 0 ? (
           <ul className="mt-6 flex flex-col items-start gap-1 border-t border-border pt-4">
-            {present.map(([key, label]) => (
-              <li key={key}>
-                <Button variant="ghost" external href={links[key] as string}>
+            {present.map(({ label, href }) => (
+              <li key={label}>
+                <Button variant="ghost" external href={href}>
                   {label}
                 </Button>
               </li>
