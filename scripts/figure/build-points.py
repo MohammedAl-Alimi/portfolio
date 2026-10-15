@@ -36,6 +36,9 @@ BIN_CAP = 250 * 1024
 POSTER_CAP = 120 * 1024
 POSTER_SIZE = (1600, 1200)
 POSTER_BG = (5, 5, 5)    # #050505
+POINT_PX = 3             # square size at 1600 px width
+RENDER_FLOOR = (0.55, 0.30, 0.40)   # front, back, interior
+RENDER_GAIN = (0.45, 0.20, 0.30)
 
 
 def load_cutout(path):
@@ -137,11 +140,12 @@ def place_points(mask, lum, depth, count, rng):
     z = depth[iy, ix]
     l = lum[iy, ix]
 
-    front = np.stack([sx, sy, z, l], axis=1)
-    back = np.stack([sx, sy, -z, BACK_LUM * l], axis=1)
+    # Columns: x, y, z, stored luminance, photo luminance (for the renders).
+    front = np.stack([sx, sy, z, l, l], axis=1)
+    back = np.stack([sx, sy, -z, BACK_LUM * l, l], axis=1)
     pick = rng.random(len(sx)) < INTERIOR_CHANCE
     zi = (rng.random(pick.sum()) * 2.0 - 1.0) * z[pick]
-    interior = np.stack([sx[pick], sy[pick], zi, INTERIOR_LUM * l[pick]], axis=1)
+    interior = np.stack([sx[pick], sy[pick], zi, INTERIOR_LUM * l[pick], l[pick]], axis=1)
 
     kinds = np.concatenate([np.zeros(len(front), np.int8), np.ones(len(back), np.int8),
                             np.full(len(interior), 2, np.int8)])
@@ -184,8 +188,15 @@ def encode(xyz, lum):
     return MAGIC + struct.pack("<I", len(q)) + rec.tobytes()
 
 
-def render(xyz, lum, yaw_deg, size=POSTER_SIZE):
-    """Orthographic view, grey 2 px squares painted back to front."""
+def render(xyz, photo_lum, kinds, yaw_deg, size=POSTER_SIZE):
+    """Orthographic view, grey squares painted back to front.
+
+    Brightness per kind, from the photo luminance l in 0..1:
+      front shell  0.55 + 0.45 * l   (no depth dimming, so the face reads on black)
+      back shell   0.30 + 0.20 * l
+      interior     0.40 + 0.30 * l
+    Back and interior points are also dimmed with depth.
+    """
     w, h = size
     a = np.radians(yaw_deg)
     x = xyz[:, 0] * np.cos(a) + xyz[:, 2] * np.sin(a)
@@ -194,13 +205,17 @@ def render(xyz, lum, yaw_deg, size=POSTER_SIZE):
     unit = 0.47 * h                                   # 1.9 units fill ~89% of the height
     px = np.round(w / 2 + x * unit).astype(np.int32)
     py = np.round(h / 2 - y * unit).astype(np.int32)
-    depth = 0.45 + 0.55 * (z + 1.0) / 2.0             # nearer is brighter
-    grey = (0.35 + 0.65 * lum / 255.0) * depth * 255.0
+    l = photo_lum / 255.0
+    floor = np.array(RENDER_FLOOR)[kinds]
+    gain = np.array(RENDER_GAIN)[kinds]
+    depth = np.where(kinds == 0, 1.0, 0.6 + 0.4 * (z + 1.0) / 2.0)
+    grey = (floor + gain * l) * depth * 255.0
     order = np.argsort(z, kind="stable")              # far first
     px, py, grey = px[order], py[order], grey[order]
+    square = max(1, round(POINT_PX * w / POSTER_SIZE[0]))
     canvas = np.full((h, w), float(POSTER_BG[0]), dtype=np.float32)
-    for dy in (0, 1):
-        for dx in (0, 1):
+    for dy in range(square):
+        for dx in range(square):
             cx, cy = px + dx, py + dy
             ok = np.nonzero((cx >= 0) & (cx < w) & (cy >= 0) & (cy < h))[0]
             flat = cy[ok] * w + cx[ok]
@@ -209,7 +224,7 @@ def render(xyz, lum, yaw_deg, size=POSTER_SIZE):
             rev = flat[::-1]
             _, first = np.unique(rev, return_index=True)
             winners = ok[::-1][first]
-            canvas.flat[flat[::-1][first]] = grey[winners]
+            canvas.flat[rev[first]] = grey[winners]
     g = np.clip(canvas, 0, 255).astype(np.uint8)
     return Image.fromarray(np.stack([g, g, g], axis=-1), "RGB")
 
@@ -261,16 +276,16 @@ def main(argv):
     # Render from the quantised values so the poster matches what ships.
     q = np.frombuffer(data, dtype=np.uint8, offset=8).reshape(-1, 4)
     qxyz = q[:, :3].view(np.int8).astype(np.float32) / 127.0
-    qlum = q[:, 3].astype(np.float32)
+    photo_lum = pts[:, 4]
 
-    poster = render(qxyz, qlum, 0)
+    poster = render(qxyz, photo_lum, kinds, 0)
     Path(args.poster).parent.mkdir(parents=True, exist_ok=True)
     poster_mode = save_poster(poster, args.poster)
     if args.previews:
         out = Path(args.previews)
         out.mkdir(parents=True, exist_ok=True)
         for yaw in (0, 35, 90):
-            render(qxyz, qlum, yaw).save(out / f"bust-{yaw}.png")
+            render(qxyz, photo_lum, kinds, yaw).save(out / f"bust-{yaw}.png")
 
     poster_size = Path(args.poster).stat().st_size
     if poster_size > POSTER_CAP:
