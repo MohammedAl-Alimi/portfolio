@@ -3,13 +3,19 @@ import { ImageResponse } from "next/og";
 import { contrastText } from "@/lib/color";
 import { getProject, getProjects } from "@/lib/content";
 
-export const alt = "Project preview";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export async function generateStaticParams() {
   const projects = await getProjects();
   return projects.map((p) => ({ slug: p.frontmatter.slug }));
+}
+
+export async function generateImageMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const project = await getProject(slug);
+  const alt = project ? `${project.frontmatter.title}: ${project.frontmatter.tagline}` : "Project preview";
+  return [{ id: "default", alt, size, contentType }];
 }
 
 export default async function OpengraphImage({ params }: { params: Promise<{ slug: string }> }) {
