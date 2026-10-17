@@ -32,7 +32,7 @@ Online checkers exist, but I wanted one that explains each finding in the langua
 
 A small web app. You enter a URL and get a graded report in seconds. Each finding links to the playbook chapter that explains the fix.
 
-It is passive and made for sites you own or have permission to check. It reads public pages the way a browser does. It does not guess passwords, inject anything or log in.
+It is passive. It reads only what any browser already receives. It never attacks a site. It does not guess passwords, inject anything or log in.
 
 ## How it works
 
@@ -40,7 +40,7 @@ The checks cover security headers, cookie flags, CORS setup, exposed files, secr
 
 The report also lists what a URL scan cannot see. Database rules, access checks for single records and webhook signatures all live on the server, so the tool names them as blind spots.
 
-The scanner fetches addresses that users type in, so it guards itself first. It looks up each address and blocks private and internal ranges. It follows redirects by hand and checks every hop. Input is validated with Zod, and the API is rate limited.
+The scanner fetches addresses that users type in, so it guards itself first. It looks up each address and blocks private and internal ranges. It follows redirects by hand and checks every hop. Input is validated with Zod, and the API has a light rate limit.
 
 ## Stack
 
