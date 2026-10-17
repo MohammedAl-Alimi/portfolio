@@ -30,7 +30,7 @@
   --muted: #808086;
   --text: #f2f2f0;
   --glow: #ffffff;
-  /* Used only by the pixel storm and the lab. Page components must not read these. */
+  /* Used only by the lab. Page components must not read these. */
   --accent-1: #ff6b35;
   --accent-2: #ffd23f;
   --accent-3: #3bceac;
