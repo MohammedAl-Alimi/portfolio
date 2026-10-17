@@ -1,0 +1,59 @@
+---
+title: Is my app safe
+slug: is-my-app-safe
+tagline: A passive web security check that grades a public URL and says what it cannot see
+color: "#F06595"
+shape: sphere
+tags: [security, web]
+year: 2026
+role: Solo developer
+featured: true
+order: 4
+links:
+  repo: https://github.com/MohammedAl-Alimi/is-my-app-safe
+  live: https://is-my-app-safe.vercel.app
+cover: /projects/is-my-app-safe/cover.webp
+coverAlt: Dark page headed Is my app safe with a URL field and a Scan button
+stack:
+  - Next.js
+  - React
+  - TypeScript
+  - Zod
+  - Vercel
+---
+
+## Problem
+
+Many people ship a web app without checking its public face. Missing headers, a leaked file or a key in the page code are easy to miss.
+
+Online checkers exist, but I wanted one that explains each finding in the language of my security playbook.
+
+## What I built
+
+A small web app. You enter a URL and get a graded report in seconds. Each finding links to the playbook chapter that explains the fix.
+
+It is passive. It reads only what any browser already receives. It never attacks a site. It does not guess passwords, inject anything or log in.
+
+## How it works
+
+The checks cover security headers, cookie flags, CORS setup, exposed files, secrets in client scripts, public source maps and DMARC. Each result maps to a playbook chapter.
+
+The report also lists what a URL scan cannot see. Database rules, access checks for single records and webhook signatures all live on the server, so the tool names them as blind spots.
+
+The scanner fetches addresses that users type in, so it guards itself first. It looks up each address and blocks private and internal ranges. It follows redirects by hand and checks every hop. Input is validated with Zod, and the API has a light rate limit.
+
+## Stack
+
+Next.js with the App Router, React and TypeScript. Zod validates input. It runs on Vercel, with no database and no stored scans.
+
+## Outcome
+
+It is live and open source under the MIT licence. Scans run in memory and nothing is saved.
+
+I audited the app against my own playbook and wrote the result in its security policy. That review led to fixes for a redirect bypass and for unsafe HTML rendering. The policy also lists the limits that remain.
+
+## What I learned
+
+A security tool must pass its own checks first. Writing the self-audit found real bugs.
+
+Honesty builds trust. A report that says what it cannot see is more useful than a clean score.
