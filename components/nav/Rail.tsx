@@ -19,10 +19,10 @@ export function Rail() {
     >
       <Link
         href="/"
-        aria-label="Mohammed Al-Alimi, home"
         className={`flex h-12 items-center px-[26px] font-mono text-[12px] font-bold text-text ${focusRing}`}
       >
-        MA
+        <span aria-hidden="true">MA</span>
+        <span className="sr-only">Mohammed Al-Alimi, home</span>
       </Link>
       <div className="flex flex-1 flex-col justify-center">
         {NAV_ITEMS.map((item) => (
