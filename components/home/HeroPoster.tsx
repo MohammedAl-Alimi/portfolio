@@ -16,7 +16,8 @@ export function HeroPoster({ src, alt, priority = true }: Props) {
       fill
       priority={priority}
       sizes="(min-width: 1024px) 50vw, 100vw"
-      className="object-contain"
+      // Cover, so the figure fills the slot. FigureCloud frames the cloud the same way.
+      className="object-cover"
     />
   );
 }
