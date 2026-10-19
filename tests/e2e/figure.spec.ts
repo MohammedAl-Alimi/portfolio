@@ -4,7 +4,7 @@ import { expect, test, type Page } from "@playwright/test";
 // (playwright.config.ts webServer env), never in production.
 type FigureProbe = { frames: number; trailCount: number; yaw: number; software: boolean };
 
-const NAME = "MOHAMMED AL-ALIMI";
+const NAME = "Mohammed Al-Alimi";
 
 async function probe(page: Page): Promise<FigureProbe | null> {
   return page.evaluate(() => {
@@ -33,7 +33,7 @@ async function sweep(page: Page) {
 }
 
 function decodedName(page: Page) {
-  return page.locator("[data-decode]").filter({ hasText: NAME }).first();
+  return page.locator("h1[data-decode]");
 }
 
 test.describe("hero figure", () => {
@@ -70,8 +70,11 @@ test.describe("hero figure", () => {
     expect(b.yaw).toBe(a.yaw);
   });
 
-  test("the name is in the DOM at load and decodes to the final text", async ({ page }, testInfo) => {
+  test("the name is in the DOM at load and decodes to the final text", async ({ page, request }, testInfo) => {
     test.skip(testInfo.project.name !== "chromium-desktop", "Desktop only");
+    // In the server HTML, before any script runs.
+    const html = await (await request.get("/")).text();
+    expect(html).toContain(NAME);
     await page.goto("/");
     const name = decodedName(page);
     // The real text is there from the first byte, for screen readers and crawlers.

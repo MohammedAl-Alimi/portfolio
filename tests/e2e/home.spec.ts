@@ -4,15 +4,18 @@ import { expectNoSeriousViolations } from "./helpers/axe";
 
 test("home renders the name and passes axe", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "Mohammed Al-Alimi",
-  );
+  await expect(page.getByRole("heading", { level: 1 })).toHaveAccessibleName("Mohammed Al-Alimi");
   await expectNoSeriousViolations(page);
 });
 
-test("hero shows name, role and both buttons", async ({ page }) => {
+test("hero shows the name once, the headline and both buttons", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Mohammed Al-Alimi");
+  const h1 = page.getByRole("heading", { level: 1 });
+  await expect(h1).toHaveAccessibleName("Mohammed Al-Alimi");
+  // The name is in the hero once for screen readers: the glyph layer is hidden from them.
+  await expect(page.locator("section[aria-labelledby=hero-title]").getByText("Mohammed Al-Alimi", { exact: true })).toHaveCount(1);
+  await expect(page.locator("[data-hero-headline]")).toHaveCSS("font-weight", "800");
+  await expect(page.locator("[data-hero-headline]")).toHaveCSS("font-family", /Syne/i);
   await expect(page.getByText("I build AI systems, agents and playful tools")).toBeVisible();
   await expect(page.getByRole("link", { name: "VIEW WORK" })).toHaveAttribute("href", "/projects");
   await expect(page.getByRole("link", { name: "DOWNLOAD CV" }).first()).toHaveAttribute("href", "/cv");
@@ -32,21 +35,18 @@ test("featured strip lists the featured projects", async ({ page }) => {
   }
 });
 
-test("hero name stays in its column on two lines", async ({ page }, testInfo) => {
+test("hero headline stays in its column", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "chromium-desktop", "Desktop only");
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto("/");
-  const h1 = await page.getByRole("heading", { level: 1 }).boundingBox();
+  const headline = page.locator("[data-hero-headline]");
+  const box = await headline.boundingBox();
   const slot = await page.locator("[data-hero-slot]").boundingBox();
-  expect(h1).not.toBeNull();
+  expect(box).not.toBeNull();
   expect(slot).not.toBeNull();
-  expect(h1!.x + h1!.width).toBeLessThanOrEqual(slot!.x);
-  const lines = page.locator("h1 [data-name-line]");
-  await expect(lines).toHaveCount(2);
-  const fits = await lines.evaluateAll((els) =>
-    els.map((el) => el.scrollWidth <= el.clientWidth && el.getClientRects().length === 1),
-  );
-  expect(fits).toEqual([true, true]);
+  expect(box!.x + box!.width).toBeLessThanOrEqual(slot!.x);
+  const fits = await headline.evaluate((el) => el.scrollWidth <= el.clientWidth);
+  expect(fits).toBe(true);
 });
 
 test.describe("hero figure", () => {
@@ -59,7 +59,7 @@ test.describe("hero figure", () => {
     await expect(page.locator("canvas")).toHaveCount(1);
     const poster = page.locator("[data-hero-slot] [data-poster]");
     await expect(poster).toHaveCSS("opacity", "0", { timeout: 6000 });
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Mohammed Al-Alimi");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveAccessibleName("Mohammed Al-Alimi");
     await expect(page.getByRole("link", { name: "VIEW WORK" })).toBeVisible();
     await expect(page.getByRole("link", { name: "DOWNLOAD CV" }).first()).toBeVisible();
     await expect(page.getByText("MOVE TO DISTURB.")).toBeVisible();
