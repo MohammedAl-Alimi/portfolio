@@ -88,17 +88,25 @@ export function wrapAngle(a: number): number {
 /** Point count of the full figure; lower tiers draw a subset. */
 export const FULL_COUNT = 56000;
 
+/** Spec 18.4: points are 1.5 to 3.5 CSS px. The shader clamps the final size to this. */
+export const POINT_MIN_PX = 1.5;
+export const POINT_MAX_PX = 3.5;
+
 /**
- * Point size multiplier, clamped to 0.8..3.
+ * Point size multiplier, from 0.8 up to the factor that takes the smallest point
+ * to the largest (3.5 / 1.5); beyond that the shader's clamp makes every point 3.5 px.
  * The points' spacing on screen grows with the camera zoom (px per world unit)
- * and with fewer points (spacing goes as 1 / sqrt(count)), so the size follows
- * both. At 190 px per unit with all 56,000 points (about a 400 px tall 4:3
- * slot) bright skin points close up into a surface while dark hair and shirt
- * points stay small and dotted, so the face reads and the cloud still looks like points.
+ * and with fewer points (spacing goes as 1 / sqrt(count)), so the size follows both.
  */
 export function pointScaleFor(zoom: number, count = FULL_COUNT): number {
   const density = Math.sqrt(FULL_COUNT / Math.max(1, count));
-  return Math.min(3, Math.max(0.8, (zoom / 190) * density));
+  return Math.min(POINT_MAX_PX / POINT_MIN_PX, Math.max(0.8, (zoom / 190) * density));
+}
+
+/** CSS px size the shader draws, for a luminance in 0..1. Mirrors shaders/figure.ts. */
+export function pointSizePx(lum: number, scale: number): number {
+  const raw = (POINT_MIN_PX + (POINT_MAX_PX - POINT_MIN_PX) * lum) * scale;
+  return Math.min(POINT_MAX_PX, Math.max(POINT_MIN_PX, raw));
 }
 
 // The poster (scripts/figure/build-points.py) draws 0.47 * height px per unit at 1600 by 1200.
