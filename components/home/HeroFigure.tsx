@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { loadFigure, type Figure } from "@/lib/figure";
+import { FULL_COUNT } from "@/lib/figure-fx";
 import { useSceneStore } from "@/lib/scene-store";
 import { useSlot } from "@/lib/use-slot";
 
@@ -12,7 +13,7 @@ const FigureCloud = dynamic(() => import("@/components/three/FigureCloud").then(
 });
 
 const SLOT = "[data-hero-slot]";
-const COUNT = { high: 56000, mid: 30000 } as const;
+const COUNT = { high: FULL_COUNT, mid: 30000 } as const;
 
 function figureUrl(): string {
   // Test-only switch to exercise the fallback. Production builds inline "0" and drop it.

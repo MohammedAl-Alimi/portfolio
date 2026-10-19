@@ -112,18 +112,20 @@ describe("timing helpers", () => {
 });
 
 describe("framing", () => {
-  it("scales points with the slot height, clamped to 0.8..2.2", () => {
-    expect(pointScaleFor(420)).toBe(1);
-    expect(pointScaleFor(100)).toBe(0.8);
-    expect(pointScaleFor(2000)).toBe(2.2);
+  it("scales points with the camera zoom and the point density, clamped to 0.8..3", () => {
+    expect(pointScaleFor(190)).toBe(1);
+    expect(pointScaleFor(380)).toBe(2);
+    expect(pointScaleFor(190, 56000 / 4)).toBe(2);
+    expect(pointScaleFor(50)).toBe(0.8);
+    expect(pointScaleFor(1000)).toBe(3);
   });
 
-  it("matches the poster's framing under object-contain", () => {
+  it("matches the poster's framing under object-cover", () => {
     // The poster draws 0.47 * 1200 px per unit at 1600 by 1200.
     expect(figureZoom(1600, 1200)).toBeCloseTo(564);
     expect(figureZoom(800, 600)).toBeCloseTo(282);
-    // A tall slot is limited by its width, a wide one by its height.
-    expect(figureZoom(800, 1000)).toBeCloseTo(282);
-    expect(figureZoom(2000, 600)).toBeCloseTo(282);
+    // A tall slot is filled by its height, a wide one by its width.
+    expect(figureZoom(800, 1200)).toBeCloseTo(564);
+    expect(figureZoom(3200, 600)).toBeCloseTo(1128);
   });
 });
