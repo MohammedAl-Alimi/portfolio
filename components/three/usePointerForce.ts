@@ -12,7 +12,7 @@ import {
 import { useSceneStore } from "@/lib/scene-store";
 
 // Turns pointer moves over the slot into wind samples. Listens on the slot,
-// not the window, so the storm only reacts to a pointer that is over it.
+// not the window, so the figure only reacts to a pointer that is over it.
 // At most one sample per animation frame, spaced further by the trail itself.
 export function usePointerForce(selector: string | undefined, enabled = true): void {
   useEffect(() => {
