@@ -1,7 +1,7 @@
 // Pure helpers and the shared pointer trail behind the storm's wind.
 // The vertex shader cannot integrate a spring per point, so the CPU keeps the
 // last few pointer samples and the shader sums a closed-form, damped response
-// to each one (see components/three/shaders/storm.ts).
+// to each one (see components/three/shaders/wind.ts).
 // No three.js and no React here: the hint and the tilt hook load it with the page.
 
 export interface Vec {
