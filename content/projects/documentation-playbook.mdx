@@ -1,0 +1,37 @@
+---
+title: Documentation playbook
+slug: documentation-playbook
+tagline: A repeatable method for AI agents to write and check technical docs
+color: "#A78BFA"
+shape: octahedron
+tags: [agents]
+year: 2026
+role: Solo developer
+featured: false
+order: 6
+links:
+  repo: https://github.com/MohammedAl-Alimi/agent-documentation-playbook
+cover: /projects/documentation-playbook/cover.webp
+coverAlt: Banner with the title Agent Documentation Playbook on a dark blue background
+stack:
+  - Markdown
+  - JavaScript
+  - Shell
+  - Mermaid
+---
+
+## Problem
+
+Project docs often fail in three ways. One page tries to teach, explain and list facts all at once. The text is written from memory and drifts out of date. And every project starts from a blank page.
+
+## What I built
+
+An open-source playbook that an AI coding agent can follow to document a codebase. It builds on the Diátaxis framework, which sorts docs into tutorials, how-to guides, reference and explanation.
+
+The repo has agent instructions, a method guide, page templates for each type, a docs folder skeleton and a worked example. A script installs a set of Diátaxis skills for Claude Code.
+
+## Outcome
+
+It is public under the MIT licence. The method has four phases: map the code, plan the pages, write them, then check every claim against the source.
+
+A workflow script runs that pipeline in one go. The instructions also work with other agents, since they are plain Markdown.
