@@ -10,6 +10,9 @@ test("unknown tag shows empty state, not an error", async ({ page }) => {
 
 test("tag chip filters and updates url", async ({ page }) => {
   await page.goto("/projects");
+  // The pointer starts at 0,0, over the rail, which expands on hover and covers
+  // the chips. Park it in the content first, as a real visitor's pointer would be.
+  await page.mouse.move(640, 400);
   await page
     .getByRole("navigation", { name: "Filter by tag" })
     .getByRole("link", { name: "ai", exact: true })
