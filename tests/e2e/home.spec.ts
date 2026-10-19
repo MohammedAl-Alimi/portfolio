@@ -19,6 +19,11 @@ test("hero shows the name once, the headline and both buttons", async ({ page })
   await expect(page.getByText("I build AI systems, agents and playful tools")).toBeVisible();
   await expect(page.getByRole("link", { name: "VIEW WORK" })).toHaveAttribute("href", "/projects");
   await expect(page.getByRole("link", { name: "DOWNLOAD CV" }).first()).toHaveAttribute("href", "/cv");
+  // Both hero buttons carry corner brackets.
+  for (const name of ["VIEW WORK", "DOWNLOAD CV"]) {
+    const link = page.locator("section[aria-labelledby=hero-title]").getByRole("link", { name });
+    await expect(link.locator("xpath=..").locator("[data-bracket]")).toHaveCount(4);
+  }
   const noOverflow = await page.evaluate(
     () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
   );
