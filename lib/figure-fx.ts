@@ -118,3 +118,15 @@ const POSTER_UNIT = 0.47 * POSTER_H;
 export function figureZoom(slotW: number, slotH: number): number {
   return POSTER_UNIT * Math.max(slotW / POSTER_W, slotH / POSTER_H);
 }
+
+/** Camera orbit at the end of the hero scroll, in rad (spec 18.4: about 30 degrees). */
+export const ORBIT_MAX = 0.52;
+
+/**
+ * Extra yaw from scrolling: 0 at the top, ORBIT_MAX once the page has scrolled
+ * `heroEnd` px (the hero's bottom edge in document coordinates), linear between.
+ */
+export function orbitFor(scrollY: number, heroEnd: number): number {
+  if (!(heroEnd > 0) || !(scrollY > 0)) return 0;
+  return ORBIT_MAX * Math.min(1, scrollY / heroEnd);
+}

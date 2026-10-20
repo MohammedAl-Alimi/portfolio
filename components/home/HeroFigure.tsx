@@ -13,6 +13,7 @@ const FigureCloud = dynamic(() => import("@/components/three/FigureCloud").then(
 });
 
 const SLOT = "[data-hero-slot]";
+const HERO = "[data-hero]";
 const COUNT = { high: FULL_COUNT, mid: 30000 } as const;
 
 function figureUrl(): string {
@@ -40,5 +41,5 @@ export function HeroFigure() {
   }, [count]);
 
   if (!figure || !size || size.width === 0) return null;
-  return <FigureCloud figure={figure} size={size} visible={visible} slot={SLOT} />;
+  return <FigureCloud figure={figure} size={size} visible={visible} slot={SLOT} orbitTrack={HERO} />;
 }
