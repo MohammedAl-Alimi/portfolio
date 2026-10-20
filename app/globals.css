@@ -30,6 +30,8 @@
   --muted: #808086;
   --text: #f2f2f0;
   --glow: #ffffff;
+  /* Grid floor lines (components/motion/GridFloor.tsx): glow at 10%. */
+  --grid-line: color-mix(in srgb, var(--glow) 10%, transparent);
   /* Used only by the lab. Page components must not read these. */
   --accent-1: #ff6b35;
   --accent-2: #ffd23f;
