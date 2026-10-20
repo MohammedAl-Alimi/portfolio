@@ -50,6 +50,7 @@ test.describe("canvas and fallbacks", () => {
     await expect(poster).toHaveCount(1);
     await expect(poster).toHaveCSS("opacity", "1");
     await expect(poster.locator("img")).toBeVisible();
+    await expect(poster.locator("img")).toHaveAttribute("src", /figure\.webp/);
   });
 
   test("no webgl: no canvas, low tier, no console errors", async ({ page }, testInfo) => {

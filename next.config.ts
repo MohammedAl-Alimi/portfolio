@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
   // in <head> for every visitor, not streamed into <body> (Lighthouse and
   // some crawlers only read <head>).
   htmlLimitedBots: /.*/,
-  // Always inlined, so production builds drop the e2e-only storm probe.
+  // Always inlined, so production builds drop the e2e-only scene probe (window.__figure).
   env: { NEXT_PUBLIC_E2E: process.env.NEXT_PUBLIC_E2E === "1" ? "1" : "0" },
   // The proxy skips static files, so send the baseline headers here too.
   async headers() {
