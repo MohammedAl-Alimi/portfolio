@@ -1,3 +1,4 @@
+import { CountUp } from "@/components/motion/CountUp";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Tag } from "@/components/ui/Tag";
@@ -18,7 +19,9 @@ export function ProjectMeta({ project }: { project: Project }) {
         <dl className="space-y-6">
           <div>
             <Label>Year</Label>
-            <dd>{year}</dd>
+            <dd>
+              <CountUp value={year} />
+            </dd>
           </div>
           <div>
             <Label>Role</Label>
