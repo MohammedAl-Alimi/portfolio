@@ -70,17 +70,34 @@ test.describe("hero figure", () => {
     expect(b.yaw).toBe(a.yaw);
   });
 
-  test("the name is in the DOM at load and decodes to the final text", async ({ page, request }, testInfo) => {
+  test("the name is in the DOM at load and resolves to the final text", async ({ page, request }, testInfo) => {
     test.skip(testInfo.project.name !== "chromium-desktop", "Desktop only");
     // In the server HTML, before any script runs.
     const html = await (await request.get("/")).text();
     expect(html).toContain(NAME);
     await page.goto("/");
     const name = decodedName(page);
-    // The real text is there from the first byte, for screen readers and crawlers.
+    await expect(name).toHaveAccessibleName(NAME);
     await expect(name.locator(".sr-only")).toHaveText(NAME);
     await expect(name.locator("[data-decode-glyphs]")).toHaveAttribute("aria-hidden", "true");
-    await expect(name).toHaveAttribute("data-decode", "done", { timeout: 1500 });
+    // A GPU decodes; a CPU renderer (CI) fades the final text in instead.
+    const software = await page.evaluate(async () => {
+      const gl = document.createElement("canvas").getContext("webgl2");
+      const ext = gl?.getExtension("WEBGL_debug_renderer_info");
+      const r = gl && ext ? String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)) : "";
+      return /swiftshader|llvmpipe|softpipe|software|basic render/i.test(r);
+    });
+    await expect(name).toHaveAttribute("data-decode", software ? "fade" : "done", { timeout: 1500 });
+    await expect(name.locator("[data-decode-glyphs]")).toHaveText(NAME);
+    await expect(name.locator("[data-decode-glyphs]")).toHaveCSS("opacity", "1");
+  });
+
+  test("no webgl: the name fades in, no decode", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium-nowebgl", "No-WebGL project only");
+    await page.goto("/");
+    await expect(page.locator("html")).toHaveAttribute("data-tier", "low");
+    const name = decodedName(page);
+    await expect(name).toHaveAttribute("data-decode", "fade");
     await expect(name.locator("[data-decode-glyphs]")).toHaveText(NAME);
     await expect(name.locator("[data-decode-glyphs]")).toHaveCSS("opacity", "1");
   });
@@ -101,7 +118,7 @@ test.describe("hero figure", () => {
     expect(errors).toEqual([]);
   });
 
-  test("reduced motion: poster, no canvas, the name is final at once", async ({ page }, testInfo) => {
+  test("reduced motion: poster, no canvas, the name fades in", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "chromium-desktop", "Desktop only");
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
@@ -113,7 +130,7 @@ test.describe("hero figure", () => {
     const glyphs = decodedName(page).locator("[data-decode-glyphs]");
     await expect(glyphs).toHaveText(NAME);
     await expect(glyphs).toHaveCSS("opacity", "1");
-    await expect(decodedName(page)).toHaveAttribute("data-decode", "done");
+    await expect(decodedName(page)).toHaveAttribute("data-decode", "fade");
     expect(await probe(page)).toBeNull();
   });
 
