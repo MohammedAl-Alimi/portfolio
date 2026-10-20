@@ -7,6 +7,7 @@ import {
   kindFromZ,
   nextGlitchDelay,
   pointScaleFor,
+  pointSizePx,
   scanY,
   wrapAngle,
 } from "@/lib/figure-fx";
@@ -112,12 +113,24 @@ describe("timing helpers", () => {
 });
 
 describe("framing", () => {
-  it("scales points with the camera zoom and the point density, clamped to 0.8..3", () => {
+  it("scales points with the camera zoom and the point density, clamped to 0.8..3.5/1.5", () => {
     expect(pointScaleFor(190)).toBe(1);
-    expect(pointScaleFor(380)).toBe(2);
+    expect(pointScaleFor(285)).toBeCloseTo(1.5);
     expect(pointScaleFor(190, 56000 / 4)).toBe(2);
     expect(pointScaleFor(50)).toBe(0.8);
-    expect(pointScaleFor(1000)).toBe(3);
+    expect(pointScaleFor(1000)).toBeCloseTo(3.5 / 1.5);
+  });
+
+  it("keeps every drawn point inside the spec's 1.5 to 3.5 px", () => {
+    for (const scale of [0.8, 1, 1.38, 1.9, pointScaleFor(1000, 1000)]) {
+      for (const lum of [0, 0.25, 0.5, 0.75, 1]) {
+        const px = pointSizePx(lum, scale);
+        expect(px).toBeGreaterThanOrEqual(1.5);
+        expect(px).toBeLessThanOrEqual(3.5);
+      }
+    }
+    expect(pointSizePx(1, 3)).toBe(3.5);
+    expect(pointSizePx(0, 0.8)).toBe(1.5);
   });
 
   it("matches the poster's framing under object-cover", () => {

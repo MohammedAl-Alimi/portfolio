@@ -78,7 +78,9 @@ void main() {
   vLum = aLum;
   vKind = aKind;
   vWorldY = r.y;
-  gl_PointSize = mix(1.5, 3.5, aLum) * uPointScale * uDpr;
+  // Size from luminance, scaled for zoom and density, held to the spec's 1.5 to 3.5 CSS px.
+  // Clamped in CSS px, not device px, so a retina screen gets the same coverage.
+  gl_PointSize = clamp(mix(1.5, 3.5, aLum) * uPointScale, 1.5, 3.5) * uDpr;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(r, 1.0);
 }
 `;
