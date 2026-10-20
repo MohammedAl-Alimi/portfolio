@@ -11,6 +11,7 @@ import {
   GLITCH_MS,
   glitchBands,
   nextGlitchDelay,
+  orbitFor,
   pointScaleFor,
   scanY,
   wrapAngle,
@@ -19,6 +20,7 @@ import { isSoftwareRenderer } from "@/lib/gpu";
 import { stormNow, windTrail } from "@/lib/pointer-force";
 import { mulberry32 } from "@/lib/rng";
 import { useSceneStore } from "@/lib/scene-store";
+import { subscribeScroll } from "@/lib/scroll";
 import type { SlotSize } from "@/lib/use-slot";
 import { useMarkReady } from "./ready";
 import { figureFrag, figureVert } from "./shaders/figure";
@@ -34,6 +36,8 @@ export interface FigureCloudProps {
   visible?: boolean;
   /** CSS selector of the slot. Pointer moves over it push the points. */
   slot?: string;
+  /** CSS selector of the section whose scroll-out orbits the camera (0 to 0.52 rad). */
+  orbitTrack?: string;
 }
 
 const YAW_SPEED = 0.15; // rad/s
@@ -44,6 +48,8 @@ export interface FigureProbe {
   frames: number;
   trailCount: number;
   yaw: number;
+  /** Camera orbit from scrolling, in rad. */
+  orbit: number;
   /** True on a CPU renderer, where the figure holds still. */
   software: boolean;
   /** Starts a glitch now, held for `ms` (default 120). */
@@ -89,9 +95,10 @@ export function buildFigureGeometry(figure: Figure): BufferGeometry {
   return g;
 }
 
-export function FigureCloud({ figure, size, visible = true, slot }: FigureCloudProps) {
+export function FigureCloud({ figure, size, visible = true, slot, orbitTrack }: FigureCloudProps) {
   const dpr = useThree((s) => s.viewport.dpr);
   const gl = useThree((s) => s.gl);
+  const invalidate = useThree((s) => s.invalidate);
   const reducedMotion = useSceneStore((s) => s.reducedMotion);
   // On a CPU renderer the figure holds still between redraws, and the wind runs lighter.
   const software = useMemo(() => isSoftwareRenderer(gl.getContext()) && !forceMotion(), [gl]);
@@ -131,6 +138,23 @@ export function FigureCloud({ figure, size, visible = true, slot }: FigureCloudP
     endAt: 0,
     holdMs: GLITCH_MS,
   });
+
+  // Scroll orbits the camera. The demand loop draws one frame per change, never more.
+  useEffect(() => {
+    const track = orbitTrack ? document.querySelector(orbitTrack) : null;
+    if (!track) return;
+    return subscribeScroll(({ y }) => {
+      const mat = materialRef.current;
+      if (!mat) return;
+      // The section's bottom edge in document coordinates, re-read so layout changes count.
+      const end = track.getBoundingClientRect().bottom + window.scrollY;
+      const orbit = orbitFor(y, end);
+      const u = mat.uniforms as FigureUniforms;
+      if (u.uOrbit.value === orbit) return;
+      u.uOrbit.value = orbit;
+      invalidate();
+    });
+  }, [orbitTrack, invalidate]);
 
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_E2E !== "1") return;
@@ -180,6 +204,7 @@ export function FigureCloud({ figure, size, visible = true, slot }: FigureCloudP
         frames: c.frames,
         trailCount: windTrail.count,
         yaw: u.uYaw.value,
+        orbit: u.uOrbit.value,
         software,
         // A test can hold the slice longer than a real one, to look at it.
         glitch: (ms = GLITCH_MS) => {
