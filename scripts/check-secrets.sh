@@ -30,8 +30,8 @@ for p in "${patterns[@]}"; do
   fi
 done
 
-# The contact email is allowed in content/profile.json only.
-if hits=$(git ls-files -z | xargs -0 grep -nEI --exclude='check-secrets.sh' --exclude='CLAUDE.md' --exclude='profile.json' -- 'alalimim14' 2>/dev/null); then
+# The contact email is allowed in content/profile.json and security.txt only.
+if hits=$(git ls-files -z | xargs -0 grep -nEI --exclude='check-secrets.sh' --exclude='CLAUDE.md' --exclude='profile.json' --exclude='security.txt' -- 'alalimim14' 2>/dev/null); then
   if [ -n "$hits" ]; then
     echo "check-secrets: pattern 'alalimim14' found:" >&2
     echo "$hits" >&2
