@@ -26,14 +26,16 @@ test("hero shows name, role and both buttons", async ({ page }) => {
   expect(noOverflow).toBe(true);
 });
 
-test("featured strip lists featured projects", async ({ page }) => {
+test("featured strip lists the four featured projects", async ({ page }) => {
   await page.goto("/");
-  await expect(
-    page.getByRole("region", { name: "Featured projects" }).getByRole("link"),
-  ).toHaveCount(1);
-  await expect(
-    page
-      .getByRole("region", { name: "Featured projects" })
-      .getByRole("link", { name: "Crowd detection", exact: true }),
-  ).toBeVisible();
+  const region = page.getByRole("region", { name: "Featured projects" });
+  await expect(region.getByRole("link")).toHaveCount(4);
+  for (const title of [
+    "Crowd detection",
+    "Noah hub",
+    "Agent security playbook",
+    "Is my app safe",
+  ]) {
+    await expect(region.getByRole("link", { name: title })).toBeVisible();
+  }
 });
