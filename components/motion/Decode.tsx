@@ -8,6 +8,7 @@ interface Props {
   text: string;
   as?: ElementType;
   className?: string;
+  id?: string;
   /** ms of scrambling before the first character resolves. */
   delay?: number;
   charMs?: number;
@@ -19,7 +20,7 @@ interface Props {
  * DOM from the first byte (visually hidden, for screen readers and crawlers);
  * the glyphs are a decorative, aria-hidden layer. Reduced motion: final text, no animation.
  */
-export function Decode({ text, as: Tag = "span", className, delay = 0, charMs = 24, maxMs = 900 }: Props) {
+export function Decode({ text, as: Tag = "span", className, id, delay = 0, charMs = 24, maxMs = 900 }: Props) {
   const root = useRef<HTMLElement>(null);
   const glyphs = useRef<HTMLSpanElement>(null);
 
@@ -57,7 +58,7 @@ export function Decode({ text, as: Tag = "span", className, delay = 0, charMs = 
   }, [text, delay, charMs, maxMs]);
 
   return (
-    <Tag ref={root} className={className} data-decode="">
+    <Tag ref={root} id={id} className={className} data-decode="">
       <span className="sr-only">{text}</span>
       <span ref={glyphs} aria-hidden="true" data-decode-glyphs="" className="whitespace-pre">
         {text}
