@@ -1,9 +1,13 @@
+import { isSoftwareRenderer } from "./gpu";
+
 export type Tier = "high" | "mid" | "low";
 
 export interface DeviceSignals {
   reducedMotion: boolean;
   saveData: boolean;
   webgl2: boolean;
+  /** WebGL runs on the CPU (SwiftShader, llvmpipe). The figure then holds still. */
+  software?: boolean;
   cores: number;
   memory: number;
   frameMs: number | null;
@@ -23,15 +27,16 @@ interface NavigatorHints extends Navigator {
   deviceMemory?: number;
 }
 
-function hasWebgl2(): boolean {
+function probeWebgl2(): { webgl2: boolean; software: boolean } {
   try {
     const canvas = document.createElement("canvas");
     const gl = canvas.getContext("webgl2");
-    if (!gl) return false;
+    if (!gl) return { webgl2: false, software: false };
+    const software = isSoftwareRenderer(gl);
     gl.getExtension("WEBGL_lose_context")?.loseContext();
-    return true;
+    return { webgl2: true, software };
   } catch {
-    return false;
+    return { webgl2: false, software: false };
   }
 }
 
@@ -47,10 +52,12 @@ const LOW_SIGNALS: DeviceSignals = {
 export function readDeviceSignals(): DeviceSignals {
   if (typeof window === "undefined") return LOW_SIGNALS;
   const nav = navigator as NavigatorHints;
+  const gl = probeWebgl2();
   return {
     reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
     saveData: nav.connection?.saveData === true,
-    webgl2: hasWebgl2(),
+    webgl2: gl.webgl2,
+    software: gl.software,
     cores: nav.hardwareConcurrency ?? 8,
     memory: nav.deviceMemory ?? 8,
     frameMs: null,

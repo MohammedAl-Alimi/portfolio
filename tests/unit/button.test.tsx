@@ -56,3 +56,18 @@ it("external opens a new tab even for internal paths", () => {
   expect(link).toHaveAttribute("target", "_blank");
   expect(link).toHaveAttribute("rel", "noopener noreferrer");
 });
+
+it("brackets secondary by default and primary when asked, outside the fill", () => {
+  const sec = render(<Button variant="secondary">A</Button>).container;
+  expect(sec.querySelectorAll("[data-bracket]")).toHaveLength(4);
+  const plain = render(<Button variant="primary">B</Button>).container;
+  expect(plain.querySelectorAll("[data-bracket]")).toHaveLength(0);
+  const prim = render(
+    <Button variant="primary" brackets>
+      C
+    </Button>,
+  ).container;
+  expect(prim.querySelectorAll("[data-bracket]")).toHaveLength(4);
+  expect((prim.firstChild as HTMLElement).className).toContain("p-[3px]");
+  expect(screen.getByRole("button", { name: "C" })).not.toHaveAttribute("brackets");
+});

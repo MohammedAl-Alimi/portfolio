@@ -4,8 +4,9 @@ import { useEffect, useSyncExternalStore } from "react";
 import { useTiltForce } from "@/components/three/useTiltForce";
 import { cn } from "@/lib/cn";
 import { useSceneActive, useSceneStore } from "@/lib/scene-store";
+import { useSlot } from "@/lib/use-slot";
 
-const SEEN_KEY = "storm-hint-seen";
+const SEEN_KEY = "hero-hint-seen";
 
 // Storage can throw in private windows or with site data blocked.
 function readSeen(): boolean {
@@ -24,7 +25,9 @@ export function HeroHint() {
   const interacted = useSceneStore((s) => s.interacted);
   // Seen earlier in this session: hidden from the start, without a fade.
   const seenBefore = useSyncExternalStore(noSubscribe, readSeen, () => false);
-  const tilt = useTiltForce(active && !reducedMotion);
+  // Tilt only listens while the hero slot is on screen.
+  const { visible } = useSlot("[data-hero-slot]");
+  const tilt = useTiltForce(active && !reducedMotion && visible);
 
   useEffect(() => {
     if (!interacted) return;
@@ -49,7 +52,7 @@ export function HeroHint() {
           interacted && !seenBefore && "[transition:opacity_400ms_ease,visibility_0s_linear_400ms]",
         )}
       >
-        MOVE YOUR MOUSE. CLICK A SHAPE.
+        MOVE TO DISTURB.
       </p>
       {tilt.needsTap ? (
         <button

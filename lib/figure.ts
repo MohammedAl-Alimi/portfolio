@@ -5,7 +5,7 @@
 //   bytes 0..3  magic "MA01"
 //   bytes 4..7  uint32 little-endian point count
 //   then count records of 4 bytes: x, y, z as int8 (value * 127), luminance as uint8
-import { mulberry32 } from "./pixel-sampler";
+import { mulberry32 } from "./rng";
 
 export interface Figure {
   count: number;

@@ -10,6 +10,8 @@ type CommonProps = {
   variant?: Variant;
   size?: Size;
   external?: boolean;
+  /** Corner brackets. On by default for secondary, opt-in for the others. */
+  brackets?: boolean;
 };
 
 type ButtonAsButton = CommonProps &
@@ -44,16 +46,21 @@ function isInternal(href: string) {
 
 export function Button(props: ButtonProps) {
   const button = renderButton(props);
-  if (props.variant !== "secondary") return button;
+  if (!(props.brackets ?? props.variant === "secondary")) return button;
+  // A filled button would hide marks drawn on its own edge, so they sit 3 px
+  // outside it. The negative margin keeps its layout box the same size.
+  const filled = props.variant === undefined || props.variant === "primary";
   return (
-    <Brackets as="span" className="inline-flex">
+    <Brackets as="span" className={cn("inline-flex", filled && "-m-[3px] p-[3px]")}>
       {button}
     </Brackets>
   );
 }
 
 function renderButton(props: ButtonProps) {
-  const { variant = "primary", size = "md", external, className, ...rest } = props;
+  // `brackets` is handled by Button; keep it off the DOM element.
+  const { variant = "primary", size = "md", external, className, brackets: _brackets, ...rest } = props;
+  void _brackets;
   const classes = cn(base, variants[variant], sizes[size], className);
 
   if (props.href !== undefined) {
