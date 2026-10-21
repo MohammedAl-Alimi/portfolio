@@ -45,7 +45,7 @@ export default async function Home() {
       <WhatIBuild />
       <FeaturedProjects projects={projects} />
       <Ticker text={TICKER} />
-      <Section id="right-now" title="Right now">
+      <Section id="right-now" title="Right now" decodeTitle>
         <div className="grid gap-6 md:grid-cols-3">
           <Skeleton className="h-[240px]" />
           <Skeleton className="h-[120px]" />
@@ -54,7 +54,7 @@ export default async function Home() {
         <p className="sr-only">Live activity loads here soon.</p>
       </Section>
       {highlights.length > 0 ? (
-        <Section id="highlights" title="Highlights">
+        <Section id="highlights" title="Highlights" decodeTitle>
           <ul className="grid gap-4 md:grid-cols-3">
             {highlights.map((h) => (
               <li key={h.url}>
