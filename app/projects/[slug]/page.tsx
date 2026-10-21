@@ -6,6 +6,7 @@ import { ProjectHero } from "@/components/projects/ProjectHero";
 import { ProjectMeta } from "@/components/projects/ProjectMeta";
 import { Container } from "@/components/ui/Container";
 import { getAdjacentProjects, getProject, getProjects } from "@/lib/content";
+import { SITE_NAME } from "@/lib/site";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -21,11 +22,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const project = await getProject(slug);
   if (!project) return {};
   const { title, tagline } = project.frontmatter;
-  const fullTitle = `${title} | Mohammed Al-Alimi`;
   return {
-    title: fullTitle,
+    title,
     description: tagline,
-    openGraph: { title: fullTitle, description: tagline, type: "article" },
+    alternates: { canonical: `/projects/${slug}` },
+    openGraph: { title, description: tagline, type: "article", siteName: SITE_NAME, locale: "en" },
   };
 }
 
