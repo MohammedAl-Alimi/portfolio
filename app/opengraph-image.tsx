@@ -21,6 +21,8 @@ export async function generateImageMetadata() {
 
 export default async function OpengraphImage() {
   const profile = await getProfile();
+  const [first = SITE_NAME, ...rest] = profile.name.split(" ");
+  const lastName = rest.join(" ");
   return new ImageResponse(
     (
       <div
@@ -60,11 +62,11 @@ export default async function OpengraphImage() {
           }}
         >
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <div style={{ fontSize: 88, fontWeight: 800, lineHeight: 1, letterSpacing: -2 }}>Mohammed</div>
-            <div style={{ fontSize: 88, fontWeight: 800, lineHeight: 1, letterSpacing: -2 }}>Al-Alimi</div>
+            <div style={{ fontSize: 88, fontWeight: 800, lineHeight: 1, letterSpacing: -2 }}>{first}</div>
+            <div style={{ fontSize: 88, fontWeight: 800, lineHeight: 1, letterSpacing: -2 }}>{lastName}</div>
             <div style={{ fontSize: 32, marginTop: 24, maxWidth: 560 }}>{profile.headline}</div>
           </div>
-          <div style={{ fontSize: 32, fontWeight: 700 }}>mohammed</div>
+          <div style={{ fontSize: 32, fontWeight: 700 }}>{first.toLowerCase()}</div>
         </div>
       </div>
     ),
