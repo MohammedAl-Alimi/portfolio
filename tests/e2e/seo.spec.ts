@@ -42,3 +42,8 @@ test("title template is applied once", async ({ page }) => {
   await page.goto("/about");
   await expect(page).toHaveTitle("About | Mohammed Al-Alimi");
 });
+
+test("dynamic page title uses the template", async ({ page }) => {
+  await page.goto("/projects/crowd-detection");
+  await expect(page).toHaveTitle("Crowd detection | Mohammed Al-Alimi");
+});
