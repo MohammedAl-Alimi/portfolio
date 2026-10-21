@@ -3,13 +3,21 @@ import { headers } from "next/headers";
 import { Footer } from "@/components/ui/Footer";
 import { Nav } from "@/components/ui/Nav";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
+import { getProfile } from "@/lib/content";
 import { display, sans } from "@/lib/fonts";
+import { SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: "Mohammed Al-Alimi",
-  description: "Interactive portfolio of Mohammed Al-Alimi.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const profile = await getProfile();
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: { default: SITE_NAME, template: `%s | ${SITE_NAME}` },
+    description: profile.headline,
+    openGraph: { type: "website", siteName: SITE_NAME, locale: "en" },
+    twitter: { card: "summary_large_image" },
+  };
+}
 
 export default async function RootLayout({
   children,
