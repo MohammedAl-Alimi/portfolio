@@ -1,0 +1,10 @@
+# We welcome good-faith security research on this site. Report vulnerabilities by
+# email and we will acknowledge receipt within 5 business days. Do not access,
+# modify or exfiltrate data beyond the minimum needed to show the issue, and do not
+# run denial-of-service, social-engineering or physical attacks. Please give us 90
+# days to fix an issue before public disclosure.
+
+Contact: mailto:alalimim14@gmail.com
+Expires: 2027-10-31T00:00:00.000Z
+Preferred-Languages: en, de
+# Canonical: set to https://<domain>/.well-known/security.txt once the domain is final.
