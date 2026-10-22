@@ -15,7 +15,7 @@ export function Rail() {
   return (
     <nav
       aria-label="Main"
-      className="group/rail hidden lg:flex fixed left-0 top-0 z-40 h-dvh w-[72px] hover:w-[220px] focus-within:w-[220px] flex-col overflow-hidden border-r border-border bg-bg motion-safe:transition-[width] duration-[var(--motion-base)]"
+      className="group/rail hidden lg:flex fixed left-0 top-0 z-40 h-dvh w-[72px] hover:w-[220px] has-[:focus-visible]:w-[220px] flex-col overflow-hidden border-r border-border bg-bg motion-safe:transition-[width] duration-[var(--motion-base)]"
     >
       <Link
         href="/"
@@ -32,7 +32,7 @@ export function Rail() {
             <span
               aria-hidden="true"
               data-rail-label
-              className="absolute left-[60px] top-1/2 -translate-y-1/2 whitespace-nowrap opacity-0 group-hover/rail:opacity-100 group-focus-within/rail:opacity-100 motion-safe:transition-opacity duration-[var(--motion-base)]"
+              className="absolute left-[60px] top-1/2 -translate-y-1/2 whitespace-nowrap opacity-0 group-hover/rail:opacity-100 group-has-[:focus-visible]/rail:opacity-100 motion-safe:transition-opacity duration-[var(--motion-base)]"
             >
               {item.label}
             </span>
