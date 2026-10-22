@@ -17,6 +17,8 @@ interface Props {
   delay?: number;
   charMs?: number;
   maxMs?: number;
+  /** "load" decodes on hydration (the hero name); "enter" waits until the text scrolls into view. */
+  trigger?: "load" | "enter";
 }
 
 /**
@@ -26,7 +28,16 @@ interface Props {
  * Fallbacks (spec 18.4): reduced motion, the low tier (which covers no WebGL)
  * and a CPU renderer get a plain fade of the final text instead of the decode.
  */
-export function Decode({ text, as: Tag = "span", className, id, delay = 0, charMs = 24, maxMs = 900 }: Props) {
+export function Decode({
+  text,
+  as: Tag = "span",
+  className,
+  id,
+  delay = 0,
+  charMs = 24,
+  maxMs = 900,
+  trigger = "load",
+}: Props) {
   const root = useRef<HTMLElement>(null);
   const glyphs = useRef<HTMLSpanElement>(null);
 
@@ -41,7 +52,8 @@ export function Decode({ text, as: Tag = "span", className, id, delay = 0, charM
     // Already resolved (a later tier change re-runs this effect): never decode twice.
     if (el.dataset.decode === "done" || el.dataset.decode === "fade") return;
     // Hydrated after the no-script fallback already showed the text: leave it.
-    if (performance.now() > FALLBACK_REVEAL_MS) {
+    // (An "enter" decode starts later by design, so this only guards "load".)
+    if (trigger === "load" && performance.now() > FALLBACK_REVEAL_MS) {
       el.dataset.decode = "done";
       return;
     }
@@ -52,6 +64,7 @@ export function Decode({ text, as: Tag = "span", className, id, delay = 0, charM
       el.dataset.decode = "fade";
       return;
     }
+    let io: IntersectionObserver | null = null;
     const rng = mulberry32(text.length * 7919 + 17);
     const duration = decodeDuration(Array.from(text).length, charMs, maxMs);
     let raf = 0;
@@ -67,20 +80,43 @@ export function Decode({ text, as: Tag = "span", className, id, delay = 0, charM
       layer.textContent = decodeFrame(text, p, rng);
       raf = requestAnimationFrame(step);
     };
-    layer.textContent = decodeFrame(text, 0, rng);
-    el.dataset.decode = "run";
-    raf = requestAnimationFrame(step);
+    const run = () => {
+      layer.textContent = decodeFrame(text, 0, rng);
+      el.dataset.decode = "run";
+      raf = requestAnimationFrame(step);
+    };
+    if (trigger === "enter") {
+      // Shows the final text until it enters the viewport, then decodes once.
+      el.dataset.decode = "wait";
+      io = new IntersectionObserver(
+        ([entry]) => {
+          if (!entry?.isIntersecting) return;
+          io?.disconnect();
+          run();
+        },
+        { rootMargin: "0px 0px -10% 0px" },
+      );
+      io.observe(el);
+    } else {
+      run();
+    }
     return () => {
+      io?.disconnect();
       cancelAnimationFrame(raf);
+      // Still waiting (a tier change re-runs this effect): wait again, do not skip the decode.
+      if (el.dataset.decode === "wait") {
+        el.dataset.decode = "";
+        return;
+      }
       layer.textContent = text;
       el.dataset.decode = "done";
     };
-  }, [text, delay, charMs, maxMs, tier, software]);
+  }, [text, delay, charMs, maxMs, trigger, tier, software]);
 
   return (
     <Tag ref={root} id={id} className={className} data-decode="">
       <span className="sr-only">{text}</span>
-      <span ref={glyphs} aria-hidden="true" data-decode-glyphs="" className="whitespace-pre">
+      <span ref={glyphs} aria-hidden="true" data-decode-glyphs="" className="whitespace-pre-wrap">
         {text}
       </span>
     </Tag>

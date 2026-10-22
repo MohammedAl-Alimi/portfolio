@@ -21,7 +21,7 @@ const ITEMS = [
 
 export function WhatIBuild() {
   return (
-    <Section title="What I build">
+    <Section title="What I build" decodeTitle>
       <div className="grid gap-6 md:grid-cols-3">
         {ITEMS.map((item) => (
           <Card key={item.href} href={item.href} className="h-full">
