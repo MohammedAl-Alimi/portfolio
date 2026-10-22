@@ -35,7 +35,6 @@ for (const vp of viewports) {
             testInfo.project.name !== vp.project,
             `Runs only on ${vp.project}; webkit-mobile is slow and these runs cover the layouts`,
           );
-          await page.setViewportSize({ width: vp.width, height: vp.height });
           await page.emulateMedia({ colorScheme: scheme });
           await page.goto(p);
 
@@ -68,53 +67,59 @@ test.describe("keyboard and motion", () => {
     test.skip(testInfo.project.name !== "chromium-desktop", "Desktop only");
   });
 
-  test("tab order reaches key controls with a visible focus style", async ({ page }) => {
+  test("tab order reaches key controls with a visible focus style", async ({ page }, testInfo) => {
     await page.goto("/");
-    const seen: string[] = [];
+    type Stop = { tag: string; name: string; inMainNav: boolean };
+    const seen: Stop[] = [];
     const hidden: string[] = [];
     for (let i = 0; i < 40; i++) {
       await page.keyboard.press("Tab");
       const info = await page.evaluate(() => {
         const el = document.activeElement as HTMLElement;
-        // Cards draw the ring on the wrapper through focus-within, so an
-        // ancestor with a visible outline counts as the focus indicator.
-        const ringed = (node: Element | null) => {
+        const ring = (node: Element | null) => {
           if (!node) return false;
           const c = getComputedStyle(node);
-          return c.outlineStyle !== "none" || c.boxShadow !== "none";
+          return c.outlineStyle !== "none" && parseFloat(c.outlineWidth) > 0;
         };
-        const visible = ringed(el) || ringed(el.parentElement) || ringed(el.closest("[class*='focus-within']"));
+        // Cards draw the ring on a wrapper through focus-within.
+        const wrapper = el.closest("[class*='focus-within']");
+        const visible =
+          ring(el) || getComputedStyle(el).boxShadow !== "none" || ring(wrapper);
         return {
           tag: el.tagName.toLowerCase(),
-          label: el.getAttribute("aria-label") ?? "",
-          text: (el.textContent ?? "").trim().replace(/\s+/g, " ").slice(0, 60),
+          name: (el.getAttribute("aria-label") || el.textContent || "").trim(),
+          inMainNav: el.closest("nav[aria-label='Main']") !== null,
           visible,
           isBody: el === document.body,
         };
       });
       if (info.isBody) break; // focus left the page, the cycle is complete
-      const name = info.label || info.text;
-      seen.push(`${info.tag}: ${name}`);
-      if (!info.visible) hidden.push(`${info.tag}: ${name}`);
+      seen.push({ tag: info.tag, name: info.name, inMainNav: info.inMainNav });
+      if (!info.visible) hidden.push(`${info.tag}: ${info.name}`);
     }
-    console.log(`Tab order on /:\n${seen.join("\n")}`);
-    expect(seen[0]).toContain("Skip to content");
-    const joined = seen.join("\n");
+    await testInfo.attach("tab-order", {
+      body: JSON.stringify(seen, null, 2),
+      contentType: "application/json",
+    });
+    expect(seen[0]).toMatchObject({ tag: "a", name: "Skip to content" });
     // The Search button is a disabled placeholder until search ships, so it is
     // correctly skipped by Tab. Assert that, so enabling it later updates this test.
     await expect(page.getByRole("button", { name: "Search" })).toBeDisabled();
-    for (const expected of [
-      "theme",
-      "Home",
-      "Projects",
-      "Lab",
-      "About",
-      "Contact",
-      "See projects",
-      "Download CV",
-      "Crowd detection",
-    ]) {
-      expect(joined.toLowerCase()).toContain(expected.toLowerCase());
+    const has = (tag: string, name: string, inMainNav?: boolean) =>
+      seen.some(
+        (s) =>
+          s.tag === tag &&
+          s.name === name &&
+          (inMainNav === undefined || s.inMainNav === inMainNav),
+      );
+    for (const label of ["Home", "Projects", "Lab", "About", "Contact"]) {
+      expect(has("a", label, true), `main nav link ${label}`).toBe(true);
+    }
+    expect(
+      has("button", "Switch to dark theme") || has("button", "Switch to light theme"),
+    ).toBe(true);
+    for (const label of ["See projects", "Download CV", "Crowd detection"]) {
+      expect(has("a", label), `link ${label}`).toBe(true);
     }
     expect(hidden).toEqual([]);
   });
