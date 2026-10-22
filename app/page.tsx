@@ -3,11 +3,14 @@ import { headers } from "next/headers";
 import { FeaturedProjects } from "@/components/home/FeaturedProjects";
 import { Hero } from "@/components/home/Hero";
 import { WhatIBuild } from "@/components/home/WhatIBuild";
+import { Ticker } from "@/components/motion/Ticker";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Section } from "@/components/ui/Section";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { getHighlights, getProfile, getProjects } from "@/lib/content";
 import { SITE_URL } from "@/lib/site";
+
+const TICKER = "AI · AGENTS · COMPUTER VISION · SECURITY · SYSTEMS";
 
 export async function generateMetadata(): Promise<Metadata> {
   const profile = await getProfile();
@@ -38,8 +41,10 @@ export default async function Home() {
         }}
       />
       <Hero profile={profile} />
+      <Ticker text={TICKER} />
       <WhatIBuild />
       <FeaturedProjects projects={projects} />
+      <Ticker text={TICKER} />
       <Section id="right-now" title="Right now">
         <div className="grid gap-6 md:grid-cols-3">
           <Skeleton className="h-[240px]" />

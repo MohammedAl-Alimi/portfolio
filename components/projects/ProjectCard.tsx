@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { CountUp } from "@/components/motion/CountUp";
 import { Card } from "@/components/ui/Card";
 import { Tag } from "@/components/ui/Tag";
 import type { Project } from "@/lib/content";
@@ -48,7 +49,7 @@ export function ProjectCard({ project, size = "md" }: ProjectCardProps) {
                 {tag}
               </Tag>
             ))}
-            <span className="ml-auto font-mono uppercase tracking-[0.12em] text-[11px] text-muted">{year}</span>
+            <CountUp value={year} className="ml-auto font-mono uppercase tracking-[0.12em] text-[11px] text-muted" />
           </div>
         </div>
       </div>
