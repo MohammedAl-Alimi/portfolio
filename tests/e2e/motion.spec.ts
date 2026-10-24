@@ -27,7 +27,7 @@ async function tier(page: Page): Promise<string> {
 }
 
 test.describe("scroll motion", () => {
-  test("scrolling 600 px orbits the figure and moves the grid floor; the ticker runs", async ({ page }) => {
+  test("scrolling 600 px orbits the figure and moves the grid floor (still on low tier); the ticker runs", async ({ page }) => {
     await page.goto("/");
     const t = await tier(page);
     if (t !== "low") {
@@ -44,9 +44,13 @@ test.describe("scroll motion", () => {
 
     const grid0 = await gridPosition(page);
     await scrollTo(page, 600);
-    await expect.poll(() => gridPosition(page)).not.toBe(grid0);
     await expect(page.locator("[data-scroll-readout]")).not.toHaveText("00.00");
-    if (t !== "low") {
+    if (t === "low") {
+      // Spec 18.2: the floor is a still image on the low tier (no WebGL here).
+      await page.waitForTimeout(300);
+      expect(await gridPosition(page)).toBe(grid0);
+    } else {
+      await expect.poll(() => gridPosition(page)).not.toBe(grid0);
       await expect.poll(() => orbit(page)).toBeGreaterThan(0);
       expect(await orbit(page)).toBeLessThanOrEqual(0.52);
     }
