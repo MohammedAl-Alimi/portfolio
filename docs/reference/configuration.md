@@ -18,7 +18,7 @@ Template: `.env.example`. Copy it to `.env.local` for local work. `.env` and `.e
 
 | Option | Value | Effect | Location |
 | --- | --- | --- | --- |
-| `poweredByHeader` | `false` | Removes the `X-Powered-By` response header. The e2e test asserts it is absent (`tests/e2e/security.spec.ts:16`). | `next.config.ts:4` |
+| `poweredByHeader` | `false` | Removes the `X-Powered-By` response header. The e2e test asserts it is absent (`tests/e2e/security.spec.ts:15`). | `next.config.ts:4` |
 | `htmlLimitedBots` | `/.*/` | Resolves metadata before the HTML shell is sent, so `<title>` and description are in `<head>` for every visitor. The comment in the file names Lighthouse and some crawlers as the reason. | `next.config.ts:8` |
 
 ## vercel.json
