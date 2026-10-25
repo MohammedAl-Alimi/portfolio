@@ -97,13 +97,15 @@ html[data-tier="mid"] [data-overlay-grain] {
 }
 
 /* Ticker strip (components/motion/Ticker.tsx): a continuous slide and a scanline
-   band (one sweep per 4 s, like the figure). Paused on hover; no motion under
-   reduced motion; no scanline on the mid tier. */
+   band (one sweep per 4 s, like the figure). Paused on hover and by its button;
+   no motion and no button under reduced motion; no scanline on the mid tier. */
 [data-ticker-track] {
   animation: ticker-slide 60s linear infinite;
 }
 
-[data-ticker]:hover [data-ticker-track] {
+[data-ticker]:hover [data-ticker-track],
+[data-ticker][data-paused] [data-ticker-track],
+[data-ticker][data-paused]::after {
   animation-play-state: paused;
 }
 
@@ -131,7 +133,8 @@ html[data-tier="mid"] [data-ticker]::after {
     animation: none;
   }
 
-  [data-ticker]::after {
+  [data-ticker]::after,
+  [data-ticker-toggle] {
     display: none;
   }
 }
