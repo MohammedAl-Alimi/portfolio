@@ -104,7 +104,7 @@ A strict Content Security Policy limits where scripts can come from. With `'nonc
 
 A different value per response has a consequence. A page that depends on the request cannot be built once and served from a cache. The root layout reads the nonce from the request headers (`app/layout.tsx:27`), so every HTML route renders on demand. The build output marks `/`, `/projects`, `/projects/[slug]`, `/lab`, `/lab/[slug]` and `/about` as dynamic. Only `robots.txt`, `sitemap.xml` and the Open Graph images are prerendered.
 
-The site accepts that cost for three reasons. The content is small and local, so rendering is fast. Security headers are the cheapest strong protection a static looking site can have. And Lighthouse is checked in CI against the real server (`lighthouserc.json:3`), so a slow page would fail a required check.
+The site accepts that cost for three reasons. The content is small and local, so rendering is fast. Security headers are the cheapest strong protection a static looking site can have. And Lighthouse is checked in CI against the real server (`lighthouserc.json:4`), so a slow page would fail a required check.
 
 `style-src` keeps `'unsafe-inline'` (`lib/csp.ts:10`). The foundation plan records the reason: Next's font handling and inline `style` attributes need it (`docs/superpowers/plans/2026-10-31-portfolio-foundation.md:683`). Scripts, the higher risk, stay strict.
 
