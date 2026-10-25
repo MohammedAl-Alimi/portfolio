@@ -2,7 +2,7 @@
 
 Interactive, colourful, 3D-forward portfolio. Built with Next.js and a lot of small commits.
 
-> Status: the foundation is shipped and live at <https://portfolio-mohammed-al-alimis-projects.vercel.app>. Home, Projects, seven project pages, Lab, About, a CV link, a nonce CSP and the quality gates are in place. The hero shows a static poster for now. The 3D scene, live data, search and the playground arrive in plans 2 to 5.
+> Status: the foundation is shipped and deployed to Vercel at <https://portfolio-mohammed-al-alimis-projects.vercel.app> (private until launch, the owner must be signed in to Vercel to view it). Home, Projects, seven project pages, Lab, About, a CV link, a nonce CSP and the quality gates are in place. The hero shows a static poster for now. The 3D scene, live data, search and the playground arrive in plans 2 to 5.
 
 ![Home page of the portfolio](docs/assets/home.webp)
 
