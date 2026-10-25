@@ -48,13 +48,13 @@ Components read the radius through `var(--radius-sm)` and `var(--radius-md)`, fo
 
 | Variable | Value | Used in |
 | --- | --- | --- |
-| `--motion-fast` | `150ms` (`app/globals.css:39`) | `var(--motion-fast)` in component classes |
+| `--motion-fast` | `150ms` (`app/globals.css:39`) | Colour transitions: `components/ui/NavLinks.tsx:26`, `components/ui/Button.tsx:27`, `components/ui/ThemeToggle.tsx:25` |
 | `--motion-base` | `300ms` (`app/globals.css:40`) | Card hover lift (`components/ui/Card.tsx:38`) |
 | `--motion-slow` | `500ms` (`app/globals.css:41`) | not used by a component yet |
 | `--motion-xslow` | `800ms` (`app/globals.css:42`) | not used by a component yet |
 | `--ease-out` | `cubic-bezier(0.22, 1, 0.36, 1)` (`app/globals.css:43`) | not used by a component yet |
 
-Motion variables are not mapped through `@theme inline`. Components reference them as `duration-[var(--motion-base)]`. Motion classes are wrapped in `motion-safe:` so reduced motion turns them off (`components/ui/Card.tsx:38`).
+Motion variables are not mapped through `@theme inline`. Components reference them as `duration-[var(--motion-base)]`. Only the card hover lift is wrapped in `motion-safe:`, so reduced motion turns it off (`components/ui/Card.tsx:38`). The colour transitions listed above run regardless of the motion preference.
 
 ## Fonts
 
