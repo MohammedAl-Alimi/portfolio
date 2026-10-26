@@ -77,6 +77,27 @@ test.describe("scroll motion", () => {
     await expect(page.locator("[data-scroll-readout]")).toHaveText("99.99");
   });
 
+  test("the ticker pause button stops and restarts it from the keyboard", async ({ page }) => {
+    await page.goto("/");
+    const toggle = page.getByRole("button", { name: "Pause ticker" }).first();
+    await expect(toggle).toHaveAttribute("aria-pressed", "false");
+    const box = await toggle.boundingBox();
+    expect(box?.width).toBeGreaterThanOrEqual(44);
+    expect(box?.height).toBeGreaterThanOrEqual(44);
+    await expect(toggle.locator("xpath=..").locator("[data-bracket]")).toHaveCount(4);
+    await toggle.focus();
+    await page.keyboard.press("Enter");
+    await expect(toggle).toHaveAttribute("aria-pressed", "true");
+    // The pause reaches the compositor a frame or two later.
+    await page.waitForTimeout(150);
+    const paused = await tickerTransform(page);
+    await page.waitForTimeout(400);
+    expect(await tickerTransform(page)).toBe(paused);
+    await page.keyboard.press("Space");
+    await expect(toggle).toHaveAttribute("aria-pressed", "false");
+    await expect.poll(() => tickerTransform(page)).not.toBe(paused);
+  });
+
   test("reduced motion: no orbit, a still grid floor and a still ticker", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
@@ -88,6 +109,8 @@ test.describe("scroll motion", () => {
     expect(await tickerTransform(page)).toBe("none");
     await page.waitForTimeout(400);
     expect(await tickerTransform(page)).toBe("none");
+    // Nothing moves, so there is nothing to pause.
+    await expect(page.locator("[data-ticker-toggle]").first()).toBeHidden();
 
     const grid0 = await gridPosition(page);
     await scrollTo(page, 600);
