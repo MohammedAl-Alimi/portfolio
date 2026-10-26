@@ -68,6 +68,28 @@ test.describe("scroll motion", () => {
     await expect.poll(() => orbit(page)).toBe(0);
   });
 
+  test("scrolling never measures the hero (no layout read per frame)", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium-desktop", "Desktop only");
+    await page.goto("/");
+    test.skip((await tier(page)) === "low", "No canvas on the low tier");
+    await page.waitForFunction(() => Boolean((window as unknown as { __figure?: Probe }).__figure));
+    await page.evaluate(() => {
+      const w = window as unknown as { __heroReads: number };
+      w.__heroReads = 0;
+      const original = Element.prototype.getBoundingClientRect;
+      Element.prototype.getBoundingClientRect = function (this: Element) {
+        if (this.matches("[data-hero]")) w.__heroReads += 1;
+        return original.call(this);
+      };
+    });
+    for (const y of [100, 250, 400, 550]) {
+      await scrollTo(page, y);
+      await page.waitForTimeout(50);
+    }
+    await expect.poll(() => orbit(page)).toBeGreaterThan(0);
+    expect(await page.evaluate(() => (window as unknown as { __heroReads: number }).__heroReads)).toBe(0);
+  });
+
   test("keyboard scrolling still works with smooth scroll on", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "chromium-desktop", "Desktop only");
     await page.goto("/");
