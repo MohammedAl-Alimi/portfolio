@@ -13,3 +13,11 @@ describe("MdxBody", () => {
     expect(hrefs.filter((h) => h === "https://example.com")).toHaveLength(1);
   });
 });
+
+describe("MdxBody code blocks", () => {
+  it("leave sideways swipes to the browser, not Lenis", async () => {
+    const ui = await MdxBody({ source: "```\nconst x = 1;\n```" });
+    const { container } = render(ui);
+    expect(container.querySelector("pre")?.hasAttribute("data-lenis-prevent-horizontal")).toBe(true);
+  });
+});
