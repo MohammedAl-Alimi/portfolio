@@ -155,6 +155,32 @@ test.describe("headings and numbers", () => {
     await expect(heading.locator("[data-decode-glyphs]")).toHaveCSS("opacity", "1");
   });
 
+  test("a heading passes through glyph frames before it settles (GPU path)", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium-desktop", "Desktop only");
+    // CI renders on the CPU, where headings fade; the test-only flag runs the decode.
+    await page.goto("/?motion=force");
+    expect(await tier(page)).not.toBe("low");
+    const heading = page.getByRole("heading", { level: 2, name: "What I build" });
+    await expect(heading).toHaveAttribute("data-decode", "wait");
+    // Record every text the decorative layers show while it decodes.
+    await heading.evaluate((el) => {
+      const seen: string[] = [];
+      (window as unknown as { __frames: string[] }).__frames = seen;
+      const record = () =>
+        el.querySelectorAll("[aria-hidden='true']").forEach((n) => {
+          const t = n.textContent ?? "";
+          if (t) seen.push(t);
+        });
+      new MutationObserver(record).observe(el, { subtree: true, childList: true, characterData: true });
+    });
+    await heading.scrollIntoViewIfNeeded();
+    await expect(heading).toHaveAttribute("data-decode", "done");
+    const frames = await page.evaluate(() => (window as unknown as { __frames: string[] }).__frames);
+    expect(frames.some((f) => f !== "What I build" && /[█▓▒░<>/\\|_\-=+*#01]/.test(f))).toBe(true);
+    await expect(heading.locator("[data-decode-glyphs]")).toHaveText("What I build");
+    await expect(heading.locator("[data-decode-glyphs]")).toBeVisible();
+  });
+
   test("reduced motion: headings fade, years do not count", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
