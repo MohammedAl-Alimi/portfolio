@@ -140,20 +140,40 @@ export function FigureCloud({ figure, size, visible = true, slot, orbitTrack }: 
   });
 
   // Scroll orbits the camera. The demand loop draws one frame per change, never more.
+  // The scroll path is math plus one uniform write: the section's bottom edge (in
+  // document coordinates) is measured only when it resizes or the window does, so
+  // scrolling never forces a layout after the readout and grid floor have written.
   useEffect(() => {
     const track = orbitTrack ? document.querySelector(orbitTrack) : null;
     if (!track) return;
-    return subscribeScroll(({ y }) => {
+    let end = 0;
+    let lastY = 0;
+    const apply = () => {
       const mat = materialRef.current;
       if (!mat) return;
-      // The section's bottom edge in document coordinates, re-read so layout changes count.
-      const end = track.getBoundingClientRect().bottom + window.scrollY;
-      const orbit = orbitFor(y, end);
+      const orbit = orbitFor(lastY, end);
       const u = mat.uniforms as FigureUniforms;
       if (u.uOrbit.value === orbit) return;
       u.uOrbit.value = orbit;
       invalidate();
+    };
+    const measure = () => {
+      end = track.getBoundingClientRect().bottom + window.scrollY;
+      apply();
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(track);
+    window.addEventListener("resize", measure);
+    const off = subscribeScroll(({ y }) => {
+      lastY = y;
+      apply();
     });
+    return () => {
+      off();
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+    };
   }, [orbitTrack, invalidate]);
 
   useEffect(() => {
