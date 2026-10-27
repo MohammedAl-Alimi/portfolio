@@ -67,7 +67,7 @@ Never give a secret a `NEXT_PUBLIC_` prefix. See [Configuration](../reference/co
    ```
    The browser install is needed only the first time. If you skip it, Playwright cannot launch Chromium or WebKit.
    The config starts `npm run build && npm run start` for you (`playwright.config.ts:16`). If something already listens on port 3000, Playwright reuses it when not in CI (`playwright.config.ts:18`). A stale server from an earlier run then serves old code. Stop it before the run.
-6. Run Lighthouse (`package.json:17`). Build first, because it starts `npm run start` (`lighthouserc.json:3`).
+6. Run Lighthouse (`package.json:17`). Build first, because it starts `npm run start` (`lighthouserc.json:4`).
    ```bash
    npm run build
    npm run lhci
@@ -83,7 +83,7 @@ Never give a secret a `NEXT_PUBLIC_` prefix. See [Configuration](../reference/co
 
 - `package.json:6` to `package.json:17`: every script.
 - `playwright.config.ts:15`: the web server the e2e tests start.
-- `lighthouserc.json:13`: the score thresholds Lighthouse enforces.
+- `lighthouserc.json:15` to `lighthouserc.json:18`: the score thresholds Lighthouse enforces.
 
 ## Related
 
