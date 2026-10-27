@@ -122,7 +122,7 @@ Simple cards with only text, such as the "What I build" cards, use the plain `Ca
 
 The design rule is: the normal site is for everyone, the playground is a side door. No public page depends on a shortcut, a gesture or a hidden feature (`docs/superpowers/specs/2026-10-31-portfolio-design.md`, section "Playground"). Anyone can reach every page with the top bar and visible buttons (`components/ui/Nav.tsx:13`, `lib/nav.ts:3`).
 
-That is why the hero says "Drag the shapes. Click one to open a project." and the projects are also in a plain list a few sections below (`components/home/Hero.tsx:32`, `components/home/FeaturedProjects.tsx:10`). The 3D layer, search and terminal can add delight for people who look for it, and nobody is blocked if they do not.
+That is why the hero says "Drag the shapes. Click one to open a project." and the same projects are also in a plain grid on `/projects`, reached from the top bar or the "See projects" button (`components/home/Hero.tsx:32`, `components/home/Hero.tsx:20`). The 3D layer, search and terminal can add delight for people who look for it, and nobody is blocked if they do not.
 
 ## Further reading
 

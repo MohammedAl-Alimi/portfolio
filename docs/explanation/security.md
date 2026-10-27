@@ -26,7 +26,7 @@ That makes the risk small but not zero. What remains is mostly about the browser
 
 The CSP uses a fresh nonce per request, with `'strict-dynamic'`, so only scripts the server stamped can run (`lib/csp.ts:4`). `frame-ancestors 'none'` stops other sites from framing this one (`lib/csp.ts:15`). `object-src 'none'` and `base-uri 'self'` close two older script routes (`lib/csp.ts:16`, `lib/csp.ts:18`). `style-src` still allows `'unsafe-inline'` because Next's fonts and inline style attributes need it (`lib/csp.ts:10`). That is a known weaker spot, accepted because styles carry far less risk than scripts. The full list is in [Configuration](../reference/configuration.md#csp-directives). The reason pages render dynamically is in [Architecture](architecture.md).
 
-An end to end test asserts the headers on five public pages and checks that no CSP violation is logged while pages render (`tests/e2e/security.spec.ts:3` to `tests/e2e/security.spec.ts:20`).
+An end to end test asserts the headers on five public pages and checks that no CSP violation is logged while pages render (`tests/e2e/security.spec.ts:3` to `tests/e2e/security.spec.ts:42`).
 
 ### Content validation
 
