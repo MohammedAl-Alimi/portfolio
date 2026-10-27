@@ -1,8 +1,10 @@
 # Mohammed Al-Alimi, portfolio
 
-Interactive, colourful, 3D-forward portfolio. Built with Next.js, React Three Fiber and a lot of small commits.
+Interactive, colourful, 3D-forward portfolio. Built with Next.js and a lot of small commits.
 
-> Status: design phase. The spec lives in [`docs/superpowers/specs/2026-10-31-portfolio-design.md`](docs/superpowers/specs/2026-10-31-portfolio-design.md).
+> Status: the foundation is shipped and live at <https://portfolio-mohammed-al-alimis-projects.vercel.app>. Home, Projects, seven project pages, Lab, About, a CV link, a nonce CSP and the quality gates are in place. The hero shows a static poster for now. The 3D scene, live data, search and the playground arrive in plans 2 to 5.
+
+![Home page of the portfolio](docs/assets/home.webp)
 
 ## What it will be
 
@@ -19,9 +21,26 @@ Interactive, colourful, 3D-forward portfolio. Built with Next.js, React Three Fi
 - Adding a project is one content file. No CMS, no database.
 - Security and documentation follow the [agent-security-playbook](https://github.com/MohammedAl-Alimi/agent-security-playbook) and the [documentation-playbook](https://github.com/MohammedAl-Alimi/documentation-playbook).
 
+## Scripts you need
+
+Use Node 24 (`nvm use`), then `npm ci`.
+
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Start the dev server |
+| `npm run test` | Unit tests |
+| `npm run test:e2e` | End to end tests |
+| `npm run validate:content` | Check all content files |
+| `npm run check:secrets` | Scan for secrets before you push |
+
 ## Docs
 
-Full documentation will live in [`docs/`](docs/) following the Diátaxis structure once the code exists.
+Start at [`docs/README.md`](docs/README.md). It follows the Diátaxis structure:
+
+- [Tutorials](docs/README.md#tutorials): none yet.
+- [How-to guides](docs/README.md#how-to-guides): [run the site locally](docs/how-to/run-locally.md).
+- [Reference](docs/README.md#reference): [project structure](docs/reference/project-structure.md), [content schema](docs/reference/content-schema.md), [configuration](docs/reference/configuration.md), [design tokens](docs/reference/design-tokens.md).
+- [Explanation](docs/README.md#explanation): [architecture](docs/explanation/architecture.md), [security](docs/explanation/security.md).
 
 ## License
 
