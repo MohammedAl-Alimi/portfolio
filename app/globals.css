@@ -83,6 +83,11 @@ html[data-tier="mid"] [data-overlay-grain] {
   animation: none;
 }
 
+/* While decoding, the final text keeps its box but hides under the frames overlay. */
+[data-decode="run"] [data-decode-glyphs] {
+  visibility: hidden;
+}
+
 [data-decode="fade"] [data-decode-glyphs] {
   animation: decode-fallback 300ms ease both;
 }

@@ -181,6 +181,29 @@ test.describe("headings and numbers", () => {
     await expect(heading.locator("[data-decode-glyphs]")).toBeVisible();
   });
 
+  test("at 320 px a wrapping heading keeps its height while it decodes", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium-narrow", "320 px project only");
+    await page.goto("/?motion=force");
+    expect(await tier(page)).not.toBe("low");
+    const heading = page.getByRole("heading", { level: 2, name: "Featured projects" });
+    await expect(heading).toHaveAttribute("data-decode", "wait");
+    // Sample the box height every frame from before the decode until it settles.
+    await heading.evaluate((el) => {
+      const heights: number[] = [];
+      (window as unknown as { __heights: number[] }).__heights = heights;
+      const tick = () => {
+        heights.push(el.getBoundingClientRect().height);
+        if ((el as HTMLElement).dataset.decode !== "done") requestAnimationFrame(tick);
+      };
+      tick();
+    });
+    await heading.scrollIntoViewIfNeeded();
+    await expect(heading).toHaveAttribute("data-decode", "done");
+    const heights = await page.evaluate(() => (window as unknown as { __heights: number[] }).__heights);
+    expect(heights.length).toBeGreaterThan(5);
+    expect(new Set(heights).size).toBe(1);
+  });
+
   test("reduced motion: headings fade, years do not count", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
