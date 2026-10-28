@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ProjectGrid } from "@/components/projects/ProjectGrid";
 import { TagFilter } from "@/components/projects/TagFilter";
 import { Section } from "@/components/ui/Section";
-import { getProjects } from "@/lib/content";
+import { getProjects, sortProjectsByYear } from "@/lib/content";
 import { filterProjects, parseTagParam } from "@/lib/filter";
 
 export const metadata: Metadata = {
@@ -18,7 +18,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
   const { tag } = await searchParams;
   const rawTag = Array.isArray(tag) ? tag[0] : tag;
   const active = parseTagParam(tag);
-  const projects = await getProjects();
+  const projects = sortProjectsByYear(await getProjects());
   const visible = rawTag !== undefined && active === null ? [] : filterProjects(projects, active);
 
   return (
