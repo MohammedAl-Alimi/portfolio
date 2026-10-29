@@ -1,5 +1,5 @@
-import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { expectNoSeriousViolations } from "./helpers/axe";
 
 for (const path of ["/projects/does-not-exist", "/definitely-not-a-page"]) {
   test(`${path} returns the custom 404 with status 404`, async ({ page }) => {
@@ -17,10 +17,7 @@ for (const path of ["/projects/does-not-exist", "/definitely-not-a-page"]) {
 
 test("404 page passes axe", async ({ page }) => {
   await page.goto("/definitely-not-a-page");
-  const results = await new AxeBuilder({ page }).analyze();
-  expect(
-    results.violations.filter((v) => ["serious", "critical"].includes(v.impact ?? "")),
-  ).toEqual([]);
+  await expectNoSeriousViolations(page);
 });
 
 test("404 page has no horizontal scroll at 320px", async ({ page }) => {
