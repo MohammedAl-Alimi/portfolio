@@ -21,7 +21,7 @@ patterns=(
 
 status=0
 for p in "${patterns[@]}"; do
-  if hits=$(git ls-files -z | xargs -0 grep -nEI --exclude='check-secrets.sh' --exclude='CLAUDE.md' -- "$p" 2>/dev/null); then
+  if hits=$(git ls-files -z | xargs -0 grep -nEI -- "$p" 2>/dev/null | grep -v -E '^(scripts/check-secrets\.sh|CLAUDE\.md):'); then
     if [ -n "$hits" ]; then
       echo "check-secrets: pattern '$p' found:" >&2
       echo "$hits" >&2
@@ -30,8 +30,8 @@ for p in "${patterns[@]}"; do
   fi
 done
 
-# The contact email is allowed in content/profile.json and security.txt only.
-if hits=$(git ls-files -z | xargs -0 grep -nEI --exclude='check-secrets.sh' --exclude='CLAUDE.md' --exclude='profile.json' --exclude='security.txt' -- 'alalimim14' 2>/dev/null); then
+# The contact email is allowed in content/profile.json and security.txt only (exact paths).
+if hits=$(git ls-files -z | xargs -0 grep -nEI -- 'alalimim14' 2>/dev/null | grep -v -E '^(scripts/check-secrets\.sh|CLAUDE\.md|content/profile\.json|public/\.well-known/security\.txt):'); then
   if [ -n "$hits" ]; then
     echo "check-secrets: pattern 'alalimim14' found:" >&2
     echo "$hits" >&2
