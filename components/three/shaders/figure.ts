@@ -7,7 +7,7 @@
 //   aKind  0 front shell, 1 back shell, 2 interior
 // Uniforms, besides the wind set from shaders/wind.ts:
 //   uYaw         continuous rotation about Y, radians
-//   uOrbit       extra yaw from scroll (Task 5), 0 for now
+//   uOrbit       extra yaw from scrolling the hero out, 0..0.52 rad
 //   uFog         0..1 strength of the depth fog
 //   uScanY       world y of the scanline sweep
 //   uGlitch      1 during a glitch slice, else 0

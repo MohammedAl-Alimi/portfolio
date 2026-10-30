@@ -3,11 +3,14 @@ import { headers } from "next/headers";
 import { FeaturedProjects } from "@/components/home/FeaturedProjects";
 import { Hero } from "@/components/home/Hero";
 import { WhatIBuild } from "@/components/home/WhatIBuild";
+import { Ticker } from "@/components/motion/Ticker";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Section } from "@/components/ui/Section";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { getHighlights, getProfile, getProjects } from "@/lib/content";
 import { SITE_URL } from "@/lib/site";
+
+const TICKER = "AI · AGENTS · COMPUTER VISION · SECURITY · SYSTEMS";
 
 export async function generateMetadata(): Promise<Metadata> {
   const profile = await getProfile();
@@ -38,9 +41,11 @@ export default async function Home() {
         }}
       />
       <Hero profile={profile} />
+      <Ticker text={TICKER} />
       <WhatIBuild />
       <FeaturedProjects projects={projects} />
-      <Section id="right-now" title="Right now">
+      <Ticker text={TICKER} />
+      <Section id="right-now" title="Right now" decodeTitle>
         <div className="grid gap-6 md:grid-cols-3">
           <Skeleton className="h-[240px]" />
           <Skeleton className="h-[120px]" />
@@ -49,7 +54,7 @@ export default async function Home() {
         <p className="sr-only">Live activity loads here soon.</p>
       </Section>
       {highlights.length > 0 ? (
-        <Section id="highlights" title="Highlights">
+        <Section id="highlights" title="Highlights" decodeTitle>
           <ul className="grid gap-4 md:grid-cols-3">
             {highlights.map((h) => (
               <li key={h.url}>
