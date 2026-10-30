@@ -110,8 +110,13 @@ export function createMdxComponents(seen: Map<string, number> = new Map()) {
       {children}
     </code>
   ),
+  // Sideways swipes scroll the code natively; Lenis (components/motion/SmoothScroll.tsx)
+  // would otherwise turn a diagonal trackpad swipe into page scroll.
   pre: ({ children }: ComponentPropsWithoutRef<"pre">) => (
-    <pre className="overflow-x-auto rounded-[var(--radius-sm)] border border-border bg-surface p-4 mb-6 text-sm [&_code]:rounded-none [&_code]:border-0 [&_code]:bg-transparent [&_code]:p-0 [&_code]:text-[1em]">
+    <pre
+      data-lenis-prevent-horizontal
+      className="overflow-x-auto rounded-[var(--radius-sm)] border border-border bg-surface p-4 mb-6 text-sm [&_code]:rounded-none [&_code]:border-0 [&_code]:bg-transparent [&_code]:p-0 [&_code]:text-[1em]"
+    >
       {children}
     </pre>
   ),

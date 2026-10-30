@@ -30,6 +30,8 @@
   --muted: #808086;
   --text: #f2f2f0;
   --glow: #ffffff;
+  /* Grid floor lines (components/motion/GridFloor.tsx): glow at 10%. */
+  --grid-line: color-mix(in srgb, var(--glow) 10%, transparent);
   /* Used only by the lab. Page components must not read these. */
   --accent-1: #ff6b35;
   --accent-2: #ffd23f;
@@ -75,6 +77,17 @@ html[data-tier="mid"] [data-overlay-grain] {
   animation: none;
 }
 
+/* An "enter" decode waiting for its heading to scroll into view shows the final
+   text, so nothing is ever hidden if the observer never fires. */
+[data-decode="wait"] [data-decode-glyphs] {
+  animation: none;
+}
+
+/* While decoding, the final text keeps its box but hides under the frames overlay. */
+[data-decode="run"] [data-decode-glyphs] {
+  visibility: hidden;
+}
+
 [data-decode="fade"] [data-decode-glyphs] {
   animation: decode-fallback 300ms ease both;
 }
@@ -85,5 +98,63 @@ html[data-tier="mid"] [data-overlay-grain] {
   }
   to {
     opacity: 1;
+  }
+}
+
+/* Ticker strip (components/motion/Ticker.tsx): a continuous slide and a scanline
+   band (one sweep per 4 s, like the figure). Paused on hover and by its button;
+   no motion and no button under reduced motion; no scanline on the mid tier. */
+[data-ticker-track] {
+  animation: ticker-slide 60s linear infinite;
+}
+
+[data-ticker]:hover [data-ticker-track],
+[data-ticker][data-paused] [data-ticker-track],
+[data-ticker][data-paused]::after {
+  animation-play-state: paused;
+}
+
+[data-ticker]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent 44%,
+    color-mix(in srgb, var(--glow) 14%, transparent) 50%,
+    transparent 56%
+  );
+  animation: ticker-scan 4s linear infinite;
+}
+
+html[data-tier="mid"] [data-ticker]::after {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-ticker-track],
+  [data-ticker]::after {
+    animation: none;
+  }
+
+  [data-ticker]::after,
+  [data-ticker-toggle] {
+    display: none;
+  }
+}
+
+@keyframes ticker-slide {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes ticker-scan {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(100%);
   }
 }
