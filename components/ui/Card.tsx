@@ -27,7 +27,7 @@ export function Card({ color, href, children, className }: CardProps) {
   return (
     <Link
       href={href}
-      className="block rounded-[var(--radius-md)] transition-transform duration-[var(--motion-base)] hover:-translate-y-1 motion-reduce:transform-none motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
+      className="block rounded-[var(--radius-md)] transition-transform duration-[var(--motion-base)] hover:-translate-y-1 motion-reduce:translate-none motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
     >
       {surface}
     </Link>
