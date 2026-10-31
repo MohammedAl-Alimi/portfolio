@@ -1,5 +1,6 @@
-import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { allProjects } from "./helpers/content";
+import { expectNoSeriousViolations } from "./helpers/axe";
 
 test("unknown tag shows empty state, not an error", async ({ page }) => {
   const res = await page.goto("/projects?tag=nonexistent");
@@ -20,10 +21,7 @@ test("tag chip filters and updates url", async ({ page }) => {
 test("projects page renders the heading and passes axe", async ({ page }) => {
   await page.goto("/projects");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Projects");
-  const results = await new AxeBuilder({ page }).analyze();
-  expect(
-    results.violations.filter((v) => ["serious", "critical"].includes(v.impact ?? "")),
-  ).toEqual([]);
+  await expectNoSeriousViolations(page);
 });
 
 test("no horizontal scroll at 320px", async ({ page }) => {
@@ -35,7 +33,7 @@ test("no horizontal scroll at 320px", async ({ page }) => {
   expect(noOverflow).toBe(true);
 });
 
-test("projects page lists all seven projects", async ({ page }) => {
+test("projects page lists every project", async ({ page }) => {
   await page.goto("/projects");
-  await expect(page.getByTestId("project-grid").getByRole("link")).toHaveCount(7);
+  await expect(page.getByTestId("project-grid").getByRole("link")).toHaveCount(allProjects().length);
 });
