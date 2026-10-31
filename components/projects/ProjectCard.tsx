@@ -11,7 +11,6 @@ type ProjectCardProps = {
 
 export function ProjectCard({ project, size = "md" }: ProjectCardProps) {
   const { title, slug, tagline, color, tags, year, cover } = project.frontmatter;
-  const titleId = `project-title-${slug}`;
 
   return (
     <Card
@@ -34,7 +33,6 @@ export function ProjectCard({ project, size = "md" }: ProjectCardProps) {
         )}
         <div className="flex flex-1 flex-col gap-3 p-6">
           <h3
-            id={titleId}
             className={size === "lg" ? "font-display text-3xl" : "font-display text-2xl"}
           >
             <Link
