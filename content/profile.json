@@ -1,0 +1,13 @@
+{
+  "name": "Mohammed Al-Alimi",
+  "headline": "I build AI systems, agents and playful tools",
+  "bio": "I recently finished a B.Sc. thesis on computer vision that counts crowds without identifying anyone. I like building agents and automation, and web apps that take security seriously.",
+  "email": "alalimim14@gmail.com",
+  "location": "Germany",
+  "availability": "Open to roles from 2027",
+  "socials": {
+    "github": "https://github.com/MohammedAl-Alimi",
+    "linkedin": "https://www.linkedin.com/in/mohammedal-alimi"
+  },
+  "decorationColors": ["#FFD23F", "#3BCEAC", "#F06595", "#A78BFA"]
+}
