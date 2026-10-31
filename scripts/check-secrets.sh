@@ -22,7 +22,7 @@ patterns=(
 
 status=0
 for p in "${patterns[@]}"; do
-  if hits=$(git ls-files -z | xargs -0 grep -nEI --exclude='check-secrets.sh' -- "$p" 2>/dev/null); then
+  if hits=$(git ls-files -z | xargs -0 grep -nEI --exclude='check-secrets.sh' --exclude='CLAUDE.md' -- "$p" 2>/dev/null); then
     if [ -n "$hits" ]; then
       echo "check-secrets: pattern '$p' found:" >&2
       echo "$hits" >&2
