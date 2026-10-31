@@ -1,3 +1,9 @@
+/*
+ * Layer order (z-index):
+ *   nav 40, dialog 50, grain 60, future transition overlay 70.
+ * The grain sits above the mobile menu dialog so it covers every surface.
+ * It never takes clicks (pointer-events none).
+ */
 export function Grain() {
   return (
     <div
