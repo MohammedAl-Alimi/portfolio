@@ -7,11 +7,19 @@ type CardProps = {
   href?: string;
   children: ReactNode;
   className?: string;
+  "data-project-card"?: boolean;
 };
 
-export function Card({ color, href, children, className }: CardProps) {
+export function Card({
+  color,
+  href,
+  children,
+  className,
+  "data-project-card": projectCard,
+}: CardProps) {
   const surface = (
     <div
+      data-project-card={projectCard ? "" : undefined}
       className={cn(
         "bg-surface border border-border rounded-[var(--radius-md)] p-6",
         className,
