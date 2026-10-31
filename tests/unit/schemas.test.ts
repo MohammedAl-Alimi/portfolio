@@ -43,7 +43,9 @@ describe("projectFrontmatterSchema", () => {
   });
 
   it("applies defaults for featured and order", () => {
-    const { featured: _f, order: _o, ...rest } = validProject;
+    const rest: Record<string, unknown> = { ...validProject };
+    delete rest.featured;
+    delete rest.order;
     const r = projectFrontmatterSchema.safeParse(rest);
     expect(r.success).toBe(true);
     if (r.success) {
