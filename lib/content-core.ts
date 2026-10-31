@@ -3,10 +3,12 @@ import path from "node:path";
 import matter from "gray-matter";
 import { z } from "zod";
 import {
+  type AboutFrontmatter,
   type Highlight,
   type LabFrontmatter,
   type Profile,
   type ProjectFrontmatter,
+  aboutFrontmatterSchema,
   highlightSchema,
   labFrontmatterSchema,
   profileSchema,
@@ -14,6 +16,7 @@ import {
 } from "./schemas";
 
 export type Project = { frontmatter: ProjectFrontmatter; body: string };
+export type About = { frontmatter: AboutFrontmatter; body: string };
 export type LabItem = { frontmatter: LabFrontmatter; body: string };
 
 const defaultDir = () => path.join(process.cwd(), "content");
@@ -122,4 +125,15 @@ export async function getAdjacentProjects(
   const index = projects.findIndex((p) => p.frontmatter.slug === slug);
   if (index === -1) return { previous: null, next: null };
   return { previous: projects[index - 1] ?? null, next: projects[index + 1] ?? null };
+}
+
+export async function getAbout(dir: string = defaultDir()): Promise<About> {
+  const file = "about.mdx";
+  const raw = await readFile(path.join(dir, file), "utf8");
+  const parsed = matter(raw);
+  const result = aboutFrontmatterSchema.safeParse(parsed.data);
+  if (!result.success) {
+    throw new Error(`Invalid frontmatter in ${file}: ${describeIssues(result.error)}`);
+  }
+  return { frontmatter: result.data, body: parsed.content };
 }

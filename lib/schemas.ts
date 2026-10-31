@@ -98,7 +98,24 @@ export const profileSchema = z.strictObject({
   decorationColors: z.array(hexColor).min(2).max(6),
 });
 
+export const aboutFrontmatterSchema = z.strictObject({
+  title: z.string().min(1).max(80),
+  intro: z.string().min(1).max(200),
+  timeline: z
+    .array(
+      z.strictObject({
+        year: z.string().regex(/^\d{4}(\s?-\s?(\d{4}|now))?$/, "must look like 2024 or 2024 - now"),
+        title: z.string().min(1).max(80),
+        detail: z.string().min(1).max(200),
+      }),
+    )
+    .min(1)
+    .max(8),
+  outside: z.array(z.string().min(1).max(80)).min(1).max(8),
+});
+
 export type ProjectFrontmatter = z.infer<typeof projectFrontmatterSchema>;
 export type LabFrontmatter = z.infer<typeof labFrontmatterSchema>;
 export type Highlight = z.infer<typeof highlightSchema>;
 export type Profile = z.infer<typeof profileSchema>;
+export type AboutFrontmatter = z.infer<typeof aboutFrontmatterSchema>;
