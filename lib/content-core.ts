@@ -89,6 +89,13 @@ export async function getProjects(dir: string = defaultDir()): Promise<Project[]
   );
 }
 
+export function sortProjectsByYear(projects: Project[]): Project[] {
+  return projects.toSorted(
+    (a, b) =>
+      b.frontmatter.year - a.frontmatter.year || a.frontmatter.order - b.frontmatter.order,
+  );
+}
+
 export async function getProject(slug: string, dir?: string): Promise<Project | null> {
   const projects = await getProjects(dir);
   return projects.find((p) => p.frontmatter.slug === slug) ?? null;

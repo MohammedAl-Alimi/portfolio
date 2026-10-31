@@ -5,4 +5,4 @@ useDefault = true
 
 [allowlist]
 description = "Documentation that names secret patterns on purpose"
-paths = ['''CLAUDE\.md''']
+paths = ['''^CLAUDE\.md$''']

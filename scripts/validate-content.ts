@@ -8,6 +8,7 @@ import {
   getProjects,
 } from "../lib/content-core";
 import { isAllowedLabOrigin } from "../lib/lab-origins";
+import { findRawTag } from "../lib/mdx-guard";
 
 const errors: string[] = [];
 
@@ -31,10 +32,22 @@ async function main() {
     getHighlights(),
   ]);
   await getProfile();
-  await getAbout();
+  const about = await getAbout();
 
   assertUnique("project", projects.map((p) => p.frontmatter.slug));
   assertUnique("lab", lab.map((p) => p.frontmatter.slug));
+
+  const bodies = [
+    ...projects.map((p) => ({ file: `content/projects/${p.frontmatter.slug}.mdx`, body: p.body })),
+    ...lab.map((p) => ({ file: `content/lab/${p.frontmatter.slug}.mdx`, body: p.body })),
+    { file: "content/about.mdx", body: about.body },
+  ];
+  for (const { file, body } of bodies) {
+    const hit = findRawTag(body);
+    if (hit) {
+      errors.push(`${file} has a raw HTML tag (body line ${hit.line}): ${hit.text}. Use plain Markdown.`);
+    }
+  }
 
   for (const { frontmatter } of projects) {
     if (frontmatter.cover) assertPublicFile(`Cover for ${frontmatter.slug}`, frontmatter.cover);

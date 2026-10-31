@@ -1,5 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { buildCsp } from "@/lib/csp";
+import {
+  PERMISSIONS_POLICY,
+  REFERRER_POLICY,
+  STRICT_TRANSPORT_SECURITY,
+  X_CONTENT_TYPE_OPTIONS,
+} from "@/lib/security-headers";
 
 export function proxy(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
@@ -20,16 +26,10 @@ export function proxy(request: NextRequest) {
 
   const response = NextResponse.next({ request: { headers: requestHeaders } });
   response.headers.set("Content-Security-Policy", csp);
-  response.headers.set(
-    "Strict-Transport-Security",
-    "max-age=63072000; includeSubDomains; preload",
-  );
-  response.headers.set("X-Content-Type-Options", "nosniff");
-  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-  response.headers.set(
-    "Permissions-Policy",
-    "camera=(), microphone=(), geolocation=(), accelerometer=(self), gyroscope=(self)",
-  );
+  response.headers.set("Strict-Transport-Security", STRICT_TRANSPORT_SECURITY);
+  response.headers.set("X-Content-Type-Options", X_CONTENT_TYPE_OPTIONS);
+  response.headers.set("Referrer-Policy", REFERRER_POLICY);
+  response.headers.set("Permissions-Policy", PERMISSIONS_POLICY);
   response.headers.set("X-Frame-Options", "DENY");
   return response;
 }
