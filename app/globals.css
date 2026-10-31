@@ -1,14 +1,13 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where(.dark, .dark *));
-@custom-variant light (&:where(.light, .light *));
-
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
   --color-text: var(--text);
   --color-muted: var(--muted);
   --color-border: var(--border);
+  --color-glow: var(--glow);
   --color-accent-1: var(--accent-1);
   --color-accent-2: var(--accent-2);
   --color-accent-3: var(--accent-3);
@@ -24,20 +23,23 @@
 }
 
 :root {
-  --bg: #0b0b10;
-  --surface: #141420;
-  --text: #f6f3ee;
-  --muted: #a39fad;
-  --border: #2a2833;
+  --bg: #050505;
+  --surface: #0f0f11;
+  --surface-2: #17171a;
+  --border: #2a2a2e;
+  --muted: #6b6b70;
+  --text: #f2f2f0;
+  --glow: #ffffff;
+  /* Unused by pages. The pixel storm and the lab still read these until they are rebuilt. */
   --accent-1: #ff6b35;
   --accent-2: #ffd23f;
   --accent-3: #3bceac;
   --accent-4: #5c7cfa;
   --accent-5: #f06595;
   --accent-6: #a78bfa;
-  --radius-sm-value: 4px;
-  --radius-md-value: 8px;
-  --radius-lg-value: 12px;
+  --radius-sm-value: 0px;
+  --radius-md-value: 0px;
+  --radius-lg-value: 0px;
   --motion-fast: 150ms;
   --motion-base: 300ms;
   --motion-slow: 500ms;
@@ -46,30 +48,13 @@
   color-scheme: dark;
 }
 
-.dark {
-  --bg: #0b0b10;
-  --surface: #141420;
-  --text: #f6f3ee;
-  --muted: #a39fad;
-  --border: #2a2833;
-  color-scheme: dark;
-}
-
-.light {
-  --bg: #fffbf5;
-  --surface: #ffffff;
-  --text: #17161a;
-  --muted: #5f5b66;
-  --border: #eae4da;
-  color-scheme: light;
-}
-
 html {
-  font-size: 18px;
+  font-size: 16px;
 }
 
 body {
   @apply font-sans bg-bg text-text;
+  line-height: 1.6;
 }
 
 html[data-tier="mid"] [data-grain] {
