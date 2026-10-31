@@ -9,6 +9,7 @@ import {
   getProfile,
   getProject,
   getProjects,
+  sortProjectsByYear,
 } from "@/lib/content-core";
 
 const fixturesDir = path.join(__dirname, "..", "fixtures", "content");
@@ -82,5 +83,19 @@ describe("about loader", () => {
 
   it("throws naming the file when the timeline is empty", async () => {
     await expect(getAbout(invalidAboutDir)).rejects.toThrow(/about\.mdx.*timeline/);
+  });
+});
+
+describe("sortProjectsByYear", () => {
+  it("sorts newest year first, then order ascending, without mutating", async () => {
+    const [a, b] = await getProjects(fixturesDir);
+    if (!a || !b) throw new Error("fixtures missing");
+    const older = { ...a, frontmatter: { ...a.frontmatter, slug: "older", year: 2020, order: 1 } };
+    const newer = { ...b, frontmatter: { ...b.frontmatter, slug: "newer", year: 2024, order: 9 } };
+    const newerFirst = { ...b, frontmatter: { ...b.frontmatter, slug: "tie", year: 2024, order: 2 } };
+    const input = [older, newer, newerFirst];
+    const sorted = sortProjectsByYear(input);
+    expect(sorted.map((x) => x.frontmatter.slug)).toEqual(["tie", "newer", "older"]);
+    expect(input.map((x) => x.frontmatter.slug)).toEqual(["older", "newer", "tie"]);
   });
 });

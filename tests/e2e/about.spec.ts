@@ -1,5 +1,5 @@
-import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { expectNoSeriousViolations } from "./helpers/axe";
 
 test("about has story, timeline and cv button", async ({ page }) => {
   await page.goto("/about");
@@ -16,8 +16,7 @@ test("/cv redirects to the pdf", async ({ request }) => {
 
 test("about passes axe", async ({ page }) => {
   await page.goto("/about");
-  const results = await new AxeBuilder({ page }).analyze();
-  expect(results.violations).toEqual([]);
+  await expectNoSeriousViolations(page);
 });
 
 test("about has no horizontal overflow at 320px", async ({ page }) => {
