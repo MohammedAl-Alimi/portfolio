@@ -3,16 +3,11 @@ import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { contrastText } from "@/lib/color";
 import type { Project } from "@/lib/content";
-
-const linkLabels = [
-  ["repo", "Repo"],
-  ["live", "Live"],
-  ["demo", "Demo"],
-] as const;
+import { projectLinks } from "@/lib/project-links";
 
 export function ProjectHero({ project }: { project: Project }) {
   const { title, tagline, color, year, role, links } = project.frontmatter;
-  const present = linkLabels.filter(([key]) => Boolean(links[key]));
+  const present = projectLinks(links);
   const style = {
     "--project-color": color,
     backgroundColor: "var(--project-color)",
@@ -34,12 +29,12 @@ export function ProjectHero({ project }: { project: Project }) {
         <p className="text-xl md:text-2xl max-w-[40ch]">{tagline}</p>
         {present.length > 0 ? (
           <div className="mt-10 flex flex-wrap gap-3">
-            {present.map(([key, label]) => (
+            {present.map(({ label, href }) => (
               <Button
-                key={key}
+                key={label}
                 variant="secondary"
                 external
-                href={links[key] as string}
+                href={href}
                 className="border-current text-current bg-transparent hover:bg-current/10"
               >
                 {label}
