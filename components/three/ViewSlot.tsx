@@ -3,16 +3,12 @@
 import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
-import { useSceneStore } from "@/lib/scene-store";
+import { useSceneActive, useSceneStore } from "@/lib/scene-store";
 import { SceneErrorBoundary } from "./SceneErrorBoundary";
 
 const ViewTrack = dynamic(() => import("./ViewTrack"), { ssr: false });
 
-export function useSceneActive(): boolean {
-  const tier = useSceneStore((s) => s.tier);
-  const failed = useSceneStore((s) => s.failed);
-  return tier !== null && tier !== "low" && !failed;
-}
+export { useSceneActive };
 
 interface Props {
   children: ReactNode;
