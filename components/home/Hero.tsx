@@ -29,7 +29,7 @@ export function Hero({ profile }: { profile: Profile }) {
             <div data-hero-slot className="relative aspect-[4/3]">
               <HeroPoster />
             </div>
-            <p className="mt-2 text-sm text-muted">Drag the shapes. Click one to open a project.</p>
+            <p className="mt-3 text-left text-sm text-muted">Drag the shapes. Click one to open a project.</p>
           </div>
         </div>
       </Container>
