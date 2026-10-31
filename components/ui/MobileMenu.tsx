@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { NAV_ITEMS } from "@/lib/nav";
@@ -9,7 +10,15 @@ import { CloseIcon, MenuIcon } from "./icons";
 const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export function MobileMenu() {
-  const [open, setOpen] = useState(false);
+  // The menu is open only for the pathname it was opened on, so navigating closes it.
+  const [openedAt, setOpenedAt] = useState<string | null>(null);
+  const pathname = usePathname();
+  const open = openedAt === pathname;
+  if (openedAt !== null && !open) setOpenedAt(null);
+  const setOpen = useCallback(
+    (next: boolean) => setOpenedAt(next ? pathname : null),
+    [pathname],
+  );
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -17,7 +26,16 @@ export function MobileMenu() {
   const close = useCallback(() => {
     setOpen(false);
     triggerRef.current?.focus();
-  }, []);
+  }, [setOpen]);
+
+  useEffect(() => {
+    const query = window.matchMedia("(min-width: 768px)");
+    function onChange(event: MediaQueryListEvent) {
+      if (event.matches) setOpen(false);
+    }
+    query.addEventListener("change", onChange);
+    return () => query.removeEventListener("change", onChange);
+  }, [setOpen]);
 
   useEffect(() => {
     if (!open) return;
