@@ -4,7 +4,7 @@ import { Footer } from "@/components/ui/Footer";
 import { Nav } from "@/components/ui/Nav";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
 import { getProfile } from "@/lib/content";
-import { display, sans } from "@/lib/fonts";
+import { display, pixel, sans } from "@/lib/fonts";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -28,7 +28,7 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={`${display.variable} ${sans.variable}`}
+      className={`${display.variable} ${sans.variable} ${pixel.variable}`}
       suppressHydrationWarning
     >
       <body>
