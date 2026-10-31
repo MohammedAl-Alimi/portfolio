@@ -5,11 +5,12 @@ import { cn } from "@/lib/cn";
 type CardProps = {
   color?: string;
   href?: string;
+  "aria-labelledby"?: string;
   children: ReactNode;
   className?: string;
 };
 
-export function Card({ color, href, children, className }: CardProps) {
+export function Card({ color, href, children, className, "aria-labelledby": labelledBy }: CardProps) {
   const surface = (
     <div
       className={cn(
@@ -27,6 +28,7 @@ export function Card({ color, href, children, className }: CardProps) {
   return (
     <Link
       href={href}
+      aria-labelledby={labelledBy}
       className="block rounded-[var(--radius-md)] motion-safe:transition-transform motion-safe:duration-[var(--motion-base)] motion-safe:hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
     >
       {surface}
