@@ -234,6 +234,8 @@ Full case studies: `crowd-detection`, `noah-hub`, `agent-security-playbook`, `is
 
 ## 6. The 3D system
 
+> Superseded on 2026-10-31 by section 17 (Pixel storm). Kept for history; where the two differ, section 17 wins.
+
 ### Cluster
 
 - 7 to 10 shapes: one per featured project (colour and geometry from frontmatter) plus decorative shapes using colours from `profile.json`.
@@ -326,6 +328,8 @@ Rule: the normal site is for everyone, the playground is a side door. No public 
 
 ## 9. Design system
 
+> Superseded on 2026-10-31 by section 17 (Pixel storm) for fonts, colour defaults and surfaces. Token names and the light/dark mechanism stay.
+
 - Tokens in `app/globals.css`: background, surface, text, muted, border, six accent colours, radii (12, 20, 32 px), spacing scale, motion durations (150, 300, 500, 800 ms) and easings.
 - Typography: one display font with strong personality for headlines, one highly legible sans for body, loaded via `next/font` and self-hosted. Final font pair chosen during implementation with a visual check.
 - Big type and generous spacing: body 18 px, hero headline clamp 48 to 112 px, section padding 96 px desktop and 64 px mobile.
@@ -408,3 +412,54 @@ CI runs on every pull request: lint, typecheck, secrets scan, unit, build, e2e, 
 - Confirm the LeetCode username.
 - Choose the final domain.
 - Review and edit drafted copy before launch.
+
+## 17. Visual direction v2: Pixel storm (added 2026-10-31)
+
+Mohammed reviewed the shipped foundation and rejected its look: generic layout, stock-looking fonts, no 3D, no motion. This section replaces sections 6 and 9 for everything visible. Content model, navigation labels, security, CI and docs from the foundation stay.
+
+### 17.1 Hero
+
+- A GPU points layer renders roughly 40,000 coloured pixels that form the word MOHAMMED in the display face, with slight depth so it reads as a cloud. Colours cycle through the six accents by column.
+- Pointer movement applies a wind force within a radius of about 140 px (screen space); pixels drift away and spring back (damped spring, stiffness tuned so settle time is under 1.2 s). On touch devices with motion permission, device tilt supplies the force; otherwise a slow autonomous breeze.
+- Every 8 seconds, or when the user scrolls past 20% of the hero, the cloud collapses and re-forms as the silhouette of one featured project's shape (sampled from the same geometry used in cards), which rotates slowly in 3D. The project title appears beside it in the pixel font with a typewriter effect. Clicking or pressing Enter on the shape navigates to the project. Keyboard users get a visually hidden list of the featured projects over the hero.
+- Hint under the hero, pixel font, caps: `MOVE YOUR MOUSE. CLICK A SHAPE.` Fades after first interaction, per session.
+- Fallbacks: `prefers-reduced-motion`, save-data, low tier or no WebGL2 show a static pre-rendered WebP of the pixel name (`public/posters/pixel-name.webp`) in the same slot. Any WebGL error falls back the same way.
+
+### 17.2 Type
+
+- Display: Clash Display (Fontshare, self-hosted woff2 via next/font/local), weights 600 and 700, used for the name, section titles and project titles. Tight tracking (-0.03em), tight leading (0.9).
+- Pixel: Silkscreen (Google Fonts via next/font/google) in caps for tags, year, nav labels, hints and the marquee's separators. Never for paragraphs.
+- Body: Satoshi (Fontshare, self-hosted) 400 and 500, 18 px base.
+- Kinetic marquee strip between Home sections: `AI · AGENTS · COMPUTER VISION · SECURITY · PLAYFUL TOOLS` in display type at about 96 px, scrolling continuously, direction follows scroll direction, speed eases with scroll velocity. Paused under reduced motion.
+
+### 17.3 Motion
+
+- Page transitions: pixel dissolve. A fixed overlay grid of 24 by 14 blocks in the accent colours flips in a diagonal wave covering the outgoing page (250 ms), the route changes, then the wave uncovers the incoming page (250 ms). The persistent canvas is not covered. Reduced motion: a 150 ms fade.
+- Section reveals: headings assemble from scattered glyph fragments over 500 ms when 30% visible; cards slide up 24 px with a slight overshoot; stagger 60 ms.
+- Custom cursor on pointer devices: an 8 px square in the current accent that follows with a 60 ms lag, a trail of 6 fading squares, grows to a 40 px ring over links, buttons and shapes, hidden on touch, hidden under reduced motion, and the native cursor returns over text inputs.
+- Project card hover: the cover image pixelates in 4 steps (16 px blocks down to 2 px) while the card's shape spins up.
+- Smooth scroll via Lenis, disabled under reduced motion.
+
+### 17.4 3D
+
+- Shapes: six low-poly geometries (sphere, box, icosahedron, torus knot, capsule, octahedron) in a dithered toon shader (ordered 4x4 Bayer dither, two-tone from the project colour, 1 px dark outline). One shared material per colour.
+- Cards: each project card carries a small spinning shape (continuous 0.25 rad/s, 4x on hover), rendered through a drei `View` into the single persistent canvas.
+- Project page hero: the shape at about 320 px, spinning, with a drifting pixel cloud in the project colour behind the title (3,000 pixels, breeze only).
+- 404: the shape shattered into about 800 pixels; clicking reassembles it over 900 ms.
+- Lab sandbox `/lab/pixel-storm`: the hero storm with sliders for wind radius, spring stiffness, pixel count (10k to 80k) and a shape picker.
+- One `<Canvas>` in the root layout, `frameloop="demand"` with invalidation from interaction and animation, paused when the tab is hidden. No physics engine: springs and wind run in the vertex shader from uniforms. No model files.
+
+### 17.5 Colour and surface
+
+- Dark is the default theme: bg `#0B0B10`, surface `#141420`, text `#F6F3EE`, muted `#A39FAD`, border `#2A2833`. Light stays available via the toggle: bg `#FFFBF5`, surface `#FFFFFF`, text `#17161A`, muted `#5F5B66`, border `#EAE4DA`. The six accents are unchanged.
+- Film grain: a fixed, pointer-events-none SVG turbulence overlay at 6% opacity (4% in light), disabled under reduced motion is not needed since it is static.
+- Cards use a 2 px solid border in the project colour and no shadow. Buttons use 2 px borders, hard corners (radius 4 px) and a 2 px offset "pixel shadow" in the accent on hover.
+- Focus rings: 2 px solid accent 4 with 2 px offset, everywhere.
+
+### 17.6 Still simple, still fast
+
+- Navigation, page set, copy rules and the "playground is a side door" principle from sections 4 and 8 are unchanged. Every page is reachable and readable without 3D or pointer effects.
+- Budgets: first-load JavaScript excluding the 3D chunk under 350 KB gzipped (enforced), 3D plus pixel chunk under 450 KB gzipped (enforced), LCP under 2.5 s on mobile (returns to a hard error in Lighthouse CI when this plan ships), 60 fps on an iPhone 13 class device for the hero, Lighthouse performance 85 or higher.
+- Device tiers from section 6 stay: high (full), mid (20k pixels, no grain, no cursor trail), low (static posters, no canvas).
+- All tests from section 12 apply; add: reduced-motion e2e proves no canvas is mounted and transitions are fades; a unit test that the pixel sampler produces a stable point count for the name; a visual baseline of the hero in both themes.
+
