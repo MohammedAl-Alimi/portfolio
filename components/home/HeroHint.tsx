@@ -43,7 +43,7 @@ export function HeroHint() {
         data-hero-hint
         aria-hidden={hidden || undefined}
         className={cn(
-          "font-pixel text-[11px] tracking-wider text-muted uppercase",
+          "font-mono uppercase tracking-[0.12em] text-[11px] text-muted",
           // Fade over 400 ms, then hide, so it leaves the accessibility tree too.
           hidden ? "invisible opacity-0" : "visible opacity-100",
           interacted && !seenBefore && "[transition:opacity_400ms_ease,visibility_0s_linear_400ms]",
@@ -55,7 +55,7 @@ export function HeroHint() {
         <button
           type="button"
           onClick={tilt.enable}
-          className="min-h-11 border border-current px-3 font-pixel text-[11px] tracking-wider uppercase"
+          className="min-h-11 border border-current px-3 font-mono uppercase tracking-[0.12em] text-[11px]"
         >
           Enable tilt
         </button>
