@@ -77,3 +77,15 @@ test("security.txt is served", async ({ request }) => {
   expect(res.status()).toBe(200);
   expect(await res.text()).toContain("Contact:");
 });
+
+test("the canvas mounts with no csp violation", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium-desktop", "Desktop only");
+  const violations: string[] = [];
+  page.on("console", (m) => {
+    if (/Content Security Policy|Refused to/i.test(m.text())) violations.push(m.text());
+  });
+  page.on("pageerror", (e) => violations.push(e.message));
+  await page.goto("/");
+  await expect(page.locator("canvas")).toHaveCount(1);
+  expect(violations).toEqual([]);
+});
