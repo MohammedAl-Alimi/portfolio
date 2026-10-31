@@ -1,12 +1,14 @@
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("next/font/local", () => ({
-  default: (opts: { variable: string }) => ({
+vi.mock("next/font/google", () => ({
+  Unbounded: (opts: { variable: string }) => ({
     variable: opts.variable,
     className: `cls${opts.variable}`,
   }),
-}));
-vi.mock("next/font/google", () => ({
+  Manrope: (opts: { variable: string }) => ({
+    variable: opts.variable,
+    className: `cls${opts.variable}`,
+  }),
   Silkscreen: (opts: { variable: string }) => ({
     variable: opts.variable,
     className: `cls${opts.variable}`,
