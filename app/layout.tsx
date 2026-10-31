@@ -30,7 +30,7 @@ export default function RootLayout({
         </a>
         <ThemeProvider>
           <Nav />
-          <main id="main" className="min-h-[60vh]">
+          <main id="main" tabIndex={-1} className="min-h-[60vh] outline-none">
             {children}
           </main>
           <Footer />
