@@ -1,25 +1,42 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { FeaturedProjects } from "@/components/home/FeaturedProjects";
 import { Hero } from "@/components/home/Hero";
 import { WhatIBuild } from "@/components/home/WhatIBuild";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { Section } from "@/components/ui/Section";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { getHighlights, getProfile, getProjects } from "@/lib/content";
+import { SITE_URL } from "@/lib/site";
 
 export async function generateMetadata(): Promise<Metadata> {
   const profile = await getProfile();
-  return { title: "Mohammed Al-Alimi", description: profile.headline };
+  return { description: profile.headline, alternates: { canonical: "/" } };
 }
 
 export default async function Home() {
-  const [profile, projects, highlights] = await Promise.all([
+  const [profile, projects, highlights, headerList] = await Promise.all([
     getProfile(),
     getProjects(),
     getHighlights(),
+    headers(),
   ]);
+  const nonce = headerList.get("x-nonce") ?? undefined;
 
   return (
     <>
+      <JsonLd
+        nonce={nonce}
+        data={{
+          "@context": "https://schema.org",
+          "@type": "Person",
+          name: profile.name,
+          url: SITE_URL,
+          jobTitle: profile.headline,
+          sameAs: [profile.socials.github, profile.socials.linkedin],
+          email: `mailto:${profile.email}`,
+        }}
+      />
       <Hero profile={profile} />
       <WhatIBuild />
       <FeaturedProjects projects={projects} />
