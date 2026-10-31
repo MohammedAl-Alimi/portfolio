@@ -35,8 +35,14 @@ for (const vp of viewports) {
             testInfo.project.name !== vp.project,
             `Runs only on ${vp.project}; webkit-mobile is slow and these runs cover the layouts`,
           );
-          await page.emulateMedia({ colorScheme: scheme });
+          // System preference is ignored, so the theme comes from the stored choice.
+          await page.addInitScript((theme) => {
+            try {
+              localStorage.setItem("theme", theme);
+            } catch {}
+          }, scheme);
           await page.goto(p);
+          await expect(page.locator("html")).toHaveClass(new RegExp(`\\b${scheme}\\b`));
 
           // The lab demo iframe is third-party content, so axe skips it.
           await expectNoSeriousViolations(page, { exclude: ["iframe"] });
@@ -110,9 +116,8 @@ test.describe("keyboard and motion", () => {
     for (const label of ["Home", "Projects", "Lab", "About", "Contact"]) {
       expect(has("a", label, true), `main nav link ${label}`).toBe(true);
     }
-    expect(
-      has("button", "Switch to dark theme") || has("button", "Switch to light theme"),
-    ).toBe(true);
+    // Dark is the default, so the toggle offers the light theme first.
+    expect(has("button", "Switch to light theme")).toBe(true);
     for (const label of ["See projects", "Download CV", "Crowd detection"]) {
       expect(has("a", label), `link ${label}`).toBe(true);
     }
