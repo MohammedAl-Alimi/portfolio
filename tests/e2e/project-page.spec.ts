@@ -10,8 +10,11 @@ test("project page renders hero, sections and only the links present", async ({ 
   await expect(page.getByRole("heading", { level: 2, name: "Problem" })).toBeVisible();
 });
 
-test("project page has an og image", async ({ request }) => {
-  const res = await request.get("/projects/crowd-detection/opengraph-image");
+test("project page has an og image", async ({ page, request }) => {
+  await page.goto("/projects/crowd-detection");
+  const og = await page.locator('meta[property="og:image"]').getAttribute("content");
+  expect(og).toBeTruthy();
+  const res = await request.get(new URL(og as string).pathname);
   expect(res.status()).toBe(200);
   expect(res.headers()["content-type"]).toContain("image/png");
 });
