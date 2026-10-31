@@ -50,8 +50,10 @@ export function Button(props: ButtonProps) {
       AnchorHTMLAttributes<HTMLAnchorElement>,
       "href"
     > & { href: string };
-    const opensNewTab = external || anchorRest.target === "_blank";
-    if (isInternal(href)) {
+    const isScheme = href.startsWith("mailto:") || href.startsWith("tel:");
+    const forceNewTab = Boolean(external) && !isScheme;
+    const opensNewTab = forceNewTab || anchorRest.target === "_blank";
+    if (isInternal(href) && !external) {
       return (
         <Link
           {...anchorRest}
@@ -65,7 +67,7 @@ export function Button(props: ButtonProps) {
       <a
         {...anchorRest}
         href={href}
-        target={external ? "_blank" : anchorRest.target}
+        target={forceNewTab ? "_blank" : anchorRest.target}
         rel={opensNewTab ? "noopener noreferrer" : anchorRest.rel}
         className={classes}
       />

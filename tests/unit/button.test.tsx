@@ -45,3 +45,14 @@ it("keeps rel noopener when an https href opens a new tab", () => {
   );
   expect(screen.getByRole("link")).toHaveAttribute("rel", "noopener noreferrer");
 });
+
+it("external opens a new tab even for internal paths", () => {
+  render(
+    <Button href="/projects" external>
+      Projects
+    </Button>,
+  );
+  const link = screen.getByRole("link");
+  expect(link).toHaveAttribute("target", "_blank");
+  expect(link).toHaveAttribute("rel", "noopener noreferrer");
+});
