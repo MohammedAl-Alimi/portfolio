@@ -1,5 +1,5 @@
 // Usage: node scripts/make-pixel-poster.mjs [out.webp]
-// Renders public/posters/pixel-name.webp: the pixel storm's word, drawn as the
+// Renders public/posters/pixel-name.webp: the pixel storm's name on two lines, drawn as the
 // same coloured squares, on a transparent 1600x900 canvas.
 //
 // Node has no Unbounded font and no 2D canvas, so the drawing happens in
@@ -72,7 +72,7 @@ window.render = async function () {
     c.width = w; c.height = h;
     return c.getContext("2d", { willReadFrequently: true });
   };
-  const raw = sampleTextToCount("MOHAMMED", { font: "700 220px Unbounded", width: 1600, height: 600, count: ${COUNT}, getContext });
+  const raw = sampleTextToCount(["MOHAMMED", "AL-ALIMI"], { font: "700 220px Unbounded", width: 1600, height: 600, count: ${COUNT}, getContext });
   const targets = fitToCount(centerAndFit(raw), ${COUNT});
   const a = buildStormAttributes(targets, ${COUNT}, STORM_COLORS);
   const ctx = document.getElementById("c").getContext("2d");
