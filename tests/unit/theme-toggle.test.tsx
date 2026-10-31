@@ -35,11 +35,11 @@ it("toggles the html class even when storage throws", async () => {
       <ThemeToggle />
     </ThemeProvider>,
   );
-  const button = screen.getByRole("button", { name: /switch to dark theme/i });
+  const button = screen.getByRole("button", { name: /switch to light theme/i });
   await userEvent.click(button);
-  expect(document.documentElement.classList.contains("dark")).toBe(true);
+  expect(document.documentElement.classList.contains("light")).toBe(true);
   expect(
-    screen.getByRole("button", { name: /switch to light theme/i }),
+    screen.getByRole("button", { name: /switch to dark theme/i }),
   ).toBeInTheDocument();
   expect(getItem.mock.calls.length + setItem.mock.calls.length).toBeGreaterThan(0);
 });

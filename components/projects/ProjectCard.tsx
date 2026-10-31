@@ -33,7 +33,7 @@ export function ProjectCard({ project, size = "md" }: ProjectCardProps) {
         )}
         <div className="flex flex-1 flex-col gap-3 p-6">
           <h3
-            className={size === "lg" ? "font-display text-3xl" : "font-display text-2xl"}
+            className={size === "lg" ? "font-display text-2xl break-words md:text-3xl" : "font-display text-xl break-words md:text-2xl"}
           >
             <Link
               href={`/projects/${slug}`}
@@ -54,7 +54,7 @@ export function ProjectCard({ project, size = "md" }: ProjectCardProps) {
                 {tag}
               </Tag>
             ))}
-            <span className="ml-auto text-sm text-muted">{year}</span>
+            <span className="ml-auto font-pixel text-[11px] uppercase tracking-wider text-muted">{year}</span>
           </div>
         </div>
       </div>
