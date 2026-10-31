@@ -46,11 +46,10 @@ test.describe("canvas and fallbacks", () => {
     await expect(page.locator("h1")).toBeVisible();
     await page.waitForLoadState("networkidle");
     expect(await scripts.has3d()).toBe(false);
-    // The poster slot ships with the hero (Task 3). Until then, assert the
-    // rule on any poster that exists.
-    for (const poster of await page.locator("[data-poster]").all()) {
-      await expect(poster).toHaveCSS("opacity", "1");
-    }
+    const poster = page.locator("[data-hero-slot] [data-poster]");
+    await expect(poster).toHaveCount(1);
+    await expect(poster).toHaveCSS("opacity", "1");
+    await expect(poster.locator("img")).toBeVisible();
   });
 
   test("no webgl: no canvas, low tier, no console errors", async ({ page }, testInfo) => {
@@ -67,6 +66,7 @@ test.describe("canvas and fallbacks", () => {
     await expect(page.locator("h1")).toBeVisible();
     await page.waitForLoadState("networkidle");
     expect(await scripts.has3d()).toBe(false);
+    await expect(page.locator("[data-hero-slot] [data-poster]")).toHaveCSS("opacity", "1");
     expect(errors).toEqual([]);
   });
 });
