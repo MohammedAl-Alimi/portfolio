@@ -2,15 +2,22 @@ import Image from "next/image";
 import type { AnchorHTMLAttributes, ComponentPropsWithoutRef, ImgHTMLAttributes, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
+const BASE = "https://x.invalid";
+
 export function isSafeHref(href: string | undefined): href is string {
   if (!href) return false;
+  // Reject backslashes, whitespace and ASCII control characters anywhere.
+  if (/[\\\u0000-\u0020\u007f]/.test(href)) return false;
   if (href.startsWith("//")) return false;
-  return (
-    href.startsWith("https:") ||
-    href.startsWith("mailto:") ||
-    href.startsWith("/") ||
-    href.startsWith("#")
-  );
+  if (href.startsWith("https:") || href.startsWith("mailto:")) return true;
+  if (href.startsWith("/") || href.startsWith("#")) {
+    try {
+      return new URL(href, BASE).origin === BASE;
+    } catch {
+      return false;
+    }
+  }
+  return false;
 }
 
 function textOf(node: ReactNode): string {
