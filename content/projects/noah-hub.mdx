@@ -1,0 +1,63 @@
+---
+title: Noah hub
+slug: noah-hub
+tagline: A personal command centre where an AI agent watches over my own apps
+color: "#5C7CFA"
+shape: torusKnot
+tags: [agents, ai, web]
+year: 2026
+role: Solo developer
+featured: true
+order: 2
+stack:
+  - Next.js
+  - React
+  - TypeScript
+  - Tailwind CSS
+  - React Flow
+  - Vercel AI SDK
+  - Claude
+  - Clerk
+  - Supabase
+  - Vercel
+---
+
+## Problem
+
+I run several small apps of my own. Each one has its own numbers and its own screen. I had to open them one by one to see how my day was going.
+
+I wanted one place that shows all of them, and an assistant that can answer questions about them.
+
+## What I built
+
+A single hub page with an org chart of my apps. An AI agent called Noah sits at the top. It knows what is happening in each app.
+
+Every morning it writes a short brief. I can also chat with it, or wake it with a double clap and talk to it out loud.
+
+## How it works
+
+The hub is a locked org chart. Small pulses travel along the lines between the apps, and they speed up while Noah thinks.
+
+The agent runs on the server and uses a small set of tools. It can read a daily digest, check my apps, and remember facts for later. A scheduled job pulls the latest changes from every app each morning, and Noah turns them into the brief.
+
+One app sends its data to the hub on its own, with a hashed token, a rate limit and a locked-down origin. The other apps are read through read-only connections. Secret keys stay on the server.
+
+Voice has three parts. A double clap is detected in the browser. Speech is turned into text by a speech service. Replies are spoken back, with a browser voice as a fallback.
+
+## Stack
+
+Next.js and React with TypeScript and Tailwind CSS. The org chart uses React Flow. The agent uses the Vercel AI SDK with Claude. Clerk handles sign-in, Supabase stores the data, and Vercel hosts it and runs the schedule.
+
+## Outcome
+
+It is live. Only one signed-in user can open it, so there is no public link here.
+
+I ran a written audit of the code. Six specialist reviews found 64 issues, and I ranked them for a single-user app on a small budget. Later commits fixed some of the top ones. Noah now keeps its chat history and memory, and it can complete and add tasks, not just read them.
+
+## What I learned
+
+An agent is only as useful as its tools. Noah got much better the day it could act, not just report.
+
+Cost matters for a personal project. Chat was the biggest cost, so caching and trimming history came first in the audit.
+
+A voice feature has many small failure cases. Each one needs its own fix.
