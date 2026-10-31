@@ -31,4 +31,9 @@ test("featured strip lists featured projects", async ({ page }) => {
   await expect(
     page.getByRole("region", { name: "Featured projects" }).getByRole("link"),
   ).toHaveCount(1);
+  await expect(
+    page
+      .getByRole("region", { name: "Featured projects" })
+      .getByRole("link", { name: "Crowd detection", exact: true }),
+  ).toBeVisible();
 });
