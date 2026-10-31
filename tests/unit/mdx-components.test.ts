@@ -23,4 +23,7 @@ describe("slugify", () => {
   it("makes a readable id", () => {
     expect(slugify("What I built")).toBe("what-i-built");
   });
+  it("falls back for headings with no ascii letters", () => {
+    expect(slugify("مرحبا")).toBe("section");
+  });
 });
