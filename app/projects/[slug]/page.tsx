@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { AdjacentProjects } from "@/components/projects/AdjacentProjects";
 import { ProjectBody } from "@/components/projects/ProjectBody";
 import { ProjectHero } from "@/components/projects/ProjectHero";
 import { ProjectMeta } from "@/components/projects/ProjectMeta";
 import { Container } from "@/components/ui/Container";
-import { getProject, getProjects } from "@/lib/content";
+import { getAdjacentProjects, getProject, getProjects } from "@/lib/content";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -32,6 +33,7 @@ export default async function ProjectPage({ params }: PageProps) {
   const { slug } = await params;
   const project = await getProject(slug);
   if (!project) notFound();
+  const { previous, next } = await getAdjacentProjects(slug);
 
   return (
     <>
@@ -44,6 +46,7 @@ export default async function ProjectPage({ params }: PageProps) {
           <ProjectBody source={project.body} />
         </div>
       </Container>
+      <AdjacentProjects previous={previous} next={next} />
     </>
   );
 }
