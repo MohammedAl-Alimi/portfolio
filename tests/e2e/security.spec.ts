@@ -11,7 +11,9 @@ test("every public page sends the security headers", async ({ request }) => {
     expect(h["x-content-type-options"], path).toBe("nosniff");
     expect(h["x-frame-options"], path).toBe("DENY");
     expect(h["referrer-policy"], path).toBe("strict-origin-when-cross-origin");
-    expect(h["permissions-policy"], path).toContain("camera=()");
+    expect(h["permissions-policy"], path).toBe(
+      "camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), browsing-topics=(), interest-cohort=(), accelerometer=(self), gyroscope=(self)",
+    );
     expect(h["x-powered-by"], path).toBeUndefined();
   }
 });
