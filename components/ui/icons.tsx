@@ -27,3 +27,28 @@ export function MoonIcon({ size = 20 }: IconProps) {
     </svg>
   );
 }
+
+export function SearchIcon({ size = 20 }: IconProps) {
+  return (
+    <svg width={size} height={size} {...common}>
+      <circle cx="11" cy="11" r="7" />
+      <path d="M20 20l-3.5-3.5" />
+    </svg>
+  );
+}
+
+export function MenuIcon({ size = 20 }: IconProps) {
+  return (
+    <svg width={size} height={size} {...common}>
+      <path d="M4 7h16M4 12h16M4 17h16" />
+    </svg>
+  );
+}
+
+export function CloseIcon({ size = 20 }: IconProps) {
+  return (
+    <svg width={size} height={size} {...common}>
+      <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
+  );
+}
