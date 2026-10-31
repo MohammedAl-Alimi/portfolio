@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { Footer } from "@/components/ui/Footer";
+import { Grain } from "@/components/ui/Grain";
 import { Nav } from "@/components/ui/Nav";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
 import { getProfile } from "@/lib/content";
@@ -44,6 +45,7 @@ export default async function RootLayout({
             {children}
           </main>
           <Footer />
+          <Grain />
         </ThemeProvider>
       </body>
     </html>
