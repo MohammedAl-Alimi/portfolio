@@ -23,20 +23,20 @@ export default function NotFound() {
           <g filter="url(#nf-shadow)" strokeLinejoin="round" strokeWidth="14">
             <polygon
               points="40,60 100,30 110,90 50,110"
-              fill="var(--accent-1)"
-              stroke="var(--accent-1)"
+              fill="#F2F2F0"
+              stroke="#F2F2F0"
               transform="rotate(-8 80 70) translate(-6 -4)"
             />
             <polygon
               points="110,50 170,70 160,130 105,115"
-              fill="var(--accent-4)"
-              stroke="var(--accent-4)"
+              fill="#808086"
+              stroke="#808086"
               transform="rotate(6 140 90) translate(6 0)"
             />
             <polygon
               points="70,125 130,135 115,180 60,170"
-              fill="var(--accent-2)"
-              stroke="var(--accent-2)"
+              fill="#2A2A2E"
+              stroke="#2A2A2E"
               transform="rotate(-4 95 150) translate(0 6)"
             />
           </g>
