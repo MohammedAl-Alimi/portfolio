@@ -14,11 +14,11 @@
   --color-accent-4: var(--accent-4);
   --color-accent-5: var(--accent-5);
   --color-accent-6: var(--accent-6);
-  --radius-sm: var(--radius-sm);
-  --radius-md: var(--radius-md);
-  --radius-lg: var(--radius-lg);
-  --font-display: var(--font-display), ui-sans-serif, system-ui, sans-serif;
-  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --radius-sm: var(--radius-sm-value);
+  --radius-md: var(--radius-md-value);
+  --radius-lg: var(--radius-lg-value);
+  --font-display: var(--font-display-src), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-sans-src), ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {
@@ -33,9 +33,9 @@
   --accent-4: #5c7cfa;
   --accent-5: #f06595;
   --accent-6: #a78bfa;
-  --radius-sm: 12px;
-  --radius-md: 20px;
-  --radius-lg: 32px;
+  --radius-sm-value: 12px;
+  --radius-md-value: 20px;
+  --radius-lg-value: 32px;
   --motion-fast: 150ms;
   --motion-base: 300ms;
   --motion-slow: 500ms;

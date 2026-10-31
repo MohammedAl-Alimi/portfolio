@@ -23,14 +23,13 @@ afterEach(() => {
 });
 
 it("toggles the html class even when storage throws", async () => {
-  vi.stubGlobal("localStorage", {
-    getItem: () => {
-      throw new Error("blocked");
-    },
-    setItem: () => {
-      throw new Error("blocked");
-    },
+  const getItem = vi.fn(() => {
+    throw new Error("blocked");
   });
+  const setItem = vi.fn(() => {
+    throw new Error("blocked");
+  });
+  vi.stubGlobal("localStorage", { getItem, setItem });
   render(
     <ThemeProvider>
       <ThemeToggle />
@@ -42,4 +41,5 @@ it("toggles the html class even when storage throws", async () => {
   expect(
     screen.getByRole("button", { name: /switch to light theme/i }),
   ).toBeInTheDocument();
+  expect(getItem.mock.calls.length + setItem.mock.calls.length).toBeGreaterThan(0);
 });
