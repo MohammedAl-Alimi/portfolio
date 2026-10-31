@@ -13,3 +13,27 @@ test("home renders the name and passes axe", async ({ page }) => {
     ),
   ).toEqual([]);
 });
+
+test("hero shows name, role and both buttons", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Mohammed Al-Alimi");
+  await expect(page.getByText("I build AI systems, agents and playful tools")).toBeVisible();
+  await expect(page.getByRole("link", { name: "See projects" })).toHaveAttribute("href", "/projects");
+  await expect(page.getByRole("link", { name: "Download CV" }).first()).toHaveAttribute("href", "/cv");
+  const noOverflow = await page.evaluate(
+    () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+  );
+  expect(noOverflow).toBe(true);
+});
+
+test("featured strip lists featured projects", async ({ page }) => {
+  await page.goto("/");
+  await expect(
+    page.getByRole("region", { name: "Featured projects" }).getByRole("link"),
+  ).toHaveCount(1);
+  await expect(
+    page
+      .getByRole("region", { name: "Featured projects" })
+      .getByRole("link", { name: "Crowd detection", exact: true }),
+  ).toBeVisible();
+});
