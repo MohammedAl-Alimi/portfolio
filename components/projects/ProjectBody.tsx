@@ -1,11 +1,5 @@
-import { compileMDX } from "next-mdx-remote/rsc";
-import { createMdxComponents } from "@/components/mdx/components";
+import { MdxBody } from "@/components/mdx/MdxBody";
 
 export async function ProjectBody({ source }: { source: string }) {
-  const { content } = await compileMDX({
-    source,
-    options: { parseFrontmatter: false },
-    components: createMdxComponents(new Map()),
-  });
-  return <div>{content}</div>;
+  return <MdxBody source={source} />;
 }
