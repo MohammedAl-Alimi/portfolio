@@ -8,7 +8,8 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/",
 }));
 
-import { TransitionProvider, useTransition } from "@/components/motion/TransitionProvider";
+import { bandShear } from "@/components/motion/GlitchOverlay";
+import { TransitionProvider, WATCHDOG_MS, useTransition } from "@/components/motion/TransitionProvider";
 
 const probe: { api: ReturnType<typeof useTransition> } = { api: null };
 function Probe() {
@@ -98,4 +99,37 @@ it("a popstate mid-transition clears the overlay", () => {
     window.dispatchEvent(new PopStateEvent("popstate"));
   });
   expect(overlayState()).toBe("idle");
+});
+
+it("renders 12 glitch bands with alternating 8 to 40 px shears", () => {
+  expect(document.querySelectorAll("[data-glitch-band]")).toHaveLength(12);
+  expect(document.querySelector("[data-glitch-fade]")).toBeNull();
+  expect(Array.from({ length: 12 }, (_, i) => bandShear(i))).toEqual([
+    -8, 11, -14, 17, -20, 23, -25, 28, -31, 34, -37, 40,
+  ]);
+});
+
+it("the watchdog forces idle at 1.5 s when the cover never finishes", async () => {
+  // Animations that never end: only the watchdog can clear the overlay.
+  const stuck = () => ({ finished: new Promise(() => {}), cancel: vi.fn() });
+  const original = HTMLElement.prototype.animate;
+  HTMLElement.prototype.animate = vi.fn(stuck) as unknown as typeof HTMLElement.prototype.animate;
+  try {
+    act(() => {
+      probe.api?.navigate("/projects");
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(WATCHDOG_MS - 1);
+    });
+    expect(overlayState()).toBe("covering");
+    expect(push).not.toHaveBeenCalled();
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1);
+    });
+    expect(overlayState()).toBe("idle");
+    const band = document.querySelector<HTMLElement>("[data-glitch-band]");
+    expect(band?.style.opacity).toBe("0");
+  } finally {
+    HTMLElement.prototype.animate = original;
+  }
 });
