@@ -51,7 +51,8 @@ test("card click wipes to the project and ends idle within 1.2 s", async ({ page
   await expect(overlay).toHaveAttribute("data-state", "idle", { timeout: 1200 });
   expect(Date.now() - start).toBeLessThan(1200);
   expect(await pathAtUncover(page)).toBe(href);
-  await expect(page).toHaveURL(new RegExp(`${href}$`));
+  // Read directly at idle: an auto-waiting toHaveURL would pass a late arrival.
+  expect(new URL(page.url()).pathname).toBe(href);
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   // The layout (nav, canvas) stays mounted through the transition.
   const kept = await page.evaluate(() =>
@@ -73,7 +74,8 @@ test("rapid double click still ends idle on the right page", async ({ page }) =>
   await link.dblclick();
   await expect(overlay).toHaveAttribute("data-state", "idle", { timeout: 2000 });
   expect(await pathAtUncover(page)).toBe(href);
-  await expect(page).toHaveURL(new RegExp(`${href}$`));
+  // Read directly at idle: an auto-waiting toHaveURL would pass a late arrival.
+  expect(new URL(page.url()).pathname).toBe(href);
 });
 
 test("reduced motion uses the plain fade", async ({ page }) => {
@@ -85,7 +87,8 @@ test("reduced motion uses the plain fade", async ({ page }) => {
   await expect(page.locator("[data-glitch-band]")).toHaveCount(0);
   await expect(overlay).toHaveAttribute("data-state", "idle", { timeout: 1200 });
   expect(await pathAtUncover(page)).toBe(href);
-  await expect(page).toHaveURL(new RegExp(`${href}$`));
+  // Read directly at idle: an auto-waiting toHaveURL would pass a late arrival.
+  expect(new URL(page.url()).pathname).toBe(href);
 });
 
 test("modifier and middle clicks open a new tab without the wipe", async ({ page, context, browserName, isMobile }) => {
