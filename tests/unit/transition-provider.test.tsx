@@ -133,3 +133,50 @@ it("the watchdog forces idle at 1.5 s when the cover never finishes", async () =
     HTMLElement.prototype.animate = original;
   }
 });
+
+it("queues clicks during the reveal; the last one runs after idle", async () => {
+  act(() => {
+    probe.api?.navigate("/projects");
+  });
+  // Cover 200 ms, then the mocked push settles at once and the reveal starts.
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(200);
+  });
+  expect(overlayState()).toBe("uncovering");
+  act(() => {
+    expect(probe.api?.navigate("/lab")).toBe(true);
+    expect(probe.api?.navigate("/about")).toBe(true);
+  });
+  expect(push).toHaveBeenCalledTimes(1);
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(200);
+  });
+  // Idle, then the queued href starts its own wipe.
+  expect(overlayState()).toBe("covering");
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(200);
+  });
+  expect(push.mock.calls.map((call) => call[0])).toEqual(["/projects", "/about"]);
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(400);
+  });
+  expect(overlayState()).toBe("idle");
+});
+
+it("a queued same-path href falls back to a plain push", async () => {
+  act(() => {
+    probe.api?.navigate("/projects");
+  });
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(200);
+  });
+  expect(overlayState()).toBe("uncovering");
+  act(() => {
+    probe.api?.navigate("/?tag=ai");
+  });
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(200);
+  });
+  expect(overlayState()).toBe("idle");
+  expect(push.mock.calls.map((call) => call[0])).toEqual(["/projects", "/?tag=ai"]);
+});

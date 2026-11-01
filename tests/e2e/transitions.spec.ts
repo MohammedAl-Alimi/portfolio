@@ -78,6 +78,53 @@ test("rapid double click still ends idle on the right page", async ({ page }) =>
   expect(new URL(page.url()).pathname).toBe(href);
 });
 
+/**
+ * Clicks internal links from inside the page the moment data-state first becomes `state`.
+ * The overlay blocks the pointer while it runs, so the clicks are dispatched on the
+ * elements directly; they still go through next/link and the provider.
+ */
+async function clickWhen(page: Page, state: string, hrefs: string[]) {
+  await page.evaluate(
+    ({ state, hrefs }) => {
+      const root = document.querySelector("[data-transition]");
+      if (!root) return;
+      const observer = new MutationObserver(() => {
+        if (root.getAttribute("data-state") !== state) return;
+        observer.disconnect();
+        for (const href of hrefs) document.querySelector<HTMLAnchorElement>(`a[href="${href}"]`)?.click();
+      });
+      observer.observe(root, { attributes: true, attributeFilter: ["data-state"] });
+    },
+    { state, hrefs },
+  );
+}
+
+test("a click during the cover is ignored", async ({ page }) => {
+  const { overlay, link, href } = await openProjects(page);
+  await clickWhen(page, "covering", ["/about"]);
+  await link.click();
+  await expect(overlay).toHaveAttribute("data-state", "idle", { timeout: 2000 });
+  // Give an ignored click time to show up if it was not ignored.
+  await page.waitForTimeout(700);
+  expect(await overlay.getAttribute("data-state")).toBe("idle");
+  expect(new URL(page.url()).pathname).toBe(href);
+  expect((await transitionLog(page)).some((entry) => entry.path === "/about")).toBe(false);
+});
+
+test("clicks during the reveal are queued and the last one wins", async ({ page }) => {
+  const { overlay, link, href } = await openProjects(page);
+  await clickWhen(page, "uncovering", ["/lab", "/about"]);
+  await link.click();
+  await expect.poll(() => new URL(page.url()).pathname, { timeout: 3000 }).toBe("/about");
+  await expect(overlay).toHaveAttribute("data-state", "idle", { timeout: 2000 });
+  expect(new URL(page.url()).pathname).toBe("/about");
+  const log = await transitionLog(page);
+  const reveals = log.filter((entry) => entry.state === "uncovering").map((entry) => entry.path);
+  // The queued navigation ran its own wipe after the first one finished.
+  expect(reveals).toEqual([href, "/about"]);
+  expect(log.some((entry) => entry.path === "/lab")).toBe(false);
+});
+
 test("reduced motion uses the plain fade", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   const { overlay, link, href } = await openProjects(page);
