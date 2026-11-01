@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { AnchorHTMLAttributes, ComponentPropsWithoutRef, ImgHTMLAttributes, ReactNode } from "react";
+import { TransitionLink } from "@/components/motion/TransitionLink";
 import { cn } from "@/lib/cn";
 
 const BASE = "https://x.invalid";
@@ -47,6 +48,13 @@ function uniqueId(text: string, seen: Map<string, number>): string {
 function Anchor({ href, children, ...rest }: AnchorHTMLAttributes<HTMLAnchorElement>) {
   if (!isSafeHref(href)) return <span>{children}</span>;
   const external = href.startsWith("https:");
+  if (href.startsWith("/")) {
+    return (
+      <TransitionLink {...rest} href={href} className="underline underline-offset-4 decoration-1 hover:decoration-2">
+        {children}
+      </TransitionLink>
+    );
+  }
   return (
     <a
       {...rest}
