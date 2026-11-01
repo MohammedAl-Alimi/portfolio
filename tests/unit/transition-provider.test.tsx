@@ -1,11 +1,12 @@
 import { act, render, screen } from "@testing-library/react";
-import { useEffect } from "react";
+import { Suspense, use, useEffect, useState } from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
 const push = vi.fn();
+const nav = vi.hoisted(() => ({ path: "/" }));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push }),
-  usePathname: () => "/",
+  usePathname: () => nav.path,
 }));
 
 import { bandShear } from "@/components/motion/GlitchOverlay";
@@ -20,25 +21,75 @@ function Probe() {
   return null;
 }
 
+// Test seams. `rerender` re-renders the provider so it reads nav.path again.
+// `slowPush` acts like Next loading a route: inside the push's transition it
+// re-renders the provider and suspends on a gate; `arrive(path)` sets the new
+// pathname and opens the gate, so the transition commits with the new page.
+const harness: { rerender: () => void; hang: () => void } = { rerender: () => {}, hang: () => {} };
+let gate: { promise: Promise<void>; open: () => void };
+function newGate() {
+  let open = () => {};
+  const promise = new Promise<void>((resolve) => {
+    open = resolve;
+  });
+  return { promise, open };
+}
+
+function Hang() {
+  const [hung, setHung] = useState(false);
+  useEffect(() => {
+    harness.hang = () => setHung(true);
+  });
+  if (hung) use(gate.promise);
+  return null;
+}
+
+function slowPush() {
+  harness.rerender();
+  harness.hang();
+}
+
+async function arrive(path: string) {
+  await act(async () => {
+    nav.path = path;
+    gate.open();
+  });
+}
+
+function Harness() {
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    harness.rerender = () => setTick((t) => t + 1);
+  });
+  return (
+    <TransitionProvider>
+      <Probe />
+      <Suspense fallback={null}>
+        <Hang />
+      </Suspense>
+      <main id="main" tabIndex={-1}>
+        page
+      </main>
+    </TransitionProvider>
+  );
+}
+
 function overlayState() {
   return document.querySelector("[data-transition]")?.getAttribute("data-state");
 }
 
 beforeEach(() => {
   vi.useFakeTimers();
-  push.mockClear();
+  push.mockReset();
+  nav.path = "/";
+  gate = newGate();
   window.scrollTo = vi.fn() as unknown as typeof window.scrollTo;
   window.matchMedia = vi.fn().mockReturnValue({
     matches: false,
     addEventListener: () => {},
     removeEventListener: () => {},
   }) as unknown as typeof window.matchMedia;
-  render(
-    <TransitionProvider>
-      <Probe />
-      <p>page</p>
-    </TransitionProvider>,
-  );
+  render(<Harness />);
 });
 
 afterEach(() => {
@@ -179,4 +230,95 @@ it("a queued same-path href falls back to a plain push", async () => {
   });
   expect(overlayState()).toBe("idle");
   expect(push.mock.calls.map((call) => call[0])).toEqual(["/projects", "/?tag=ai"]);
+});
+
+it("waits for the new pathname before scrolling to the top", async () => {
+  // The route is still loading after the push.
+  push.mockImplementation(slowPush);
+  act(() => {
+    probe.api?.navigate("/projects");
+  });
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(300);
+  });
+  expect(push).toHaveBeenCalledTimes(1);
+  expect(overlayState()).toBe("covering");
+  // The old page must not move while the new one loads.
+  expect(window.scrollTo).not.toHaveBeenCalled();
+  await arrive("/projects");
+  expect(window.scrollTo).toHaveBeenCalledWith(0, 0);
+  expect(overlayState()).toBe("uncovering");
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(200);
+  });
+  expect(overlayState()).toBe("idle");
+  expect(document.activeElement?.id).toBe("main");
+});
+
+it("after the watchdog, a late page still scrolls to the top and gets focus", async () => {
+  // A slow route: the page has not arrived when the watchdog fires.
+  push.mockImplementation(slowPush);
+  act(() => {
+    probe.api?.navigate("/projects");
+  });
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(WATCHDOG_MS);
+  });
+  expect(push).toHaveBeenCalledTimes(1);
+  expect(overlayState()).toBe("idle");
+  // The old page is revealed where it was: no scroll, focus untouched.
+  expect(window.scrollTo).not.toHaveBeenCalled();
+  expect(document.activeElement?.id).not.toBe("main");
+  // The page lands later.
+  await arrive("/projects");
+  expect(window.scrollTo).toHaveBeenCalledWith(0, 0);
+  expect(document.activeElement?.id).toBe("main");
+});
+
+it("when the watchdog fires after the page arrived, focus moves at once", async () => {
+  // The page arrives with the push, but the reveal animation never ends.
+  let calls = 0;
+  const original = HTMLElement.prototype.animate;
+  HTMLElement.prototype.animate = vi.fn(() => {
+    calls += 1;
+    return { finished: calls <= 12 ? Promise.resolve() : new Promise(() => {}), cancel: vi.fn() };
+  }) as unknown as typeof HTMLElement.prototype.animate;
+  push.mockImplementation(() => {
+    nav.path = "/projects";
+    harness.rerender();
+  });
+  try {
+    act(() => {
+      probe.api?.navigate("/projects");
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(WATCHDOG_MS - 1);
+    });
+    expect(overlayState()).toBe("uncovering");
+    expect(document.activeElement?.id).not.toBe("main");
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1);
+    });
+    expect(overlayState()).toBe("idle");
+    expect(document.activeElement?.id).toBe("main");
+  } finally {
+    HTMLElement.prototype.animate = original;
+  }
+});
+
+it("a back after the watchdog cancels the late-arrival handling", async () => {
+  push.mockImplementation(slowPush);
+  act(() => {
+    probe.api?.navigate("/projects");
+  });
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(WATCHDOG_MS);
+  });
+  act(() => {
+    window.dispatchEvent(new PopStateEvent("popstate"));
+    nav.path = "/about";
+    harness.rerender();
+  });
+  expect(window.scrollTo).not.toHaveBeenCalled();
+  expect(document.activeElement?.id).not.toBe("main");
 });
