@@ -20,6 +20,8 @@ interface Props {
   className?: string;
   /** "hover" fades the dither out on hover and focus of the surrounding card, showing the grey image. */
   resolve?: "hover" | "none";
+  /** Set when the image is the page's LCP element: preload it with a high fetch priority. */
+  priority?: boolean;
 }
 
 /**
@@ -29,7 +31,7 @@ interface Props {
  * The canvas stays hidden until it has drawn, so a failed load or a missing 2D context
  * leaves the grey image. The low tier skips the canvas.
  */
-export function Halftone({ src, alt = "", sizes, className, resolve = "hover" }: Props) {
+export function Halftone({ src, alt = "", sizes, className, resolve = "hover", priority = false }: Props) {
   const box = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const image = useRef<HTMLImageElement>(null);
@@ -122,7 +124,16 @@ export function Halftone({ src, alt = "", sizes, className, resolve = "hover" }:
 
   return (
     <div ref={box} className={cn("relative overflow-hidden", className)}>
-      <Image ref={image} src={src} alt={alt} fill sizes={sizes} className="object-cover grayscale" />
+      <Image
+        ref={image}
+        src={src}
+        alt={alt}
+        fill
+        sizes={sizes}
+        priority={priority}
+        fetchPriority={priority ? "high" : undefined}
+        className="object-cover grayscale"
+      />
       {tier === "low" ? null : (
         <canvas
           ref={canvas}
