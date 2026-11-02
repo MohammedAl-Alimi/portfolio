@@ -1,0 +1,5 @@
+/* Visual baselines (tests/e2e/visual.spec.ts): the grain is a full-screen layer,
+   so a mask would cover the whole shot. It is hidden instead. */
+[data-overlay-grain] {
+  visibility: hidden !important;
+}

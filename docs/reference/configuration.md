@@ -62,19 +62,22 @@ LCP is still a warning. Lighthouse's simulated LCP sits near 2.6 to 2.9 s becaus
 | Setting | Value | Location |
 | --- | --- | --- |
 | Test directory | `tests/e2e` | `playwright.config.ts:6` |
-| Parallel | `fullyParallel: true` | `playwright.config.ts:7` |
-| CI mode | `CI` env var set: `forbidOnly`, 2 retries, `github` and `html` reporters | `playwright.config.ts:3`, `playwright.config.ts:8` to `playwright.config.ts:10` |
-| Base URL | `http://localhost:3000` | `playwright.config.ts:12` |
-| Web server | `npm run build && npm run start`, timeout 180000 ms | `playwright.config.ts:16`, `playwright.config.ts:19` |
-| Reuse server | `!isCI`: reuses a running server outside CI | `playwright.config.ts:18` |
+| Snapshot paths | `tests/e2e/__screenshots__/<spec file>/<name>-<project>.png` | `playwright.config.ts:8` |
+| Screenshot defaults | `maxDiffPixelRatio: 0.01`, CSS animations disabled | `playwright.config.ts:9` |
+| Parallel | `fullyParallel: true` | `playwright.config.ts:10` |
+| CI mode | `CI` env var set: `forbidOnly`, 2 retries, `github` and `html` reporters | `playwright.config.ts:3`, `playwright.config.ts:11` to `playwright.config.ts:13` |
+| Base URL | `http://localhost:3000` | `playwright.config.ts:15` |
+| Web server | `npm run build && npm run start` with `NEXT_PUBLIC_E2E=1`, timeout 180000 ms | `playwright.config.ts:19`, `playwright.config.ts:22` to `playwright.config.ts:24` |
+| Reuse server | `!isCI`: reuses a running server outside CI | `playwright.config.ts:21` |
 
 Projects:
 
 | Name | Device | Viewport | Location |
 | --- | --- | --- | --- |
-| `chromium-desktop` | Desktop Chrome | 1280 by 800 | `playwright.config.ts:23` to `playwright.config.ts:24` |
-| `webkit-mobile` | iPhone 13 | device default | `playwright.config.ts:26` |
-| `chromium-narrow` | Desktop Chrome | 320 by 640 | `playwright.config.ts:28` to `playwright.config.ts:29` |
+| `chromium-desktop` | Desktop Chrome | 1280 by 800 | `playwright.config.ts:28` to `playwright.config.ts:29` |
+| `chromium-nowebgl` | Desktop Chrome, WebGL off | 1280 by 800 | `playwright.config.ts:32` to `playwright.config.ts:36` |
+| `webkit-mobile` | iPhone 13 | device default | `playwright.config.ts:39` |
+| `chromium-narrow` | Desktop Chrome | 320 by 640 | `playwright.config.ts:41` to `playwright.config.ts:42` |
 
 ## vitest.config.ts
 

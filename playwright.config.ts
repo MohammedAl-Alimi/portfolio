@@ -4,6 +4,9 @@ const isCI = Boolean(process.env.CI);
 
 export default defineConfig({
   testDir: "tests/e2e",
+  // Visual baselines (tests/e2e/visual.spec.ts), one PNG per screenshot and project.
+  snapshotPathTemplate: "{testDir}/__screenshots__/{testFilePath}/{arg}-{projectName}{ext}",
+  expect: { toHaveScreenshot: { maxDiffPixelRatio: 0.01, animations: "disabled" } },
   fullyParallel: true,
   forbidOnly: isCI,
   retries: isCI ? 2 : 0,
