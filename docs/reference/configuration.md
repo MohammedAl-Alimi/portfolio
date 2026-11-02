@@ -36,9 +36,9 @@ Template: `.env.example`. Copy it to `.env.local` for local work. `.env` and `.e
 | Ready pattern | `Ready\|started server` | `lighthouserc.json:5` |
 | URLs | `/`, `/projects/crowd-detection`, `/lab` on `localhost:3000` | `lighthouserc.json:6` to `lighthouserc.json:10` |
 | Runs per URL | 3 | `lighthouserc.json:11` |
-| Upload target | `temporary-public-storage` | `lighthouserc.json:21` |
+| Upload target | `filesystem`, written to `.lighthouseci/` (git-ignored) | `lighthouserc.json:24` |
 
-Budgets (each level is `error`, so a miss fails the job):
+Category budgets (each level is `error`, so a miss fails the job):
 
 | Category | Minimum score | Location |
 | --- | --- | --- |
@@ -46,6 +46,16 @@ Budgets (each level is `error`, so a miss fails the job):
 | Accessibility | 0.95 | `lighthouserc.json:16` |
 | Best practices | 0.95 | `lighthouserc.json:17` |
 | SEO | 0.95 | `lighthouserc.json:18` |
+
+Metric budgets:
+
+| Assertion | Level | Limit | Location |
+| --- | --- | --- | --- |
+| `largest-contentful-paint` | `warn` | 2500 ms | `lighthouserc.json:19` |
+| `resource-summary:script:size` | `error` | 819200 B | `lighthouserc.json:20` |
+| `total-byte-weight` | `warn` | 1572864 B | `lighthouserc.json:21` |
+
+LCP is still a warning. Lighthouse's simulated LCP sits near 2.6 to 2.9 s because the whole first-load bundle downloads before the first paint, and the follow-up performance task (first-load JS reduction) owns making it a hard `error`.
 
 ## playwright.config.ts
 
