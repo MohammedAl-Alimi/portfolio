@@ -13,6 +13,8 @@ async function open(page: Page, path: string, width: number, height: number) {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width, height });
   await page.goto(path);
+  // The pointer can start at 0,0 over the rail, which opens on hover. Park it in the content.
+  await page.mouse.move(width - 40, height - 120);
   await expect(page.locator("html")).toHaveAttribute("data-tier", "low");
   await page.evaluate(() => document.fonts.ready);
 }
