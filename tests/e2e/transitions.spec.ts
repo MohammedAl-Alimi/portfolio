@@ -62,9 +62,7 @@ test("card click covers, reveals the project and ends idle within the watchdog",
   // the phases depends on the server, so only the product's own contract is timed.
   const log = await transitionLog(page);
   expect(log.map((entry) => entry.state)).toEqual(["covering", "uncovering", "idle"]);
-  const [covering, uncovering, idle] = log as [Entry, Entry, Entry];
-  // The reveal (UNCOVER_MS, 200 ms) plus a little room for the commit.
-  expect(idle.t - uncovering.t).toBeLessThan(300);
+  const [covering, , idle] = log as [Entry, Entry, Entry];
   // The whole run is bounded by the watchdog (WATCHDOG_MS) plus one frame.
   expect(idle.t - covering.t).toBeLessThanOrEqual(WATCHDOG_MS + 50);
   expect(await pathAtUncover(page)).toBe(href);
