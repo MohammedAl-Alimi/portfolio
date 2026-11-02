@@ -82,7 +82,18 @@ test("card click wipes to the project and ends idle within 1.2 s", async ({ page
 test("rapid double click still ends idle on the right page", async ({ page }) => {
   const { overlay, link, href } = await openProjects(page);
   await link.dblclick();
-  await expect(overlay).toHaveAttribute("data-state", "idle", { timeout: 2000 });
+  // Right after the clicks the overlay can still read "idle" from before the wipe started,
+  // so wait on the log: a reveal has happened and the last state committed is idle.
+  await expect
+    .poll(
+      async () => {
+        const log = await transitionLog(page);
+        return log.some((entry) => entry.state === "uncovering") ? log.at(-1)?.state : "running";
+      },
+      { timeout: 2000 },
+    )
+    .toBe("idle");
+  await expect(overlay).toHaveAttribute("data-state", "idle");
   expect(await pathAtUncover(page)).toBe(href);
   // Read directly at idle: an auto-waiting toHaveURL would pass a late arrival.
   expect(new URL(page.url()).pathname).toBe(href);
