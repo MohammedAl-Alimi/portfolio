@@ -96,7 +96,7 @@ varying float vKind;
 varying float vWorldY;
 
 void main() {
-  // Brightness per kind, as the poster (scripts/figure/README.md).
+  // Brightness per kind, as the poster (docs/reference/figure-format.md).
   float b;
   if (vKind < 0.5) b = 0.12 + 0.88 * vLum;
   else if (vKind < 1.5) b = 0.08 + 0.30 * vLum;

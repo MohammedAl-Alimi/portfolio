@@ -1,7 +1,7 @@
 // Reads the hero figure point cloud (public/figure/bust.bin).
 // Pure data code: no three.js, so it can be tested and imported anywhere.
 //
-// Format MA01 (see scripts/figure/README.md):
+// Format MA01 (see docs/reference/figure-format.md):
 //   bytes 0..3  magic "MA01"
 //   bytes 4..7  uint32 little-endian point count
 //   then count records of 4 bytes: x, y, z as int8 (value * 127), luminance as uint8
