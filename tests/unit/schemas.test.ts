@@ -36,7 +36,6 @@ const validProfile = {
     github: "https://github.com/example",
     linkedin: "https://www.linkedin.com/in/example",
   },
-  decorationColors: ["#FFD23F", "#3BCEAC"],
 };
 
 describe("projectFrontmatterSchema", () => {
@@ -148,10 +147,6 @@ describe("profileSchema", () => {
 
   it("rejects a bad email", () => {
     expect(profileSchema.safeParse({ ...validProfile, email: "nope" }).success).toBe(false);
-  });
-
-  it("needs between 2 and 6 decoration colors", () => {
-    expect(profileSchema.safeParse({ ...validProfile, decorationColors: ["#FFD23F"] }).success).toBe(false);
   });
 });
 

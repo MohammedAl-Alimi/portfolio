@@ -120,17 +120,22 @@ test.describe("crosshair cursor", () => {
     await link.hover();
     await expect(root).toHaveAttribute("data-state", "brackets");
 
+    const before = await page.evaluate(() => window.scrollY);
     await page.evaluate(() => window.scrollBy(0, 30));
-    const centre = async () => {
-      const box = await link.boundingBox();
-      return box ? [Math.round(box.x + box.width / 2), Math.round(box.y + box.height / 2)] : null;
-    };
-    const rootAt = () =>
-      root.evaluate((el) => {
-        const m = new DOMMatrix(getComputedStyle(el).transform);
-        return [Math.round(m.m41), Math.round(m.m42)];
-      });
-    await expect.poll(async () => JSON.stringify(await rootAt())).toBe(JSON.stringify(await centre()));
+    // The scroll lands on a later frame (Lenis syncs it), so wait for it before measuring.
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(before);
+    // Both sides are read on every poll: the target is measured where it is now, not where it was.
+    const offset = () =>
+      Promise.all([
+        link.boundingBox(),
+        root.evaluate((el) => {
+          const m = new DOMMatrix(getComputedStyle(el).transform);
+          return [Math.round(m.m41), Math.round(m.m42)];
+        }),
+      ]).then(([box, at]) =>
+        box ? [at[0]! - Math.round(box.x + box.width / 2), at[1]! - Math.round(box.y + box.height / 2)] : null,
+      );
+    await expect.poll(async () => JSON.stringify(await offset())).toBe(JSON.stringify([0, 0]));
   });
 
   test("a route change keeps the brackets on a rail link still under the pointer", async ({ page }, testInfo) => {

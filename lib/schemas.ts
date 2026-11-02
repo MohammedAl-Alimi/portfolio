@@ -95,7 +95,6 @@ export const profileSchema = z.strictObject({
   location: z.string().min(1),
   availability: z.string().min(1),
   socials: z.strictObject({ github: httpsUrl, linkedin: httpsUrl }),
-  decorationColors: z.array(hexColor).min(2).max(6),
 });
 
 export const aboutFrontmatterSchema = z.strictObject({

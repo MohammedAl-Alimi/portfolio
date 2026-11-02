@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
+import { afterPoster } from "@/lib/after-poster";
 import { loadFigure, type Figure } from "@/lib/figure";
 import { FULL_COUNT } from "@/lib/figure-fx";
 import { useSceneStore } from "@/lib/scene-store";
@@ -33,11 +34,18 @@ export function HeroFigure() {
 
   useEffect(() => {
     const ctrl = new AbortController();
-    // A failed load gives null: the poster stays and no scene is drawn.
-    void loadFigure(figureUrl(), { count, signal: ctrl.signal }).then((fig) => {
-      if (!ctrl.signal.aborted) setFigure(fig);
+    // The poster is the LCP image: the 220 KB figure waits until it has loaded (or the browser idles).
+    const poster = document.querySelector<HTMLImageElement>(`${SLOT} [data-poster] img`);
+    const cancel = afterPoster(poster, () => {
+      // A failed load gives null: the poster stays and no scene is drawn.
+      void loadFigure(figureUrl(), { count, signal: ctrl.signal }).then((fig) => {
+        if (!ctrl.signal.aborted) setFigure(fig);
+      });
     });
-    return () => ctrl.abort();
+    return () => {
+      cancel();
+      ctrl.abort();
+    };
   }, [count]);
 
   if (!figure || !size || size.width === 0) return null;

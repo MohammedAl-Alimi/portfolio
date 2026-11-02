@@ -36,9 +36,9 @@ Template: `.env.example`. Copy it to `.env.local` for local work. `.env` and `.e
 | Ready pattern | `Ready\|started server` | `lighthouserc.json:5` |
 | URLs | `/`, `/projects/crowd-detection`, `/lab` on `localhost:3000` | `lighthouserc.json:6` to `lighthouserc.json:10` |
 | Runs per URL | 3 | `lighthouserc.json:11` |
-| Upload target | `temporary-public-storage` | `lighthouserc.json:21` |
+| Upload target | `filesystem`, written to `.lighthouseci/` (git-ignored) | `lighthouserc.json:24` |
 
-Budgets (each level is `error`, so a miss fails the job):
+Category budgets (each level is `error`, so a miss fails the job):
 
 | Category | Minimum score | Location |
 | --- | --- | --- |
@@ -47,24 +47,38 @@ Budgets (each level is `error`, so a miss fails the job):
 | Best practices | 0.95 | `lighthouserc.json:17` |
 | SEO | 0.95 | `lighthouserc.json:18` |
 
+Metric budgets:
+
+| Assertion | Level | Limit | Location |
+| --- | --- | --- | --- |
+| `largest-contentful-paint` | `warn` | 2500 ms | `lighthouserc.json:19` |
+| `resource-summary:script:size` | `error` | 819200 B | `lighthouserc.json:20` |
+| `total-byte-weight` | `warn` | 1572864 B | `lighthouserc.json:21` |
+
+LCP is still a warning. Lighthouse's simulated LCP sits near 2.6 to 2.9 s because the whole first-load bundle downloads before the first paint, and the follow-up performance task (first-load JS reduction) owns making it a hard `error`.
+
 ## playwright.config.ts
 
 | Setting | Value | Location |
 | --- | --- | --- |
 | Test directory | `tests/e2e` | `playwright.config.ts:6` |
-| Parallel | `fullyParallel: true` | `playwright.config.ts:7` |
-| CI mode | `CI` env var set: `forbidOnly`, 2 retries, `github` and `html` reporters | `playwright.config.ts:3`, `playwright.config.ts:8` to `playwright.config.ts:10` |
-| Base URL | `http://localhost:3000` | `playwright.config.ts:12` |
-| Web server | `npm run build && npm run start`, timeout 180000 ms | `playwright.config.ts:16`, `playwright.config.ts:19` |
-| Reuse server | `!isCI`: reuses a running server outside CI | `playwright.config.ts:18` |
+| Snapshot paths | `tests/e2e/__screenshots__/<spec file>/<name>-<project>.png` | `playwright.config.ts:8` |
+| Screenshot defaults | `maxDiffPixelRatio: 0.01`, CSS animations disabled | `playwright.config.ts:9` |
+| Baseline renderer | CI's Chromium on Ubuntu. macOS renders text differently, so update baselines as [How to update the visual baselines](../how-to/update-visual-baselines.md) says. | `tests/e2e/__screenshots__/visual.spec.ts/` |
+| Parallel | `fullyParallel: true` | `playwright.config.ts:10` |
+| CI mode | `CI` env var set: `forbidOnly`, 2 retries, `github` and `html` reporters | `playwright.config.ts:3`, `playwright.config.ts:11` to `playwright.config.ts:13` |
+| Base URL | `http://localhost:3000` | `playwright.config.ts:15` |
+| Web server | `npm run build && npm run start` with `NEXT_PUBLIC_E2E=1`, timeout 180000 ms | `playwright.config.ts:19`, `playwright.config.ts:22` to `playwright.config.ts:24` |
+| Reuse server | `!isCI`: reuses a running server outside CI | `playwright.config.ts:21` |
 
 Projects:
 
 | Name | Device | Viewport | Location |
 | --- | --- | --- | --- |
-| `chromium-desktop` | Desktop Chrome | 1280 by 800 | `playwright.config.ts:23` to `playwright.config.ts:24` |
-| `webkit-mobile` | iPhone 13 | device default | `playwright.config.ts:26` |
-| `chromium-narrow` | Desktop Chrome | 320 by 640 | `playwright.config.ts:28` to `playwright.config.ts:29` |
+| `chromium-desktop` | Desktop Chrome | 1280 by 800 | `playwright.config.ts:28` to `playwright.config.ts:29` |
+| `chromium-nowebgl` | Desktop Chrome, WebGL off | 1280 by 800 | `playwright.config.ts:32` to `playwright.config.ts:36` |
+| `webkit-mobile` | iPhone 13 | device default | `playwright.config.ts:39` |
+| `chromium-narrow` | Desktop Chrome | 320 by 640 | `playwright.config.ts:41` to `playwright.config.ts:42` |
 
 ## vitest.config.ts
 

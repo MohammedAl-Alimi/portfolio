@@ -6,7 +6,7 @@ Usage:
       [--count 56000] [--seed 7] [--previews <dir>]
 
 Needs numpy and Pillow only. The input photo never enters the repo; only the
-derived binary and the poster are committed. See scripts/figure/README.md.
+derived binary and the poster are committed. See docs/how-to/regenerate-the-figure.md.
 """
 
 import argparse

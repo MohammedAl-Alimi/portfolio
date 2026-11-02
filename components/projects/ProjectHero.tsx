@@ -20,7 +20,8 @@ export function ProjectHero({ project }: { project: Project }) {
     >
       {cover ? (
         <div aria-hidden="true" data-project-backdrop className="pointer-events-none absolute inset-0">
-          <Halftone src={cover} sizes="100vw" resolve="none" className="absolute inset-0 opacity-20" />
+          {/* The backdrop is the LCP element of a project page. */}
+          <Halftone src={cover} sizes="100vw" resolve="none" priority className="absolute inset-0 opacity-20" />
           <div data-overlay-scanlines className="absolute inset-0" style={{ background: SCANLINES }} />
         </div>
       ) : null}

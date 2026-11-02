@@ -24,6 +24,9 @@ export function LabCard({ item, index, total, tryLabel }: LabCardProps) {
           width={1600}
           height={900}
           sizes="(min-width: 1024px) 380px, (min-width: 768px) 45vw, 100vw"
+          // The first thumbnail is the LCP element of /lab.
+          priority={index === 1}
+          fetchPriority={index === 1 ? "high" : undefined}
           className="aspect-video w-full object-cover"
         />
         <div className="flex flex-1 flex-col gap-3 p-6">

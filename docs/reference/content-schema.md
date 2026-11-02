@@ -68,17 +68,17 @@ A `kind: component` item renders the component its `component` field names from 
 
 ## About frontmatter
 
-File: `content/about.mdx`. Schema: `aboutFrontmatterSchema` (`lib/schemas.ts:101`).
+File: `content/about.mdx`. Schema: `aboutFrontmatterSchema` (`lib/schemas.ts:100`).
 
 | Field | Type | Constraint | Default | Example |
 | --- | --- | --- | --- | --- |
-| `title` | string | 1 to 80 characters (`lib/schemas.ts:102`) | required | `About me` |
-| `intro` | string | 1 to 200 characters (`lib/schemas.ts:103`) | required | `I am a computer science student...` |
-| `timeline` | array of object | 1 to 8 entries (`lib/schemas.ts:104` to `lib/schemas.ts:113`) | required | see below |
-| `timeline[].year` | string | `^\d{4}(\s?-\s?(\d{4}\|now))?$` (`lib/schemas.ts:107`) | required | `"2025 - 2026"` |
-| `timeline[].title` | string | 1 to 80 characters (`lib/schemas.ts:108`) | required | `B.Sc. thesis` |
-| `timeline[].detail` | string | 1 to 200 characters (`lib/schemas.ts:109`) | required | `Studying in Berlin.` |
-| `outside` | array of string | 1 to 8 items, each 1 to 80 characters (`lib/schemas.ts:114`) | required | `[Running]` |
+| `title` | string | 1 to 80 characters (`lib/schemas.ts:101`) | required | `About me` |
+| `intro` | string | 1 to 200 characters (`lib/schemas.ts:102`) | required | `I am a computer science student...` |
+| `timeline` | array of object | 1 to 8 entries (`lib/schemas.ts:103` to `lib/schemas.ts:112`) | required | see below |
+| `timeline[].year` | string | `^\d{4}(\s?-\s?(\d{4}\|now))?$` (`lib/schemas.ts:106`) | required | `"2025 - 2026"` |
+| `timeline[].title` | string | 1 to 80 characters (`lib/schemas.ts:107`) | required | `B.Sc. thesis` |
+| `timeline[].detail` | string | 1 to 200 characters (`lib/schemas.ts:108`) | required | `Studying in Berlin.` |
+| `outside` | array of string | 1 to 8 items, each 1 to 80 characters (`lib/schemas.ts:113`) | required | `[Running]` |
 
 ## Highlight
 
@@ -104,24 +104,23 @@ File: `content/profile.json`. Schema: `profileSchema` (`lib/schemas.ts:90`).
 | `availability` | string | At least 1 character (`lib/schemas.ts:96`) | required | `Open to roles from 2027` |
 | `socials.github` | string | `httpsUrl` (`lib/schemas.ts:97`) | required | `https://github.com/MohammedAl-Alimi` |
 | `socials.linkedin` | string | `httpsUrl` (`lib/schemas.ts:97`) | required | `https://www.linkedin.com/in/...` |
-| `decorationColors` | array of string | 2 to 6 `hexColor` items (`lib/schemas.ts:98`) | required | `["#FFD23F", "#3BCEAC"]` |
 
 ## Site copy
 
-File: `content/site.json`. Schema: `siteSchema` (`lib/schemas.ts:121`). Type: `Site` (`lib/schemas.ts:169`).
+File: `content/site.json`. Schema: `siteSchema` (`lib/schemas.ts:120`). Type: `Site` (`lib/schemas.ts:168`).
 
-Every visible UI string that is not page content lives here, grouped by surface. Every value is a non-empty string (`lib/schemas.ts:117`) and every object is strict, so a typo in a key fails the build. `npm run validate:content` loads it at `prebuild` (`scripts/validate-content.ts:36`).
+Every visible UI string that is not page content lives here, grouped by surface. Every value is a non-empty string (`lib/schemas.ts:116`) and every object is strict, so a typo in a key fails the build. `npm run validate:content` loads it at `prebuild` (`scripts/validate-content.ts:36`).
 
 | Group | Keys | Used by |
 | --- | --- | --- |
-| `home` | `hero.work`, `hero.cv`, `hint.move`, `hint.tilt`, `ticker`, `whatIBuild.title`, `whatIBuild.items[]` (`title`, `text`, `href`; 1 to 6 items; `href` starts with `/`), `featured.title`, `rightNow.title`, `rightNow.loading`, `highlights.title` (`lib/schemas.ts:122`) | Home page and its sections |
-| `projects` | `title`, `intro`, `empty`, `all`, `meta.stack`, `meta.tags`, `adjacent.previous`, `adjacent.next` (`lib/schemas.ts:137`) | `/projects`, tag filter, project page |
-| `lab` | `title`, `intro`, `empty`, `try`, `howItWorks`, `back`, `building` (`lib/schemas.ts:145`) | `/lab` and lab item pages |
-| `about` | `outside`, `cv` (`lib/schemas.ts:154`) | `/about` |
-| `contact` | `title`, `rows.email`, `rows.github`, `rows.linkedin`, `rows.cv`, each `{ label, action }` (`lib/schemas.ts:155`) | `/contact` |
-| `footer` | `line` (`lib/schemas.ts:159`). `{year}` is the only placeholder; `fillYear` replaces it with the current year (`lib/site-copy.ts:2`). | Footer |
-| `notFound` | `title`, `text`, `home`, `projects` (`lib/schemas.ts:160`) | 404 page |
-| `error` | `title`, `text`, `retry`, `home`, `requestId` (`lib/schemas.ts:161`) | Route error page |
+| `home` | `hero.work`, `hero.cv`, `hint.move`, `hint.tilt`, `ticker`, `whatIBuild.title`, `whatIBuild.items[]` (`title`, `text`, `href`; 1 to 6 items; `href` starts with `/`), `featured.title`, `rightNow.title`, `rightNow.loading`, `highlights.title` (`lib/schemas.ts:121`) | Home page and its sections |
+| `projects` | `title`, `intro`, `empty`, `all`, `meta.stack`, `meta.tags`, `adjacent.previous`, `adjacent.next` (`lib/schemas.ts:136`) | `/projects`, tag filter, project page |
+| `lab` | `title`, `intro`, `empty`, `try`, `howItWorks`, `back`, `building` (`lib/schemas.ts:144`) | `/lab` and lab item pages |
+| `about` | `outside`, `cv` (`lib/schemas.ts:153`) | `/about` |
+| `contact` | `title`, `rows.email`, `rows.github`, `rows.linkedin`, `rows.cv`, each `{ label, action }` (`lib/schemas.ts:154`) | `/contact` |
+| `footer` | `line` (`lib/schemas.ts:158`). `{year}` is the only placeholder; `fillYear` replaces it with the current year (`lib/site-copy.ts:2`). | Footer |
+| `notFound` | `title`, `text`, `home`, `projects` (`lib/schemas.ts:159`) | 404 page |
+| `error` | `title`, `text`, `retry`, `home`, `requestId` (`lib/schemas.ts:160`) | Route error page |
 
 Server components call `getSite()`. Client components get their strings as props from a server parent. The route error page is a client component that Next renders on its own, so it imports `content/site.json` directly instead of loading it from disk.
 

@@ -29,8 +29,8 @@ export default function GlobalError({
       <body
         style={{
           margin: 0,
-          background: "#fffbf5",
-          color: "#17161a",
+          background: "#050505",
+          color: "#f2f2f0",
           font: "16px/1.5 system-ui, sans-serif",
         }}
       >
@@ -38,14 +38,14 @@ export default function GlobalError({
           <h1 style={{ fontSize: "clamp(2rem, 6vw, 3.5rem)", lineHeight: 1.1, margin: 0 }}>
             Something broke on our side.
           </h1>
-          <p style={{ color: "#5f5b66", marginTop: 16 }}>
+          <p style={{ color: "#808086", marginTop: 16 }}>
             It has been logged. You can try again or head home.
           </p>
           <div style={{ display: "flex", gap: 12, justifyContent: "center", marginTop: 32 }}>
             <button
               type="button"
               onClick={reset}
-              style={{ ...button, background: "#17161a", color: "#fffbf5", border: 0 }}
+              style={{ ...button, background: "#f2f2f0", color: "#050505", border: 0 }}
             >
               Try again
             </button>
@@ -53,12 +53,12 @@ export default function GlobalError({
             {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a
               href="/"
-              style={{ ...button, color: "#17161a", border: "1px solid #17161a" }}
+              style={{ ...button, color: "#f2f2f0", border: "1px solid #2a2a2e" }}
             >
               Home
             </a>
           </div>
-          <p style={{ color: "#5f5b66", marginTop: 32, font: "14px ui-monospace, monospace" }}>
+          <p style={{ color: "#808086", marginTop: 32, font: "14px ui-monospace, monospace" }}>
             Request ID: {error.digest ?? "unknown"}
           </p>
         </main>

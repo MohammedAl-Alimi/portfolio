@@ -1,24 +1,6 @@
-import fs from "node:fs";
-import path from "node:path";
 import { expect, test } from "@playwright/test";
 import { expectNoSeriousViolations } from "./helpers/axe";
-
-const slugs = fs
-  .readdirSync(path.join(process.cwd(), "content/projects"))
-  .filter((f) => f.endsWith(".mdx"))
-  .map((f) => f.replace(/\.mdx$/, ""))
-  .sort();
-
-const paths = [
-  "/",
-  "/projects",
-  ...slugs.map((s) => `/projects/${s}`),
-  "/lab",
-  "/lab/crowd-dashboard",
-  "/about",
-  "/contact",
-  "/nope",
-];
+import { sitePaths as paths } from "./helpers/pages";
 
 const viewports = [
   { project: "chromium-narrow", width: 320, height: 640 },

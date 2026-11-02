@@ -78,7 +78,7 @@ portfolio/
 | --- | --- | --- |
 | `content/projects/*.mdx` | One case study per file, 7 files. | `projectFrontmatterSchema` (`lib/schemas.ts:35`) |
 | `content/lab/*.mdx` | One lab item per file, 1 file (`content/lab/crowd-dashboard.mdx`). | `labFrontmatterSchema` (`lib/schemas.ts:63`) |
-| `content/about.mdx` | About page text and timeline. | `aboutFrontmatterSchema` (`lib/schemas.ts:101`) |
+| `content/about.mdx` | About page text and timeline. | `aboutFrontmatterSchema` (`lib/schemas.ts:100`) |
 | `content/profile.json` | Name, headline, contact, socials. | `profileSchema` (`lib/schemas.ts:90`) |
 | `content/highlights.json` | Highlight posts. Currently an empty array. | `highlightSchema` (`lib/schemas.ts:84`) |
 
@@ -89,8 +89,8 @@ portfolio/
 | `scripts/validate-content.ts` | Build-time content checks (`scripts/validate-content.ts:27`). |
 | `scripts/check-secrets.sh` | Fast scan for secrets and personal strings (`scripts/check-secrets.sh:8`). |
 | `scripts/screenshot.mjs` | Takes a page screenshot and saves it as WebP (`scripts/screenshot.mjs:1`). |
-| `scripts/make-poster.mjs` | Generates the hero poster image (`scripts/make-poster.mjs:1`). |
-| `proxy.ts` | Nonce CSP and security headers (`proxy.ts:4`). |
+| `scripts/figure/` | Dev tools that build the hero figure and its poster from a photo (`scripts/figure/README.md:1`). |
+| `proxy.ts` | Nonce CSP and security headers (`proxy.ts:10`). |
 | `.env.example` | Environment variable template. |
 | `.gitleaks.toml` | Secret scanner config. |
 | `.nvmrc` | Node version, `24` (`.nvmrc:1`). |
