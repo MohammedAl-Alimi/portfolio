@@ -35,7 +35,12 @@ async function openProjects(page: Page) {
   return { overlay, link, href: href as string };
 }
 
-async function transitionLog(page: Page) {
+type Entry = { state: string; path: string; t: number };
+
+// From components/motion/TransitionProvider.tsx:36. Not imported: that module pulls in next/navigation.
+const WATCHDOG_MS = 1500;
+
+async function transitionLog(page: Page): Promise<Entry[]> {
   return page.evaluate(
     () =>
       (window as Window & { __transitionLog?: { state: string; path: string; t: number }[] }).__transitionLog ?? [],
@@ -47,19 +52,21 @@ async function pathAtUncover(page: Page) {
   return (await transitionLog(page)).find((entry) => entry.state === "uncovering")?.path;
 }
 
-test("card click wipes to the project and ends idle within 1.2 s", async ({ page }) => {
+test("card click covers, reveals the project and ends idle within the watchdog", async ({ page }) => {
   const { overlay, link, href } = await openProjects(page);
   await link.click();
   await expect(overlay).not.toHaveAttribute("data-state", "idle");
   expect(await page.locator("[data-glitch-band]").count()).toBe(12);
   await expect(overlay).toHaveAttribute("data-state", "idle", { timeout: 2000 });
-  // Timed in the page, from the cover starting to idle, so runner round trips do not count.
+  // Timed in the page, so runner round trips do not count. The route fetch between
+  // the phases depends on the server, so only the product's own contract is timed.
   const log = await transitionLog(page);
-  const covered = log.find((entry) => entry.state === "covering");
-  const idle = log.find((entry) => entry.state === "idle");
-  expect(covered).toBeDefined();
-  expect(idle).toBeDefined();
-  expect(idle!.t - covered!.t).toBeLessThan(1200);
+  expect(log.map((entry) => entry.state)).toEqual(["covering", "uncovering", "idle"]);
+  const [covering, uncovering, idle] = log as [Entry, Entry, Entry];
+  // The reveal (UNCOVER_MS, 200 ms) plus a little room for the commit.
+  expect(idle.t - uncovering.t).toBeLessThan(300);
+  // The whole run is bounded by the watchdog (WATCHDOG_MS) plus one frame.
+  expect(idle.t - covering.t).toBeLessThanOrEqual(WATCHDOG_MS + 50);
   expect(await pathAtUncover(page)).toBe(href);
   // Read directly at idle: an auto-waiting toHaveURL would pass a late arrival.
   expect(new URL(page.url()).pathname).toBe(href);
