@@ -64,6 +64,7 @@ LCP is still a warning. Lighthouse's simulated LCP sits near 2.6 to 2.9 s becaus
 | Test directory | `tests/e2e` | `playwright.config.ts:6` |
 | Snapshot paths | `tests/e2e/__screenshots__/<spec file>/<name>-<project>.png` | `playwright.config.ts:8` |
 | Screenshot defaults | `maxDiffPixelRatio: 0.01`, CSS animations disabled | `playwright.config.ts:9` |
+| Baseline renderer | CI's Chromium on Ubuntu. macOS renders text differently, so update baselines as [How to update the visual baselines](../how-to/update-visual-baselines.md) says. | `tests/e2e/__screenshots__/visual.spec.ts/` |
 | Parallel | `fullyParallel: true` | `playwright.config.ts:10` |
 | CI mode | `CI` env var set: `forbidOnly`, 2 retries, `github` and `html` reporters | `playwright.config.ts:3`, `playwright.config.ts:11` to `playwright.config.ts:13` |
 | Base URL | `http://localhost:3000` | `playwright.config.ts:15` |

@@ -14,6 +14,7 @@ Task-oriented recipes for people who already know the basics.
 
 - [How to run the site locally](how-to/run-locally.md): clone, install on Node 24, set environment variables, and run the dev server, tests and checks.
 - [How to regenerate the figure](how-to/regenerate-the-figure.md): turn a new photo into the point cloud and poster, check them, and commit only the outputs.
+- [How to update the visual baselines](how-to/update-visual-baselines.md): refresh the screenshot baselines, taking from CI any that differ on your machine.
 
 ## Reference
 

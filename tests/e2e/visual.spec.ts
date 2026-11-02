@@ -3,8 +3,8 @@ import { expect, test, type Page } from "@playwright/test";
 
 // Visual baselines for the Monolith (spec 18). Reduced motion makes them deterministic:
 // the low tier shows the poster instead of the live figure, and nothing decodes or glitches.
-// Regenerate with `npx playwright test tests/e2e/visual.spec.ts --update-snapshots`
-// and commit the PNGs in tests/e2e/__screenshots__/.
+// The baselines are CI's Linux Chromium renders: macOS text differs by more than the 1% limit
+// on the project page. See docs/how-to/update-visual-baselines.md before updating any PNG.
 
 // The grain is a full-screen layer, so a mask would hide the whole shot: it is hidden instead.
 const HIDE_GRAIN = path.join(__dirname, "helpers/hide-grain.css");

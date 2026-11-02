@@ -51,14 +51,11 @@ If `git check-ignore` prints nothing, pick another folder (or add it to `.gitign
    npm run build && npm run start
    ```
    Open `http://localhost:3000/`. The live figure should land exactly on the poster when it fades in.
-4. Update the visual baselines, because the hero poster is in the hero screenshot.
-   ```sh
-   npx playwright test tests/e2e/visual.spec.ts --update-snapshots
-   ```
+4. A new poster changes the hero screenshot, so the visual baselines need updating. Follow [How to update the visual baselines](update-visual-baselines.md).
 
 ## Commit
 
-Commit only the outputs and the new baselines:
+Commit only the outputs and the new baselines (from step 4):
 
 ```sh
 git add public/figure/bust.bin public/posters/figure.webp tests/e2e/__screenshots__
