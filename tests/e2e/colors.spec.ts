@@ -1,22 +1,10 @@
 import { expect, test, type APIRequestContext } from "@playwright/test";
 import { allProjects } from "./helpers/content";
+import { BANNED, bannedIn } from "./helpers/colors";
 import { sitePaths } from "./helpers/pages";
 
 // The site is monochrome (spec 18.2): the old accent palette and the cream page colour
 // must not reach any page outside the Lab, through the markup, the CSS or computed styles.
-
-/** The six old accents, the old fourth accent token, the cream background and the first accent. */
-const ACCENTS = ["#FFD23F", "#FF8A3D", "#3BCEAC", "#F06595", "#A78BFA", "#5AA9FF", "#5C7CFA"];
-const BANNED = [...ACCENTS, "#FFFBF5", "#FF6B35"];
-
-const rgbOf = (hex: string) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
-/** `rgb(255, 210, 63)` and `rgb(255 210 63)`, with or without alpha, in any spacing. */
-const rgbPattern = (hex: string) => {
-  const [r, g, b] = rgbOf(hex);
-  return new RegExp(`rgba?\\(\\s*${r}[\\s,]+${g}[\\s,]+${b}\\b`, "i");
-};
-/** As getComputedStyle prints it. */
-const computed = BANNED.map((hex) => `rgb(${rgbOf(hex).join(", ")})`);
 
 const pages = sitePaths.filter((p) => !p.startsWith("/lab"));
 
@@ -45,21 +33,14 @@ async function source(request: APIRequestContext, path: string) {
   return { html, sheets, css: css.join("\n") };
 }
 
-function found(text: string): string[] {
-  const hits: string[] = [];
-  for (const hex of BANNED) if (text.toLowerCase().includes(hex.toLowerCase())) hits.push(hex);
-  for (const hex of ACCENTS) if (rgbPattern(hex).test(text)) hits.push(`rgb of ${hex}`);
-  return hits;
-}
-
 test.describe("no colour outside the lab", () => {
   for (const path of pages) {
     test(`${path} html and css carry no accent colour`, async ({ request }, testInfo) => {
       test.skip(testInfo.project.name !== "chromium-desktop", "The markup and CSS are the same for every browser");
       const { html, sheets, css } = await source(request, path);
       expect(sheets.length, "the page links its stylesheet").toBeGreaterThan(0);
-      expect(found(html), "in the HTML").toEqual([]);
-      expect(found(css), "in the CSS").toEqual([]);
+      expect(bannedIn(html), "in the HTML").toEqual([]);
+      expect(bannedIn(css), "in the CSS").toEqual([]);
     });
 
     test(`${path} computes no accent colour`, async ({ page }, testInfo) => {
@@ -69,7 +50,8 @@ test.describe("no colour outside the lab", () => {
       );
       await page.goto(path);
       await page.waitForLoadState("load");
-      const hits = await page.evaluate((banned) => {
+      // Every distinct computed colour, on each element and its ::before and ::after.
+      const values = await page.evaluate(() => {
         const props = [
           "color",
           "background-color",
@@ -77,20 +59,38 @@ test.describe("no colour outside the lab", () => {
           "border-right-color",
           "border-bottom-color",
           "border-left-color",
+          "outline-color",
+          "fill",
+          "stroke",
         ];
-        const out: string[] = [];
+        const seen = new Map<string, string>();
         for (const el of Array.from(document.querySelectorAll("*"))) {
-          const cs = getComputedStyle(el);
-          for (const prop of props) {
-            const value = cs.getPropertyValue(prop);
-            if (banned.includes(value)) out.push(`${el.tagName.toLowerCase()} ${prop}: ${value}`);
+          for (const pseudo of [null, "::before", "::after"]) {
+            const cs = getComputedStyle(el, pseudo);
+            for (const prop of props) {
+              const value = cs.getPropertyValue(prop);
+              if (!seen.has(value)) seen.set(value, `${el.tagName.toLowerCase()}${pseudo ?? ""} ${prop}`);
+            }
           }
         }
-        return out;
-      }, computed);
+        return [...seen].map(([value, where]) => ({ value, where }));
+      });
+      expect(values.length, "the walk read some colours").toBeGreaterThan(0);
+      const hits = values.flatMap(({ value, where }) => bannedIn(value).map((hit) => `${where}: ${value} (${hit})`));
       expect(hits).toEqual([]);
     });
   }
+
+  test("the matcher catches every form of a banned colour", async ({}, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium-desktop", "Pure logic");
+    for (const hex of BANNED) expect(bannedIn(hex.toLowerCase()), hex).toContain(hex);
+    expect(bannedIn("rgba(59, 206, 172, 0.5)")).toEqual(["rgb of #3BCEAC"]);
+    expect(bannedIn("rgb(255 107 53 / 50%)")).toEqual(["rgb of #FF6B35"]);
+    expect(bannedIn("rgb(255, 251, 245)")).toEqual(["rgb of #FFFBF5"]);
+    expect(bannedIn("color(srgb 0.231373 0.807843 0.67451 / 0.5)")).toEqual(["srgb of #3BCEAC"]);
+    // The site's own greys and near misses stay clear.
+    expect(bannedIn("rgb(242, 242, 240) rgba(5, 5, 5, 0.9) #f2f2f0 rgb(255, 107, 530)")).toEqual([]);
+  });
 
   test("a project's frontmatter colour never reaches its page", async ({ request }, testInfo) => {
     test.skip(testInfo.project.name !== "chromium-desktop", "Markup only");
