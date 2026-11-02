@@ -5,6 +5,5 @@
   "email": "test@example.com",
   "location": "Germany",
   "availability": "Open to roles",
-  "socials": { "github": "https://github.com/example", "linkedin": "https://www.linkedin.com/in/example" },
-  "decorationColors": ["#FFD23F", "#3BCEAC"]
+  "socials": { "github": "https://github.com/example", "linkedin": "https://www.linkedin.com/in/example" }
 }
